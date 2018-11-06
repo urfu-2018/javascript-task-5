@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "main": "lib.js",
+  "scripts": {
+    "lint": "eslint .",
+    "mocha": "mocha --exit *.spec.js",
+    "test": "npm run lint && npm run mocha"
+  },
+  "dependencies": {
+    "eslint": "5.8.0",
+    "eslint-config-hrundel": "1.4.0",
+    "mocha": "5.2.0"
+  }
+}
