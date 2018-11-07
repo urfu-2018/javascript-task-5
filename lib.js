@@ -1,5 +1,33 @@
 'use strict';
 
+let friendsSort = (first, second) => first.name.localeCompare(second.name);
+
+/**
+* Подготовка списка друзей, которых Билли пригласит на свадьбу.
+* @param {Object[]} friends – список друзей из блокнота Билли.
+* @param {Filter} filter – фильтр для друзей.
+* @param {Number} maxLevel – максимальный круг друзей.
+* @returns {Object[]} – отфильрованный и отсортированный список приглашаемых друзей.
+*/
+function collectInvitedFriends(friends, filter, maxLevel = Infinity) {
+    let invitedFriends = [];
+    let currentLevelFriends = friends.filter(friend => friend.best).sort(friendsSort);
+
+    while (currentLevelFriends.length > 0 && maxLevel > 0) {
+        invitedFriends.push(...currentLevelFriends);
+        currentLevelFriends = currentLevelFriends
+            .reduce((object, friend) => object.concat(friend.friends), [])
+            .map(friendName => friends.find(friend => friend.name === friendName))
+            .filter((friend, pos, arr) => {
+                return !invitedFriends.includes(friend) && arr.indexOf(friend) === pos;
+            })
+            .sort(friendsSort);
+        maxLevel--;
+    }
+
+    return invitedFriends.filter(filter.checkTypeGender);
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -7,8 +35,28 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
+
+    this.invitedGuests = collectInvitedFriends(friends, filter);
 }
+
+/**
+ * Итерация по приглашаемым друзьям.
+ * @returns {null|Object} null если обход закончен иначе объект описывающий друга.
+ */
+Iterator.prototype.next = function () {
+    return this.done() ? null : this.invitedGuests.shift();
+};
+
+/**
+* Проверка завершения обхода.
+* @returns {boolean} true, если обход закончен, и false в противном случае.
+*/
+Iterator.prototype.done = function () {
+    return this.invitedGuests.length === 0;
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -19,15 +67,18 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
+    Iterator.call(this, friends, filter);
+    this.invitedGuests = collectInvitedFriends(friends, filter, maxLevel);
 }
+
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    this.checkTypeGender = () => true;
 }
 
 /**
@@ -36,8 +87,10 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
+    this.checkTypeGender = friend => friend.gender === 'male';
 }
+
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -45,8 +98,10 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    this.checkTypeGender = friend => friend.gender === 'female';
 }
+
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
