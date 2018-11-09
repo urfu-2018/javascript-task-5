@@ -5,16 +5,6 @@ const FEMALE = 'female';
 
 function sortFriends(friends) {
     return friends.slice().sort(function (a, b) {
-        if (a.best && b.best) {
-            return a.name.localeCompare(b.name);
-        }
-        if (a.best) {
-            return -1;
-        }
-        if (b.best) {
-            return 1;
-        }
-
         return a.name.localeCompare(b.name);
     });
 }
@@ -31,6 +21,31 @@ function filterFriends(friends, filter) {
     return filteredFriends;
 }
 
+function tryGetNext(thisObject, filter) {
+    for (let i = thisObject.pointer; i < thisObject.currentFriendCycle.length; i++) {
+        if (filter.isSuitable(thisObject.currentFriendCycle[i])) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+function getNextCycle(thisObject, friendsStorage) {
+    // Линтер ругается, если использовать this здесь, поэтому придется передавать его явно
+    const nextCycle = [];
+    thisObject.currentFriendCycle.forEach(friend => {
+        friend.friends.forEach(friendOfFriend => {
+            if (!thisObject.invited.has(friendOfFriend)) {
+                nextCycle.push(friendsStorage.get(friendOfFriend));
+                thisObject.invited.add(friendOfFriend);
+            }
+        });
+    });
+
+    return sortFriends(nextCycle);
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -44,25 +59,47 @@ function Iterator(friends, filter) {
         throw new TypeError('filter must be a type of Filter');
     }
 
-    this.friends = filterFriends(friends, filter);
-    this.invited = new Set();
-
+    const bestFriendFilter = {
+        isSuitable(friend) {
+            return friend.best;
+        }
+    };
+    Object.setPrototypeOf(bestFriendFilter, new Filter());
+    this.currentFriendCycle = filterFriends(friends, bestFriendFilter);
+    this.invited = new Set(this.currentFriendCycle.map(friend => friend.name));
+    this.maxLevel = Infinity;
     this.pointer = 0;
+
+    let currentLevel = 1;
+    const friendsStorage = new Map();
+    friends.forEach(friend => friendsStorage.set(friend.name, friend));
+
     this.done = function () {
-        return this.pointer === this.friends.length;
+        if (tryGetNext(this, filter) !== -1) {
+            return false;
+        }
+        const nextCycle = getNextCycle(this, friendsStorage);
+        if (currentLevel++ < this.maxLevel && nextCycle.length !== 0) {
+            this.currentFriendCycle = nextCycle;
+            this.pointer = 0;
+
+            return this.done();
+        }
+
+        return true;
     };
 
     this.next = function () {
         if (!this.done()) {
-            this.invited.add(this.friends[this.pointer].name);
-            const friend = this.friends[this.pointer];
-            this.pointer++;
+            const friendIndex = tryGetNext(this, filter);
+            this.pointer = friendIndex + 1;
 
-            return friend;
+            return this.currentFriendCycle[friendIndex];
         }
 
         return null;
     };
+
 }
 
 /**
@@ -74,42 +111,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    const bestFriendFilter = {
-        isSuitable(friend) {
-            return friend.best;
-        }
-    };
-    Object.setPrototypeOf(bestFriendFilter, new Filter());
-
-    let currentLevel = 1;
-    let currentCycle = filterFriends(friends, bestFriendFilter);
-
-    const limitedIterator = {
-        friendsStorage: new Map(),
-        done() {
-            const isDone = super.done();
-            if (isDone && currentLevel < maxLevel) {
-                const friendsOfFriends = [];
-                currentCycle.forEach(friend => {
-                    friend.friends.forEach(name => {
-                        if (!this.invited.has(name)) {
-                            friendsOfFriends.push(this.friendsStorage.get(name));
-                        }
-                    });
-                });
-                currentLevel++;
-                this.pointer = 0;
-                currentCycle = filterFriends(sortFriends(friendsOfFriends), filter);
-                this.friends = currentCycle;
-            }
-
-            return super.done();
-        }
-    };
-    friends.forEach(friend => limitedIterator.friendsStorage.set(friend.name, friend));
-
-    const iterator = new Iterator(currentCycle, filter);
-    Object.setPrototypeOf(limitedIterator, iterator);
+    const limitedIterator = Object.create(new Iterator(friends, filter));
+    limitedIterator.maxLevel = maxLevel;
 
     return limitedIterator;
 }
