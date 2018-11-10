@@ -10,7 +10,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('\'filter\' must be instance of Filter!');
     }
-    this._friends = this._getCircles(friends)
+    this._friends = this._getCircles(friends, this._maxLevel)
         .filter(filter.check);
 }
 
@@ -50,9 +50,8 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    this._maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
-    this._friends = this._getCircles(friends, maxLevel)
-        .filter(filter.check);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
