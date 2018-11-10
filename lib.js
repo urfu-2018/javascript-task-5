@@ -53,7 +53,7 @@ Iterator.prototype = {
         return this.currentIndex >= this.guests.length;
     },
     next() {
-        return this.done ? this.guests[this.currentIndex++] : null;
+        return this.done() ? null : this.guests[this.currentIndex++];
     }
 };
 
