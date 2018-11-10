@@ -14,8 +14,9 @@ function getChosenFriendsList(friends, circlesCount = Infinity) {
             .filter(n => !usedNames.includes(n));
 
         currentCircle = friends
-            .filter(e => nextCircleNames.includes(e.name));
-        result = result.concat([... new Set(currentCircle)]);
+            .filter(e => nextCircleNames.includes(e.name))
+            .sort(compareNames);
+        result = result.concat(currentCircle);
     }
 
     return result;
