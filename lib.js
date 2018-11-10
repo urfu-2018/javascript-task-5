@@ -1,9 +1,7 @@
 'use strict';
 
-const compareNames = (x, y) => x.name.localeCompare(y.name);
-
 function getChosenFriendsList(friends, circlesCount = Infinity) {
-    friends = friends.sort(compareNames);
+    friends = friends.sort((x, y) => x.name.localeCompare(y.name));
     let currentCircle = friends.filter(f => f.best);
     let result = currentCircle;
 
@@ -13,9 +11,7 @@ function getChosenFriendsList(friends, circlesCount = Infinity) {
             .reduce((acc, next) => acc.concat(next.friends), [])
             .filter(n => !usedNames.includes(n));
 
-        currentCircle = friends
-            .filter(e => nextCircleNames.includes(e.name))
-            .sort(compareNames);
+        currentCircle = friends.filter(e => nextCircleNames.includes(e.name));
         result = result.concat(currentCircle);
     }
 
@@ -34,7 +30,7 @@ function Iterator(friends, filter) {
     }
 
     this.orderedFriends = getChosenFriendsList(friends).filter(filter.isSutable);
-    this.next = () => this.done() ? null : this.orderedFriends.shift();
+    this.next = () => (this.done() ? null : this.orderedFriends.shift());
     this.done = () => !this.orderedFriends.length;
 }
 
