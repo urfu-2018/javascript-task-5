@@ -105,7 +105,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     this.super(friends, filter);
-    maxLevel = typeof maxLevel === 'number' && maxLevel >= 0 ? maxLevel : Number.MAX_SAFE_INTEGER;
+    maxLevel = typeof maxLevel === 'number' && maxLevel > 0 ? maxLevel : 0;
     this.friends = getFriends(friends, filter, maxLevel);
 }
 
