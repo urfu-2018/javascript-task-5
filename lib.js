@@ -1,6 +1,6 @@
 'use strict';
 
-const IteratorPrototype = {
+let IteratorPrototype = {
     invitedFriends: [],
     index: 0,
     done() {
