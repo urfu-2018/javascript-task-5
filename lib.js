@@ -84,13 +84,14 @@ function makeIterationLevels(friends, filter) {
         friendsByName.set(friend.name, friend);
     });
 
-    // Остальные круги - друзья друзей из предыдущего круга
-    iterationLevels.forEach((level) => {
-        const nextLevel = getNextLevel(level, iterationLevels, friendsByName);
+    // В следующий кругах - друзья друзей из предыдущих кругов
+    for (let i = 0; i < iterationLevels.length; i++) {
+        const currentLevel = iterationLevels[i];
+        const nextLevel = makeNextLevel(currentLevel, iterationLevels, friendsByName);
         if (nextLevel.length > 0) {
             iterationLevels.push(nextLevel);
         }
-    });
+    }
 
     // Последний круг - ещё не добавленные друзья, не являющиеся лучшими
     const lastLevel = friends.filter((friend) => {
@@ -106,7 +107,7 @@ function makeIterationLevels(friends, filter) {
 /*
  * Получить следующий круг друзей
  */
-function getNextLevel(previousLevel, levelContainer, friendsByName) {
+function makeNextLevel(previousLevel, levelContainer, friendsByName) {
 
     const nextLevel = [];
     previousLevel.forEach((friend) => {
@@ -137,8 +138,8 @@ function friendAlreadyAdded(iterationLevels, friend) {
 /*
  * Проверить, содержит ли некоторый контейнер запись о друге с таким же именем
  */
-function levelContainsFriend(container, friend) {
-    return container.some((existingFriend) => {
+function levelContainsFriend(level, friend) {
+    return level.some((existingFriend) => {
         return existingFriend.name === friend.name;
     });
 }
@@ -186,7 +187,7 @@ function Filter() {
 
     // Функция, проверяющая, проходит ли друг через этот фильтр
     this.isPassing = function (friend) {
-        return friend.name.length >= 0;
+        return typeof friend !== undefined;
     };
 }
 
