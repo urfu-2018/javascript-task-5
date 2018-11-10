@@ -4,7 +4,7 @@ const proto = {
     inv: [],
     index: 0,
     done() {
-        return this.index >= this.inv.length;
+        return this.index === this.inv.length;
     },
     next() {
         return this.done() ? null : this.inv[this.index++];
@@ -51,13 +51,12 @@ function check(filter) {
     }
 }
 
-function createAPair(friends, maxDepth = friends.length) {
+function createAPair(friends, maxDepth = Infinity) {
     var depth = 1;
     var result = [];
     var addFriends = friends.filter(f => f.best);
     while (addFriends.length > 0 && depth++ <= maxDepth) {
-        result = result.concat(addFriends.sort((a, b) => a.name
-            .localeCompare(b.name)));
+        result = result.concat(addFriends.sort((a, b) => a.name.localeCompare(b.name)));
         addFriends = friendsOfFriends(addFriends, result)
             .map(name => friends.find(friend => friend.name === name));
     }
@@ -69,7 +68,18 @@ function friendsOfFriends(addFriends, listInvFriends) {
     var result = [];
     var listFriends = listInvFriends.map(f => f.name);
     for (var i = 0; i < addFriends.length; i++) {
-        result.push(...addFriends[i].friends.filter(f => !listFriends.includes(f)));
+        var tmp = addFriends[i].friends;
+        result = addInvFriend(tmp, result, listFriends);
+    }
+
+    return result;
+}
+
+function addInvFriend(tmp, result, listFriends) {
+    for (var j = 0; j < tmp.length; j++) {
+        if (!listFriends.includes(tmp[j]) && tmp.indexOf(tmp[j]) === j) {
+            result.push(tmp[j]);
+        }
     }
 
     return result;
