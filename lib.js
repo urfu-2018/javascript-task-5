@@ -1,8 +1,8 @@
 'use strict';
 
 function getChosenFriendsList(friends, circlesCount = Infinity) {
-    if (typeof circlesCount !== 'number') {
-        throw new TypeError('maxLevel is not a number');
+    if (circlesCount < 1) {
+        return [];
     }
     friends = friends.sort((x, y) => x.name.localeCompare(y.name));
     let currentCircle = friends.filter(f => f.best);
