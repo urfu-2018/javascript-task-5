@@ -48,11 +48,12 @@ function createAPair(friends, maxDepth = friends.length) {
     var depth = 1;
     var result = [];
     var addFriends = friends.filter(f => f.best);
-    while (addFriends.length > 0 && depth++ <= maxDepth) {
+    while (addFriends.length > 0 && depth <= maxDepth) {
         result = result.concat(addFriends.sort((a, b) => a.name
             .localeCompare(b.name)));
         addFriends = friendsOfFriends(addFriends, result)
             .map(name => friends.find(friend => friend.name === name));
+            depth++;
     }
 
     return result;
