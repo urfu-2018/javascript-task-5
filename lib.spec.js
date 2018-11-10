@@ -51,6 +51,12 @@ const friends = [
 ];
 
 describe('Итераторы', () => {
+    it('должжны наследоваться', () => {
+        const maleFilter = new lib.MaleFilter();
+        const limitedIterator = new lib.LimitedIterator(friends, maleFilter, 2);
+        assert.ok(limitedIterator instanceof lib.Iterator);
+    });
+
     it('должны обойти в правильном порядке друзей и составить пары', () => {
         const maleFilter = new lib.MaleFilter();
         const femaleFilter = new lib.FemaleFilter();

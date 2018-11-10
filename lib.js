@@ -1,24 +1,5 @@
 'use strict';
 
-function generateIterator(iterable) {
-    let current = 0;
-    let last = iterable.length;
-
-    return {
-        next() {
-            if (current < last) {
-                return iterable[current++];
-            }
-
-            return null;
-        },
-
-        done() {
-            return current === last;
-        }
-    };
-}
-
 function getLeveledFriends(allFriends, maxLevel = Infinity) {
     const friendsMap = createNameToFriendMap(allFriends);
     let result = [];
@@ -61,8 +42,18 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
+    this.friends = getLeveledFriends(friends).filter(filter.isFit);
 
-    return generateIterator(getLeveledFriends(friends).filter(filter.isFit));
+    let current = 0;
+    this.next = () => {
+        if (current < this.friends.length) {
+            return this.friends[current++];
+        }
+
+        return null;
+    };
+
+    this.done = () => current === this.friends.length;
 }
 
 /**
@@ -77,15 +68,11 @@ function LimitedIterator(friends, filter, maxLevel) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-
-    return generateIterator(getLeveledFriends(friends, maxLevel).filter(filter.isFit));
+    Iterator.call(this, friends, filter);
+    this.friends = getLeveledFriends(friends, maxLevel).filter(filter.isFit);
 }
 
-LimitedIterator.prototype = Object.create(Iterator.prototype, {
-    constructor: {
-        value: LimitedIterator
-    }
-});
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
  * Фильтр друзей
