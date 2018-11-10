@@ -56,11 +56,11 @@ function createNameToFriendMap(friends) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    if (typeof filter !== Filter) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
 
-    return generateIterator(getLeveledFriends(friends).filter(filter));
+    return generateIterator(getLeveledFriends(friends).filter(filter.isFit));
 }
 
 /**
@@ -72,19 +72,25 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (typeof filter !== Filter) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
 
-    return generateIterator(getLeveledFriends(friends, maxLevel).filter(filter));
+    return generateIterator(getLeveledFriends(friends, maxLevel).filter(filter.isFit));
 }
+
+LimitedIterator.prototype = Object.create(Iterator.prototype, {
+    constructor: {
+        value: LimitedIterator
+    }
+});
 
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    return () => true;
+    this.isFit = () => true;
 }
 
 /**
@@ -93,8 +99,14 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    return obj => obj.gender === 'male';
+    this.isFit = obj => obj.gender === 'male';
 }
+
+MaleFilter.prototype = Object.create(Filter.prototype, {
+    constructor: {
+        value: MaleFilter
+    }
+});
 
 /**
  * Фильтр друзей-девушек
@@ -102,8 +114,14 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    return obj => obj.gender === 'female';
+    this.isFit = obj => obj.gender === 'female';
 }
+
+FemaleFilter.prototype = Object.create(Filter.prototype, {
+    constructor: {
+        value: FemaleFilter
+    }
+});
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
