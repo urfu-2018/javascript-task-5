@@ -47,12 +47,10 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 function createAPair(friends, maxDepth = friends.length) {
     let depth = 0;
     let result = [];
-    if (maxDepth < 1) {
-        return [];
-    }
     let addFriends = friends.filter(f => f.best);
     while (addFriends.length > 0 && depth < maxDepth) {
-        result = result.concat(addFriends.sort((a, b) => a.name.localeCompare(b.name)));
+        let tmp = addFriends.sort((a, b) => a.name.localeCompare(b.name));
+        result = result.concat(tmp);
         addFriends = friendsOfFriends(addFriends, result)
             .map(name => friends.find(friend => friend.name === name));
         depth++;
@@ -65,7 +63,8 @@ function friendsOfFriends(addFriends, listInvFriends) {
     let result = [];
     let listFriends = listInvFriends.map(f => f.name);
     for (var i = 0; i < addFriends.length; i++) {
-        result.push(...addFriends[i].friends.filter(f => listFriends.indexOf(f) === -1));
+        let tmp = addFriends[i].friends.filter(f => listFriends.indexOf(f) === -1);
+        result.push(...tmp);
     }
 
     return result;
