@@ -1,5 +1,25 @@
 'use strict';
 
+const IteratorPrototype = {
+    invitedFriends: [],
+    index: 0,
+    done() {
+        return this.index >= this.invitedFriends.length;
+    },
+    next() {
+        if (this.done()) {
+            return null;
+        }
+
+        return this.invitedFriends[this.index++];
+    }
+};
+
+Object.setPrototypeOf(Iterator.prototype, IteratorPrototype);
+Object.setPrototypeOf(LimitedIterator.prototype, IteratorPrototype);
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -91,26 +111,6 @@ function getNextLevelFriends(currentLevelFriends, invitedFriends, allFriends) {
 
     return nextLevelFriends.sort((a, b) => a.name.localeCompare(b.name));
 }
-
-const IteratorPrototype = {
-    invitedFriends: [],
-    index: 0,
-    done() {
-        return this.index >= this.invitedFriends.length;
-    },
-    next() {
-        if (this.done()) {
-            return null;
-        }
-
-        return this.invitedFriends[this.index++];
-    }
-};
-
-Object.setPrototypeOf(Iterator.prototype, IteratorPrototype);
-Object.setPrototypeOf(LimitedIterator.prototype, IteratorPrototype);
-Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
-Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
