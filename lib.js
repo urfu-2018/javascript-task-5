@@ -1,6 +1,6 @@
 'use strict';
 
-let IteratorPrototype = {
+Iterator.prototype = {
     invitedFriends: [],
     index: 0,
     done() {
@@ -15,8 +15,7 @@ let IteratorPrototype = {
     }
 };
 
-Object.setPrototypeOf(Iterator.prototype, IteratorPrototype);
-Object.setPrototypeOf(LimitedIterator.prototype, IteratorPrototype);
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
@@ -36,7 +35,7 @@ function Iterator(friends, filter) {
 }
 
 /**
- * Итератор по друзям с ограничением по кругу
+ * Итератор по друзьям с ограничением по кругу
  * @extends Iterator
  * @constructor
  * @param {Object[]} friends
@@ -83,14 +82,20 @@ function FemaleFilter() {
 
 function getFriends({ friends, maxLevel = Infinity }) {
     let result = [];
-    let currentLevelIndex = 1;
     let currentLevelFriends = friends.filter(friend => friend.best)
         .sort((a, b) => a.name.localeCompare(b.name));
 
-    while (currentLevelIndex <= maxLevel && currentLevelFriends.length > 0) {
-        result = result.concat(currentLevelFriends);
+    if (currentLevelFriends.length === 0) {
+        return result;
+    }
+    result = result.concat(currentLevelFriends);
+
+    for (let i = 2; i <= maxLevel; i++) {
         currentLevelFriends = getNextLevelFriends(currentLevelFriends, result, friends);
-        currentLevelIndex++;
+        if (currentLevelFriends.length === 0) {
+            break;
+        }
+        result = result.concat(currentLevelFriends);
     }
 
     return result;
