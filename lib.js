@@ -5,8 +5,9 @@
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
+ * @param {Number} maxLevel
  */
-function Iterator(friends, filter) {
+function Iterator(friends, filter, maxLevel = Infinity) {
 
     if (!(filter instanceof Filter)) {
         throw new TypeError();
@@ -19,27 +20,6 @@ function Iterator(friends, filter) {
     const nextElement = {
         level: 0,
         index: 0
-    };
-
-    // Функция, отражающая, завершилась ли итерация
-    this.done = function () {
-        return nextElement.level === iterationLevels.length;
-    };
-
-    // Функция для получения следующего элемента
-    this.next = function () {
-        if (this.done()) {
-            return null;
-        }
-        const result = iterationLevels[nextElement.level][nextElement.index];
-        increaseCounter();
-
-        return result;
-    };
-
-    // Функция для получения номера текущего круга (0-based)
-    this.getLevelIndex = function () {
-        return nextElement.level;
     };
 
     // Функция для увеличения счётчика, указывающего на следующий элемент итератора
@@ -62,6 +42,22 @@ function Iterator(friends, filter) {
             nextElement.index++;
         }
     }
+
+    return {
+        done() {
+            return nextElement.level === iterationLevels.length || nextElement.level >= maxLevel;
+        },
+        next() {
+            if (this.done()) {
+                return null;
+            }
+            const result = iterationLevels[nextElement.level][nextElement.index];
+            increaseCounter();
+
+            return result;
+        }
+    };
+
 }
 
 /*
@@ -161,24 +157,7 @@ function compareFriendsByName(a, b) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-
-    const parentIterator = new Iterator(friends, filter);
-
-    return Object.create(parentIterator, {
-        done: {
-            value: function () {
-                return parentIterator.done() || parentIterator.getLevelIndex() >= maxLevel;
-            }
-        },
-        next: {
-            value: function () {
-                if (this.done()) {
-                    return null;
-                }
-                return parentIterator.done();
-            }
-        }
-    });
+    return Object.create(new Iterator(friends, filter, maxLevel));
 }
 
 /**
