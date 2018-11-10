@@ -87,12 +87,10 @@ function getFriends({ friends, maxLevel = Infinity }) {
     }
     let currentLevelFriends = friends.filter(friend => friend.best)
         .sort((a, b) => a.name.localeCompare(b.name));
-
     if (currentLevelFriends.length === 0) {
         return result;
     }
     result = result.concat(currentLevelFriends);
-
     for (let i = 2; i <= maxLevel; i++) {
         currentLevelFriends = getNextLevelFriends(currentLevelFriends, result, friends);
         if (currentLevelFriends.length === 0) {
@@ -113,7 +111,7 @@ function getNextLevelFriends(currentLevelFriends, invitedFriends, allFriends) {
     });
     let currentIndex = 0;
     let nextLevelFriends = friends.filter(friend => !invitedFriends.includes(friend));
-    nextLevelFriends.filter(friend => {
+    nextLevelFriends = nextLevelFriends.filter(friend => {
         return nextLevelFriends.indexOf(friend) === currentIndex++;
     });
 
