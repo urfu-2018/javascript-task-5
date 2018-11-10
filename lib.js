@@ -8,6 +8,9 @@
  * @returns {Object[]}
  */
 function getFriends(friends, filter, levels = Number.MAX_SAFE_INTEGER) {
+    if (levels === 0) {
+        return [];
+    }
     // друзья на 1 круге (лучшие друзья)
     let levelFriends = friends.filter(friend => friend.best);
     // приглашенные лучшие друзья
@@ -102,9 +105,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     this.super(friends, filter);
-    if (!(typeof maxLevel === 'number' && maxLevel > 0)) {
-        maxLevel = 1;
-    }
+    maxLevel = typeof maxLevel === 'number' && maxLevel >= 0 ? maxLevel : Number.MAX_SAFE_INTEGER;
     this.friends = getFriends(friends, filter, maxLevel);
 }
 
