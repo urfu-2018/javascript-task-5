@@ -50,7 +50,37 @@ const friends = [
     }
 ];
 
+describe('Фильтры', () => {
+    it('Должен коректно фильтровать девушек', () => {
+        const femaleFilter = new lib.FemaleFilter();
+
+        const friendNames = friends
+            .filter(femaleFilter.filterFunction)
+            .map(friend => friend.name);
+
+        assert.deepStrictEqual(friendNames, ['Sally', 'Sharon', 'Emily', 'Julia']);
+    });
+
+    it('Должен коректно фильтровать парней', () => {
+        const femaleFilter = new lib.MaleFilter();
+
+        const friendNames = friends
+            .filter(femaleFilter.filterFunction)
+            .map(friend => friend.name);
+
+        assert.deepStrictEqual(friendNames, ['Sam', 'Mat', 'Brad', 'Itan']);
+    });
+});
+
 describe('Итераторы', () => {
+
+    it('Должен выбрасывать исключение когда передан не фильтр', () => {
+        const notAFilter = 'is not a filter';
+
+        assert.throws(() => new lib.Iterator(friends, notAFilter), TypeError);
+        assert.throws(() => new lib.LimitedIterator(friends, notAFilter, 1), TypeError);
+    });
+
     it('должны обойти в правильном порядке друзей и составить пары', () => {
         const maleFilter = new lib.MaleFilter();
         const femaleFilter = new lib.FemaleFilter();
