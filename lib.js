@@ -134,10 +134,6 @@ function FemaleFilter() {
     this.acceptableGender = 'female';
 }
 
-/**
- * Проверяет, походит ли `friend` под условия фильтрации
- * @returns {boolean}
- */
 Filter.prototype.isAcceptableFriend = function (friend) {
     if (!this.acceptableGender) {
         return true;
