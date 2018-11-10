@@ -26,7 +26,7 @@ function getChosenFriendsList(friends, circlesCount = Infinity) {
  */
 function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
-        throw new TypeError();
+        throw new TypeError('filter should be an instanse of Filter');
     }
 
     this.orderedFriends = getChosenFriendsList(friends).filter(filter.isSutable);
@@ -54,9 +54,7 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.isSutable = function () {
-        return Boolean;
-    };
+    this.isSutable = () => Boolean;
 }
 
 /**
