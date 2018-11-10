@@ -130,7 +130,7 @@ function friendAlreadyAdded(iterationLevels, friend) {
 }
 
 /*
- * Проверить, содержит ли некоторый контейнер запись о друге с таким же именем
+ * Проверить, содержит ли круг запись о друге с таким же именем
  */
 function levelContainsFriend(level, friend) {
     return level.some((existingFriend) => {
@@ -168,6 +168,14 @@ function LimitedIterator(friends, filter, maxLevel) {
         done: {
             value: function () {
                 return parentIterator.done() || parentIterator.getLevelIndex() >= maxLevel;
+            }
+        },
+        next: {
+            value: function () {
+                if (this.done()) {
+                    return null;
+                }
+                return parentIterator.done();
             }
         }
     });
