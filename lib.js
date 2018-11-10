@@ -53,7 +53,7 @@ function createAPair(friends, maxDepth = friends.length) {
             .localeCompare(b.name)));
         addFriends = friendsOfFriends(addFriends, result)
             .map(name => friends.find(friend => friend.name === name));
-            depth++;
+        depth++;
     }
 
     return result;
