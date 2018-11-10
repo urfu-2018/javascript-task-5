@@ -1,7 +1,8 @@
 'use strict';
 
-let bestFriends = [];
-let countInvitePerLap = Infinity;
+const nameSort = function (first, second) {
+    return first.name.localeCompare(second.name);
+};
 
 /**
  * Итератор по друзьям
@@ -13,7 +14,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.guests = addNewLapGuests(friends, filter);
+    this.guests = getInvitedFriends(friends, filter);
     this.done = () => {
         return this.guests.length === 0;
     };
@@ -35,7 +36,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     if (maxLevel === 0) {
         return [];
     }
-    this.guests = addNewLapGuests(friends, filter, maxLevel);
+    this.guests = getInvitedFriends(friends, filter, maxLevel);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
@@ -45,12 +46,7 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.gender = undefined;
     this.getNeed = function (array, gender) {
-        if (!gender) {
-            return array;
-        }
-
         return array.filter(element => {
             return element.gender === gender;
         });
@@ -81,78 +77,40 @@ function FemaleFilter() {
 
 FemaleFilter.prototype = Object.create(Filter.prototype);
 
-function getFriends(friends, allFriends, uniqueFriends) {
-    friends.forEach(friend => {
-        allFriends.forEach(element => {
+function getNextCircle(currentCircle, friends, invitedFriends) {
+    console.info(currentCircle);
+    let combinedFriends = currentCircle.reduce((array, friend) => {
+        return array.concat(friend.friends);
+    }, []);
+    let objectFriends = getFriends(combinedFriends, friends);
+
+    return objectFriends.filter(friend => !invitedFriends.includes(friend));
+}
+
+function getInvitedFriends(friends, filter, maxLevel = Infinity) {
+    let invitedFriends = [];
+    let currentCircle = friends.filter(friend => friend.best).sort(nameSort);
+    while (maxLevel > 0 && currentCircle.length !== 0) {
+        invitedFriends = invitedFriends.concat(currentCircle);
+        console.info(invitedFriends);
+        currentCircle = getNextCircle(currentCircle, friends, invitedFriends).sort(nameSort);
+        maxLevel--;
+    }
+
+    return filter.getNeed(invitedFriends, filter.gender);
+}
+
+function getFriends(combinedFriends, friends) {
+    let result = [];
+    combinedFriends.forEach(friend => {
+        friends.forEach(element => {
             if (element.name === friend) {
-                uniqueFriends.push(element);
+                result.push(element);
             }
         });
     });
 
-    return uniqueFriends;
-}
-
-function notInvited(friend, invitedMales) {
-    return invitedMales.every(male => {
-        return friend.name !== male.name;
-    });
-}
-
-function getBestFriends(friends) {
-    return friends.filter(element => {
-        return element.best;
-    });
-}
-
-function getNextCircle(circle, friends) {
-    let uniqueFriends = [];
-    circle.forEach(bestFriend => {
-        uniqueFriends = getFriends(bestFriend.friends, friends, uniqueFriends);
-    });
-
-    return uniqueFriends;
-}
-
-function addNewLapGuests(friends, filter, maxLevel = Infinity) {
-    bestFriends = getBestFriends(friends);
-    let oneGenderBestFriends = filter.getNeed(bestFriends, filter.gender);
-    let invitedFriends = pushUsed(oneGenderBestFriends);
-    maxLevel--;
-    let regularFriends = bestFriends;
-    while (maxLevel !== 0 && countInvitePerLap !== 0) {
-        countInvitePerLap = 0;
-        regularFriends = getNextCircle(regularFriends, friends);
-        let oneGenderFriends = filter.getNeed(regularFriends, filter.gender);
-        invitedFriends = pushUsed(oneGenderFriends, invitedFriends);
-        maxLevel--;
-    }
-
-    return invitedFriends;
-}
-
-function nameSort(array) {
-    return array.sort((a, b) => {
-        if (a.name < b.name) {
-            return -1;
-        } else if (a.name > b.name) {
-            return 1;
-        }
-
-        return 0;
-    });
-}
-
-function pushUsed(maleFriends, invitedFriends = []) {
-    nameSort(maleFriends);
-    maleFriends.forEach(friend => {
-        if (notInvited(friend, invitedFriends)) {
-            countInvitePerLap++;
-            invitedFriends.push(friend);
-        }
-    });
-
-    return invitedFriends;
+    return result;
 }
 
 exports.Iterator = Iterator;
