@@ -51,6 +51,7 @@ const friends = [
 const maleFilter = new lib.MaleFilter();
 const femaleFilter = new lib.FemaleFilter();
 
+
 // Создаем итераторы
 const femaleIterator = new lib.Iterator(friends, femaleFilter);
 

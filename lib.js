@@ -20,12 +20,8 @@ function getCycle(friends, prevCycle) {
 function getFilteredFriends(friends, filter, maxLevel = Infinity) {
     const copiedFriends = friends.slice();
     let filteredFriends = [];
-    let prevCycle;
-    while (maxLevel > 0 && copiedFriends.length !== 0) {
-        const cycle = getCycle(copiedFriends, prevCycle);
-        if (cycle.length === 0) {
-            break;
-        }
+    let cycle = getCycle(copiedFriends);
+    while (maxLevel > 0 && cycle.length !== 0) {
         cycle.forEach(function (friend) {
             if (filter.isOk(friend)) {
                 filteredFriends.push(friend);
@@ -33,11 +29,12 @@ function getFilteredFriends(friends, filter, maxLevel = Infinity) {
             copiedFriends.splice(copiedFriends.indexOf(friend), 1);
         });
         maxLevel--;
-        prevCycle = cycle;
+        cycle = getCycle(copiedFriends, cycle);
     }
 
     return filteredFriends;
 }
+
 
 function compareFriends(fr1, fr2) {
     return fr1.name.localeCompare(fr2.name);
