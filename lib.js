@@ -9,6 +9,8 @@ function generateIterator(iterable) {
             if (current < last) {
                 return iterable[current++];
             }
+
+            return null;
         },
 
         done() {
@@ -54,6 +56,10 @@ function createNameToFriendMap(friends) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
+    if (typeof filter !== Filter) {
+        throw new TypeError();
+    }
+
     return generateIterator(getLeveledFriends(friends).filter(filter));
 }
 
@@ -66,6 +72,10 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (typeof filter !== Filter) {
+        throw new TypeError();
+    }
+
     return generateIterator(getLeveledFriends(friends, maxLevel).filter(filter));
 }
 
