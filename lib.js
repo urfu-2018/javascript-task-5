@@ -48,26 +48,25 @@ function getInvitedFriends(friends, maxDepth = friends.length) {
     let depth = 0;
     let result = [];
     let friendsToAdd = friends.filter(f => f.best);
-    while (friendsToAdd.length > 0 && depth < maxDepth) {
+    while (friendsToAdd.length > 0 && depth++ < maxDepth) {
         let tmp = friendsToAdd.sort((a, b) => a.name.localeCompare(b.name));
         result = result.concat(tmp);
-        friendsToAdd = friendsOfFriendsNames(friendsToAdd, result)
-            .map(name => friends.find(friend => friend.name === name));
-        depth++;
+        friendsToAdd = friendsOfFriendsNames(friendsToAdd, result, friends);
     }
 
     return result;
 }
 
-function friendsOfFriendsNames(friendsToAdd, invFriendsList) {
+function friendsOfFriendsNames(friendsToAdd, invFriendsList, friends) {
     let result = [];
     let invFriendsNames = invFriendsList.map(f => f.name);
-    for (var i = 0; i < friendsToAdd.length; i++) {
+    for (let i = 0; i < friendsToAdd.length; i++) {
         let tmp = friendsToAdd[i].friends.filter(f => invFriendsNames.indexOf(f) === -1);
         result = result.concat(tmp);
     }
+    var t = friends.filter(f => result.includes(f.name));
 
-    return result;
+    return t;
 }
 
 
