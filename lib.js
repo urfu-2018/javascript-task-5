@@ -34,9 +34,7 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError('azaazazazaza');
-    }
+    Iterator.call(this, friends, filter);
     this.inv = createAPair(friends, maxLevel)
         .filter(f => filter.filterOut(f));
     this.index = 0;
