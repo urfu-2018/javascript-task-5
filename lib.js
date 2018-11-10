@@ -34,21 +34,28 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('azaazazazaza');
+    }
     this.inv = createAPair(friends, maxLevel)
         .filter(f => filter.filterOut(f));
+    this.index = 0;
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 function createAPair(friends, maxDepth = friends.length) {
-    let depth = 1;
+    let depth = 0;
     let result = [];
+    if (maxDepth < 1) {
+        return [];
+    }
     let addFriends = friends.filter(f => f.best);
-    while (addFriends.length > 0 && depth++ <= maxDepth) {
+    while (addFriends.length > 0 && depth < maxDepth) {
         result = result.concat(addFriends.sort((a, b) => a.name.localeCompare(b.name)));
         addFriends = friendsOfFriends(addFriends, result)
             .map(name => friends.find(friend => friend.name === name));
+        depth++;
     }
 
     return result;
@@ -58,22 +65,12 @@ function friendsOfFriends(addFriends, listInvFriends) {
     let result = [];
     let listFriends = listInvFriends.map(f => f.name);
     for (var i = 0; i < addFriends.length; i++) {
-        let tmp = addFriends[i].friends;
-        result = addInvFriend(tmp, result, listFriends);
+        result.push(...addFriends[i].friends.filter(f => listFriends.indexOf(f) === -1));
     }
 
     return result;
 }
 
-function addInvFriend(tmp, result, listFriends) {
-    for (var j = 0; j < tmp.length; j++) {
-        if (listFriends.indexOf(tmp[j]) === -1) {
-            result.push(tmp[j]);
-        }
-    }
-
-    return result;
-}
 
 /**
  * Фильтр друзей
