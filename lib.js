@@ -1,9 +1,6 @@
 'use strict';
 
 function getChosenFriendsList(friends, circlesCount = Infinity) {
-    if (circlesCount === 0) {
-        return [];
-    }
     friends = friends.sort((x, y) => x.name.localeCompare(y.name));
     let currentCircle = friends.filter(f => f.best);
     let result = currentCircle;
@@ -48,6 +45,9 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     Iterator.call(this, friends, filter);
     this.orderedFriends = getChosenFriendsList(friends, maxLevel).filter(filter.isSutable);
 }
