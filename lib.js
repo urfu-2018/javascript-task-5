@@ -16,7 +16,7 @@ function getFriends(Arcadyfriends, filter, maxLevel = Infinity) {
 
     const friends = [];
 
-    while (currentLevelFriends.length > 0 && currentLevel < maxLevel) {
+    while (currentLevelFriends.length > 0 && currentLevel <= maxLevel) {
         friends.push(...currentLevelFriends);
         currentLevelFriends = currentLevelFriends
             .reduce((prev, curr) => [...prev, ...curr.friends], [])
