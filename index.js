@@ -72,6 +72,7 @@ while (!femaleIterator.done()) {
     invitedFriends.push(femaleIterator.next());
 }
 
+console.info('answer');
 console.info(invitedFriends);
 // Sam, Sally
 // Brad, Emily
