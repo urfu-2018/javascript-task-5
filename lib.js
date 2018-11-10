@@ -7,10 +7,6 @@ function compareByName(first, second) {
 function getFriendByName(friends, name) {
     const friend = friends.filter(f => f.name === name);
 
-    if (friend.length === 0) {
-        return null;
-    }
-
     return friend[0];
 }
 
@@ -44,7 +40,6 @@ function Iterator(friends, filter) {
         throw new TypeError('filter is not instance of Filter');
     }
     this.guests = getFriends(friends).filter(friend => filter.isRelevent(friend));
-    this.currentIndex = 0;
 }
 
 Iterator.prototype = {
@@ -67,8 +62,8 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
     this.guests = getFriends(friends, maxLevel).filter(friend => filter.isRelevent(friend));
+    this.currentIndex = 0;
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
