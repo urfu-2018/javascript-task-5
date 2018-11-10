@@ -82,6 +82,9 @@ function FemaleFilter() {
 
 function getFriends({ friends, maxLevel = Infinity }) {
     let result = [];
+    if (maxLevel < 1) {
+        return result;
+    }
     let currentLevelFriends = friends.filter(friend => friend.best)
         .sort((a, b) => a.name.localeCompare(b.name));
 
