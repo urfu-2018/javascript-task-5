@@ -18,38 +18,26 @@ const compareNames = (a, b) => a.name.localeCompare(b.name);
 
 Iterator.prototype = {
     constructor: Iterator,
-    _counter: 0,
     _getCircles(friends, maxLevel = Infinity) {
         let currentCircle = friends.filter(_ => _.best).sort(compareNames);
         const circles = [];
 
-        while (currentCircle.length > 0 && maxLevel-- > 0) {
+        while (currentCircle.length > 0 && maxLevel > 0) {
             circles.push(...currentCircle);
-            const nextCircle = this._getNextCircle(currentCircle, circles, friends);
-
-            nextCircle.sort(compareNames);
-            currentCircle = nextCircle;
+            currentCircle = currentCircle.reduce((acc, friend) => acc.concat(friend.friends), [])
+                .map(friendName => friends.find(friend => friend.name === friendName))
+                .filter((friend, i, arr) => !circles.includes(friend) && arr.indexOf(friend) === i)
+                .sort(compareNames);
+            maxLevel--;
         }
 
         return circles;
     },
-    _getNextCircle(currentCircle, circles, friends) {
-        const nextCircle = [];
-        for (const friendName of currentCircle.reduce((acc, friend) =>
-            acc.concat(friend.friends), [])) {
-            const friend = friends.find(_ => _.name === friendName);
-            if (!circles.includes(friend)) {
-                nextCircle.push(friend);
-            }
-        }
-
-        return nextCircle;
-    },
     done() {
-        return this._counter === this._friends.length;
+        return this._friends.length === 0;
     },
     next() {
-        return (this.done()) ? null : this._friends[this._counter++];
+        return this.done() ? null : this._friends.shift();
     }
 };
 
