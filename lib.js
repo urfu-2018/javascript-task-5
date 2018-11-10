@@ -33,7 +33,9 @@ function getLeveledFriends(allFriends, maxLevel = Infinity) {
             .filter(friend => friend.hasOwnProperty('friends'))
             .reduce((accumulator, currentFriend) => [...accumulator, ...currentFriend.friends], [])
             .map(friendName => friendsMap.get(friendName))
-            .filter(friendOfFriend => !result.includes(friendOfFriend))
+            .filter((friendOfFriend, indexOfFriend, allFriendsOfFriends) =>
+                !result.includes(friendOfFriend) &&
+                allFriendsOfFriends.indexOf(friendOfFriend) === indexOfFriend)
             .sort((a, b) => a.name > b.name);
     }
 
