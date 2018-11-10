@@ -10,7 +10,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('azaazazazaza');
     }
-    this.inv = createAPair(friends).filter(f => filter.filterOut(f));
+    this.inv = getInvitedFriends(friends).filter(f => filter.filterOut(f));
     this.index = 0;
 }
 
@@ -18,7 +18,7 @@ Iterator.prototype = {
     inv: [],
     index: 0,
     done() {
-        return this.index >= this.inv.length;
+        return this.index === this.inv.length;
     },
     next() {
         return this.done() ? null : this.inv[this.index++];
@@ -37,21 +37,21 @@ function LimitedIterator(friends, filter, maxLevel) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('azaazazazaza');
     }
-    this.inv = createAPair(friends, maxLevel)
+    this.inv = getInvitedFriends(friends, maxLevel)
         .filter(f => filter.filterOut(f));
     this.index = 0;
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
-function createAPair(friends, maxDepth = friends.length) {
+function getInvitedFriends(friends, maxDepth = friends.length) {
     let depth = 0;
     let result = [];
-    let addFriends = friends.filter(f => f.best);
-    while (addFriends.length > 0 && depth < maxDepth) {
-        let tmp = addFriends.sort((a, b) => a.name.localeCompare(b.name));
+    let friendsToAdd = friends.filter(f => f.best);
+    while (friendsToAdd.length > 0 && depth < maxDepth) {
+        let tmp = friendsToAdd.sort((a, b) => a.name.localeCompare(b.name));
         result = result.concat(tmp);
-        addFriends = friendsOfFriends(addFriends, result)
+        friendsToAdd = friendsOfFriendsNames(friendsToAdd, result)
             .map(name => friends.find(friend => friend.name === name));
         depth++;
     }
@@ -59,12 +59,12 @@ function createAPair(friends, maxDepth = friends.length) {
     return result;
 }
 
-function friendsOfFriends(addFriends, listInvFriends) {
+function friendsOfFriendsNames(friendsToAdd, invFriendsList) {
     let result = [];
-    let listFriends = listInvFriends.map(f => f.name);
-    for (var i = 0; i < addFriends.length; i++) {
-        let tmp = addFriends[i].friends.filter(f => listFriends.indexOf(f) === -1);
-        result.push(...tmp);
+    let invFriendsNames = invFriendsList.map(f => f.name);
+    for (var i = 0; i < friendsToAdd.length; i++) {
+        let tmp = friendsToAdd[i].friends.filter(f => invFriendsNames.indexOf(f) === -1);
+        result = result.concat(tmp);
     }
 
     return result;
