@@ -47,6 +47,7 @@ const friends = [
     }
 ];
 
+
 // Создаем фильтры парней и девушек
 const maleFilter = new lib.MaleFilter();
 const femaleFilter = new lib.FemaleFilter();

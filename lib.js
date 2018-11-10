@@ -1,38 +1,22 @@
 'use strict';
 
-function getCycle(friends, prevCycle) {
-    if (prevCycle === undefined) {
-        return friends.filter(obj => obj.best).sort(compareFriends);
-    }
-    const cycle = [];
-    const prevCycleNames = prevCycle.map(obj => obj.name);
-    friends.forEach(function (friend) {
-        if (friend.friends.some(function (f) {
-            return prevCycleNames.indexOf(f) !== -1;
-        })) {
-            cycle.push(friend);
-        }
-    });
-
-    return cycle.sort(compareFriends);
-}
 
 function getFilteredFriends(friends, filter, maxLevel = Infinity) {
-    const copiedFriends = friends.slice();
-    let filteredFriends = [];
-    let cycle = getCycle(copiedFriends);
-    while (maxLevel > 0 && cycle.length !== 0) {
-        cycle.forEach(function (friend) {
-            if (filter.isOk(friend)) {
-                filteredFriends.push(friend);
-            }
-            copiedFriends.splice(copiedFriends.indexOf(friend), 1);
-        });
+    let cycle = friends.filter(friend => friend.best).sort(compareFriends);
+    const sortedFriends = [];
+    while (maxLevel > 0 && cycle.length > 0) {
+        sortedFriends.push(...cycle);
+        cycle = cycle
+            .reduce((result, friend) => result.concat(friend.friends), [])
+            .map(name => friends.find(friend => friend.name === name))
+            .filter(function (friend, index, arr) {
+                return (!sortedFriends.includes(friend) && arr.indexOf(friend) === index);
+            })
+            .sort(compareFriends);
         maxLevel--;
-        cycle = getCycle(copiedFriends, cycle);
     }
 
-    return filteredFriends;
+    return sortedFriends.filter(filter.isOk);
 }
 
 
