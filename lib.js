@@ -1,38 +1,7 @@
 'use strict';
 
-function bestSort(array) {
-    return array.sort((a, b) => {
-        if (a.best === b.best) {
-            return 0;
-        } else if (a.best) {
-            return -1;
-        }
-
-        return 1;
-    });
-}
-
-function nameSort(array) {
-    return array.sort((a, b) => {
-        if (a.name < b.name) {
-            return -1;
-        } else if (a.name > b.name) {
-            return 1;
-        }
-
-        return 0;
-    });
-}
-
-function pushUsed(maleFriends, invitedMales = []) {
-    maleFriends.forEach(friend => {
-        if (notInvited(friend, invitedMales)) {
-            invitedMales.push(friend);
-        }
-    });
-
-    return invitedMales;
-}
+let bestFriends = [];
+let countInvitePerLap = Infinity;
 
 /**
  * Итератор по друзьям
@@ -41,15 +10,76 @@ function pushUsed(maleFriends, invitedMales = []) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    let allFemale = filter.prototype.getNeed(friends, filter.gender);
-    let sortNameFemale = nameSort(allFemale);
-    let resultSort = bestSort(sortNameFemale);
-
-    console.info('sorted');
-    console.info(resultSort);
-
-    return resultSort;
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
+    this.guests = addNewLapGuests(friends, filter);
+    this.done = () => {
+        return this.guests.length === 0;
+    };
+    this.next = () => {
+        return this.guests.shift();
+    };
 }
+
+/**
+ * Итератор по друзям с ограничением по кругу
+ * @extends Iterator
+ * @constructor
+ * @param {Object[]} friends
+ * @param {Filter} filter
+ * @param {Number} maxLevel – максимальный круг друзей
+ */
+function LimitedIterator(friends, filter, maxLevel) {
+    Iterator.call(this, friends, filter);
+    if (maxLevel === 0) {
+        return [];
+    }
+    this.guests = addNewLapGuests(friends, filter, maxLevel);
+}
+
+LimitedIterator.prototype = Object.create(Iterator.prototype);
+
+/**
+ * Фильтр друзей
+ * @constructor
+ */
+function Filter() {
+    this.gender = undefined;
+    this.getNeed = function (array, gender) {
+        if (!gender) {
+            return array;
+        }
+
+        return array.filter(element => {
+            return element.gender === gender;
+        });
+    };
+}
+
+/**
+ * Фильтр друзей
+ * @extends Filter
+ * @constructor
+ */
+function MaleFilter() {
+    Filter.call(this);
+    this.gender = 'male';
+}
+
+MaleFilter.prototype = Object.create(Filter.prototype);
+
+/**
+ * Фильтр друзей-девушек
+ * @extends Filter
+ * @constructor
+ */
+function FemaleFilter() {
+    Filter.call(this);
+    this.gender = 'female';
+}
+
+FemaleFilter.prototype = Object.create(Filter.prototype);
 
 function getFriends(friends, allFriends, uniqueFriends) {
     friends.forEach(friend => {
@@ -69,103 +99,60 @@ function notInvited(friend, invitedMales) {
     });
 }
 
-function getBestFriends(friends, filter) {
-    return filter.prototype.getBest(friends);
+function getBestFriends(friends) {
+    return friends.filter(element => {
+        return element.best;
+    });
 }
 
-function getNextCircle(bestFriends, friends) {
+function getNextCircle(circle, friends) {
     let uniqueFriends = [];
-    bestFriends.forEach(bestFriend => {
+    circle.forEach(bestFriend => {
         uniqueFriends = getFriends(bestFriend.friends, friends, uniqueFriends);
     });
 
     return uniqueFriends;
 }
 
-/**
- * Итератор по друзям с ограничением по кругу
- * @extends Iterator
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- * @param {Number} maxLevel – максимальный круг друзей
- */
-function LimitedIterator(friends, filter, maxLevel) {
-    if (maxLevel === 0) {
-        return [];
-    }
-    let bestFriends = getBestFriends(friends, filter);
-    let bestMale = nameSort(filter.prototype.getNeed(bestFriends, filter.gender));
-    let invitedMales = pushUsed(bestMale);
+function addNewLapGuests(friends, filter, maxLevel = Infinity) {
+    bestFriends = getBestFriends(friends);
+    let oneGenderBestFriends = filter.getNeed(bestFriends, filter.gender);
+    let invitedFriends = pushUsed(oneGenderBestFriends);
     maxLevel--;
-    let regularFriends = bestFriends; // для поиска друзей ЛД
-    while (maxLevel !== 0) {
+    let regularFriends = bestFriends;
+    while (maxLevel !== 0 && countInvitePerLap !== 0) {
+        countInvitePerLap = 0;
         regularFriends = getNextCircle(regularFriends, friends);
-        let maleFriends = filter.prototype.getNeed(regularFriends, filter.gender);
-        invitedMales = pushUsed(maleFriends, invitedMales);
+        let oneGenderFriends = filter.prototype.getNeed(regularFriends, filter.gender);
+        invitedFriends = pushUsed(oneGenderFriends, invitedFriends);
         maxLevel--;
     }
-    console.info('tyta');
-    console.info(invitedMales);
 
-    return invitedMales;
-    // в конце отсортирую и усё
-    // bestFriend.friends = nameSort(filter.prototype.getNeed(bestFriend.friends,
-    // filter.gender));
-    // сделал 1 и 2 круги дальше легче можно сделать рекурсию
-    /* let circle = allMale.filter(element => {
-        return !element.best;
-    });*/
+    return invitedFriends;
 }
 
-/**
- * Фильтр друзей
- * @constructor
- */
-function Filter() {
-    this.gender = undefined;
-    this.getBest = function (array) {
-        const result = [];
-        array.forEach(element => {
-            if (element.best) {
-                result.push(element);
-            }
-        });
-
-        return result;
-    };
-    this.getNeed = function (array, gender) {
-        if (!gender) {
-            return array;
+function nameSort(array) {
+    return array.sort((a, b) => {
+        if (a.name < b.name) {
+            return -1;
+        } else if (a.name > b.name) {
+            return 1;
         }
 
-        return array.filter(element => {
-            return element.gender === gender;
-        });
-    };
-    console.info('Filter');
+        return 0;
+    });
 }
 
-/**
- * Фильтр друзей
- * @extends Filter
- * @constructor
- */
-function MaleFilter() {
-    this.gender = 'male';
-    this.prototype = new Filter();
-    console.info('MaleFilter');
-}
+function pushUsed(maleFriends, invitedFriends = []) {
+    nameSort(maleFriends);
+    maleFriends.forEach(friend => {
+        if (notInvited(friend, invitedFriends)) {
+            countInvitePerLap++;
+            invitedFriends.push(friend);
+        }
+    });
 
-/**
- * Фильтр друзей-девушек
- * @extends Filter
- * @constructor
- */
-function FemaleFilter() {
-    this.gender = 'female';
-    this.prototype = new Filter();
-    console.info('FemaleFilter');
+    return invitedFriends;
 }
 
 exports.Iterator = Iterator;
