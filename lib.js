@@ -13,7 +13,8 @@ function getChosenFriendsList(friends, circlesCount = Infinity) {
             .reduce((acc, next) => acc.concat(next.friends), [])
             .filter(n => !usedNames.includes(n));
 
-        currentCircle = friends.filter(e => nextCircleNames.includes(e.name)).sort(compareNames);
+        currentCircle = friends
+            .filter(e => nextCircleNames.includes(e.name));
         result = result.concat(currentCircle);
     }
 
@@ -33,7 +34,7 @@ function Iterator(friends, filter) {
 
     this.orderedFriends = getChosenFriendsList(friends).filter(filter.isSutable);
     this.next = () => this.orderedFriends.shift();
-    this.done = () => this.orderedFriends.length === 0;
+    this.done = () => !this.orderedFriends.length;
 }
 
 /**
