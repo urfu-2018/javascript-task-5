@@ -93,12 +93,6 @@ function makeIterationLevels(friends, filter) {
         }
     }
 
-    // Последний круг - ещё не добавленные друзья, не являющиеся лучшими
-    const lastLevel = friends.filter((friend) => {
-        return !friendAlreadyAdded(iterationLevels, friend);
-    });
-    iterationLevels.push(lastLevel);
-
     return iterationLevels.map((level) => {
         return level.filter(filter.isPassing).sort(compareFriendsByName);
     });
@@ -173,7 +167,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     return Object.create(parentIterator, {
         done: {
             value: function () {
-                return parentIterator.done() || parentIterator.getLevelIndex() === maxLevel;
+                return parentIterator.done() || parentIterator.getLevelIndex() >= maxLevel;
             }
         }
     });
