@@ -49,8 +49,7 @@ function getInvitedFriends(friends, maxDepth = friends.length) {
     let result = [];
     let friendsToAdd = friends.filter(f => f.best);
     while (friendsToAdd.length > 0 && depth++ < maxDepth) {
-        let tmp = friendsToAdd.sort((a, b) => a.name.localeCompare(b.name));
-        result = result.concat(tmp);
+        result = result.concat(friendsToAdd.sort((a, b) => a.name.localeCompare(b.name)));
         friendsToAdd = friendsOfFriendsNames(friendsToAdd, result, friends);
     }
 
@@ -64,9 +63,8 @@ function friendsOfFriendsNames(friendsToAdd, invFriendsList, friends) {
         let tmp = friendsToAdd[i].friends.filter(f => invFriendsNames.indexOf(f) === -1);
         result = result.concat(tmp);
     }
-    var t = friends.filter(f => result.includes(f.name));
 
-    return t;
+    return friends.filter(f => result.includes(f.name));
 }
 
 
