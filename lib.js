@@ -1,5 +1,52 @@
 'use strict';
 
+function generateIterator(iterable) {
+    let current = 0;
+    let last = iterable.length;
+
+    return {
+        next() {
+            if (current < last) {
+                return iterable[current++];
+            }
+        },
+
+        done() {
+            return current === last;
+        }
+    };
+}
+
+function getLeveledFriends(allFriends, maxLevel = Infinity) {
+    const friendsMap = createNameToFriendMap(allFriends);
+    let result = [];
+    let currentLevel = 0;
+    let currentLevelFriends = allFriends
+        .filter(friend => friend.best)
+        .sort((a, b) => a.name > b.name);
+    while (currentLevel < maxLevel && currentLevelFriends.length !== 0) {
+        result.push(...currentLevelFriends);
+        currentLevel++;
+        currentLevelFriends = currentLevelFriends
+            .filter(friend => friend.hasOwnProperty('friends'))
+            .reduce((accumulator, currentFriend) => [...accumulator, ...currentFriend.friends], [])
+            .map(friendName => friendsMap.get(friendName))
+            .filter(friendOfFriend => !result.includes(friendOfFriend))
+            .sort((a, b) => a.name > b.name);
+    }
+
+    return result;
+}
+
+function createNameToFriendMap(friends) {
+    let result = new Map();
+    friends.forEach(friend => {
+        result.set(friend.name, friend);
+    });
+
+    return result;
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -7,7 +54,7 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    return generateIterator(getLeveledFriends(friends).filter(filter));
 }
 
 /**
@@ -19,7 +66,7 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
+    return generateIterator(getLeveledFriends(friends, maxLevel).filter(filter));
 }
 
 /**
@@ -27,7 +74,7 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    return () => true;
 }
 
 /**
@@ -36,7 +83,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
+    return obj => obj.gender === 'male';
 }
 
 /**
@@ -45,7 +92,7 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    return obj => obj.gender === 'female';
 }
 
 exports.Iterator = Iterator;
