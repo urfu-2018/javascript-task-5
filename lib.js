@@ -33,7 +33,7 @@ function Iterator(friends, filter) {
     }
 
     this.orderedFriends = getChosenFriendsList(friends).filter(filter.isSutable);
-    this.next = () => this.orderedFriends.shift();
+    this.next = () => this.done() ? null : this.orderedFriends.shift();
     this.done = () => !this.orderedFriends.length;
 }
 
