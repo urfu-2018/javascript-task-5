@@ -1,23 +1,24 @@
 'use strict';
 
-function getLeveledFriends(allFriends, maxLevel = Infinity) {
-    const friendsMap = createNameToFriendMap(allFriends);
+const sortByName = (first, second) => first.name > second.name;
+
+function getOrderedFriends(friends, maxLevel = Infinity) {
+    const friendsMap = createNameToFriendMap(friends);
     let result = [];
     let currentLevel = 0;
-    let currentLevelFriends = allFriends
+    let currentLevelFriends = friends
         .filter(friend => friend.best)
-        .sort((a, b) => a.name > b.name);
+        .sort(sortByName);
     while (currentLevel < maxLevel && currentLevelFriends.length !== 0) {
         result.push(...currentLevelFriends);
         currentLevel++;
         currentLevelFriends = currentLevelFriends
-            .filter(friend => friend.hasOwnProperty('friends'))
             .reduce((accumulator, currentFriend) => [...accumulator, ...currentFriend.friends], [])
             .map(friendName => friendsMap.get(friendName))
-            .filter((friendOfFriend, indexOfFriend, allFriendsOfFriends) =>
-                !result.includes(friendOfFriend) &&
-                allFriendsOfFriends.indexOf(friendOfFriend) === indexOfFriend)
-            .sort((a, b) => a.name > b.name);
+            .filter((currentFriend, currentIdx, currentLevelAccumulator) =>
+                !result.includes(currentFriend) &&
+                currentLevelAccumulator.indexOf(currentFriend) === currentIdx)
+            .sort(sortByName);
     }
 
     return result;
@@ -42,7 +43,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.friends = getLeveledFriends(friends).filter(filter.isFit);
+    this.friends = getOrderedFriends(friends).filter(filter.isFit);
 
     let current = 0;
     this.next = () => {
@@ -69,7 +70,7 @@ function LimitedIterator(friends, filter, maxLevel) {
         throw new TypeError();
     }
     Iterator.call(this, friends, filter);
-    this.friends = getLeveledFriends(friends, maxLevel).filter(filter.isFit);
+    this.friends = getOrderedFriends(friends, maxLevel).filter(filter.isFit);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
@@ -91,11 +92,7 @@ function MaleFilter() {
     this.isFit = obj => obj.gender === 'male';
 }
 
-MaleFilter.prototype = Object.create(Filter.prototype, {
-    constructor: {
-        value: MaleFilter
-    }
-});
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -106,11 +103,7 @@ function FemaleFilter() {
     this.isFit = obj => obj.gender === 'female';
 }
 
-FemaleFilter.prototype = Object.create(Filter.prototype, {
-    constructor: {
-        value: FemaleFilter
-    }
-});
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
