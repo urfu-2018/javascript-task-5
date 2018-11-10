@@ -1,6 +1,9 @@
 'use strict';
 
 function getChosenFriendsList(friends, circlesCount = Infinity) {
+    if (circlesCount < 1) {
+        return [];
+    }
     friends = friends.sort((x, y) => x.name.localeCompare(y.name));
     let currentCircle = friends.filter(f => f.best);
     let result = currentCircle;
