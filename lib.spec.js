@@ -56,7 +56,6 @@ describe('Итераторы', () => {
         const femaleFilter = new lib.FemaleFilter();
         const maleIterator = new lib.LimitedIterator(friends, maleFilter, 2);
         const femaleIterator = new lib.Iterator(friends, femaleFilter);
-
         const invitedFriends = [];
 
         while (!maleIterator.done() && !femaleIterator.done()) {
