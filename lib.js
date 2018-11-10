@@ -136,7 +136,6 @@ function FemaleFilter() {
 
 /**
  * Проверяет, походит ли `friend` под условия фильтрации
- * @param {Object] friend - друг из списка всех друзей
  * @returns {boolean}
  */
 Filter.prototype.isAcceptableFriend = function (friend) {
