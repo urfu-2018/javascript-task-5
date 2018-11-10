@@ -66,12 +66,7 @@ function Filter() {
     console.info('Filter');
 }
 
-Filter.prototype = {
-    constructor: Filter,
-    check(predicate, friend) {
-        return predicate(friend);
-    }
-};
+Filter.prototype.check = (predicate, friend) => predicate(friend);
 
 /**
  * Фильтр друзей
@@ -82,14 +77,14 @@ function MaleFilter() {
     console.info('MaleFilter');
 }
 
-MaleFilter.prototype = Object.create(Filter.prototype, {
-    constructor: {
-        value: MaleFilter
-    },
-    check: {
-        value: friend => friend.gender === 'male'
+MaleFilter.prototype = {
+    constructor: MaleFilter,
+    check(friend) {
+        return super.check(person =>
+            person.gender === 'male', friend);
     }
-});
+};
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
