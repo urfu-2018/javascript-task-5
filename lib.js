@@ -37,7 +37,6 @@ function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
     this.inv = createAPair(friends, maxLevel)
         .filter(f => filter.filterOut(f));
-    this.index = 0;
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
