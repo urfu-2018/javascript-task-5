@@ -50,9 +50,9 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    if (this.invitedFriends === undefined) {
-        this.invitedFriends = getInvitedFriends(friends, filter);
-    }
+    // if (this.invitedFriends === undefined) {
+    this.invitedFriends = getInvitedFriends(friends, filter);
+    // }
     this.done = () => this.invitedFriends.length === 0;
     this.next = () => this.done() ? null : this.invitedFriends.shift();
 }
@@ -66,8 +66,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
     Iterator.call(this, friends, filter);
+    this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
