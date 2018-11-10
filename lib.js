@@ -123,7 +123,7 @@ function addNewLapGuests(friends, filter, maxLevel = Infinity) {
     while (maxLevel !== 0 && countInvitePerLap !== 0) {
         countInvitePerLap = 0;
         regularFriends = getNextCircle(regularFriends, friends);
-        let oneGenderFriends = filter.prototype.getNeed(regularFriends, filter.gender);
+        let oneGenderFriends = filter.getNeed(regularFriends, filter.gender);
         invitedFriends = pushUsed(oneGenderFriends, invitedFriends);
         maxLevel--;
     }
