@@ -24,10 +24,9 @@ Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
  */
 function Iterator(friends, filter) {
     console.info(friends, filter);
-    if (!(filter instanceof Filter)) {
-        throw new TypeError('azaazazazaza');
-    }
+    check(filter);
     this.inv = createAPair(friends).filter(f => filter.filterOut(f));
+    this.index = 0;
 }
 
 /**
@@ -40,20 +39,27 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
+    check(filter);
     this.inv = createAPair(friends, maxLevel)
         .filter(f => filter.filterOut(f));
+    this.index = 0;
+}
+
+function check(filter) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('azaazazazaza');
+    }
 }
 
 function createAPair(friends, maxDepth = friends.length) {
     var depth = 1;
     var result = [];
     var addFriends = friends.filter(f => f.best);
-    while (addFriends.length > 0 && depth <= maxDepth) {
+    while (addFriends.length > 0 && depth++ <= maxDepth) {
         result = result.concat(addFriends.sort((a, b) => a.name
             .localeCompare(b.name)));
         addFriends = friendsOfFriends(addFriends, result)
             .map(name => friends.find(friend => friend.name === name));
-        depth++;
     }
 
     return result;
