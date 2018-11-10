@@ -51,10 +51,10 @@ function check(filter) {
     }
 }
 
-function createAPair(friends, maxDepth = Infinity) {
-    var depth = 1;
-    var result = [];
-    var addFriends = friends.filter(f => f.best);
+function createAPair(friends, maxDepth = friends.length) {
+    let depth = 1;
+    let result = [];
+    let addFriends = friends.filter(f => f.best);
     while (addFriends.length > 0 && depth++ <= maxDepth) {
         result = result.concat(addFriends.sort((a, b) => a.name.localeCompare(b.name)));
         addFriends = friendsOfFriends(addFriends, result)
@@ -65,10 +65,10 @@ function createAPair(friends, maxDepth = Infinity) {
 }
 
 function friendsOfFriends(addFriends, listInvFriends) {
-    var result = [];
-    var listFriends = listInvFriends.map(f => f.name);
+    let result = [];
+    let listFriends = listInvFriends.map(f => f.name);
     for (var i = 0; i < addFriends.length; i++) {
-        var tmp = addFriends[i].friends;
+        let tmp = addFriends[i].friends;
         result = addInvFriend(tmp, result, listFriends);
     }
 
