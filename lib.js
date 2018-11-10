@@ -10,13 +10,13 @@ function getFriendByName(friends, name) {
     return friend[0];
 }
 
-function getFriends(Arcadyfriends, maxLevel = Infinity) {
+function getFriends(Arcadyfriends, filter, maxLevel = Infinity) {
     let currentLevel = 1;
     let currentLevelFriends = Arcadyfriends.filter(friend => friend.best).sort(compareByName);
 
     const friends = currentLevelFriends.slice();
 
-    while (currentLevelFriends.length !== 0 && currentLevel < maxLevel) {
+    while (currentLevelFriends.length > 0 && currentLevel < maxLevel) {
         currentLevelFriends = currentLevelFriends
             .reduce((prev, curr) => [...prev, ...curr.friends], [])
             .map(friendName => getFriendByName(Arcadyfriends, friendName))
@@ -26,7 +26,7 @@ function getFriends(Arcadyfriends, maxLevel = Infinity) {
         currentLevel++;
     }
 
-    return friends;
+    return friends.filter(filter.isRelevant);
 }
 
 /**
@@ -39,7 +39,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter is not instance of Filter');
     }
-    this.guests = getFriends(friends).filter(friend => filter.isRelevent(friend));
+    this.guests = getFriends(friends, filter);
 }
 
 Iterator.prototype = {
@@ -62,7 +62,7 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    this.guests = getFriends(friends, maxLevel).filter(friend => filter.isRelevent(friend));
+    this.guests = getFriends(friends, filter, maxLevel);
     this.currentIndex = 0;
 }
 
@@ -73,7 +73,7 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.isRelevent = () => true;
+    this.isRelevant = () => true;
 }
 
 /**
@@ -82,7 +82,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.isRelevent = friend => friend.gender === 'male';
+    this.isRelevant = friend => friend.gender === 'male';
 }
 
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
@@ -93,7 +93,7 @@ Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    this.isRelevent = friend => friend.gender === 'female';
+    this.isRelevant = friend => friend.gender === 'female';
 }
 
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
