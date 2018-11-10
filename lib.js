@@ -25,10 +25,6 @@ Iterator.prototype = {
     }
 };
 
-Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
-Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
-Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
-
 /**
  * Итератор по друзям с ограничением по кругу
  * @extends Iterator
@@ -46,6 +42,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.index = 0;
 }
 
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 function createAPair(friends, maxDepth = friends.length) {
     let depth = 1;
@@ -98,6 +95,8 @@ function MaleFilter() {
     this.filterOut = (friend) => friend.gender === 'male';
 }
 
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
+
 /**
  * Фильтр друзей-девушек
  * @extends Filter
@@ -106,6 +105,8 @@ function MaleFilter() {
 function FemaleFilter() {
     this.filterOut = (friend) => friend.gender === 'female';
 }
+
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
