@@ -44,6 +44,7 @@ function Iterator(friends, filter) {
         throw new TypeError('filter is not instance of Filter');
     }
     this.guests = getFriends(friends).filter(friend => filter.isRelevent(friend));
+    this.currentIndex = 0;
 }
 
 Iterator.prototype = {
