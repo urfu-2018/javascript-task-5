@@ -24,7 +24,7 @@ function getFriends(Arcadyfriends, maxLevel = Infinity) {
         currentLevelFriends = currentLevelFriends
             .reduce((prev, curr) => [...prev, ...curr.friends], [])
             .map(friendName => getFriendByName(Arcadyfriends, friendName))
-            .filter(friend => !friends.includes(friend))
+            .filter((item, pos, self) => !friends.includes(item) && self.indexOf(item) === pos)
             .sort(compareByName);
         friends.push(...currentLevelFriends);
         currentLevel++;
