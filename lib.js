@@ -18,7 +18,7 @@ Iterator.prototype = {
     inv: [],
     index: 0,
     done() {
-        return this.index === this.inv.length;
+        return this.index >= this.inv.length;
     },
     next() {
         return this.done() ? null : this.inv[this.index++];
