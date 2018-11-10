@@ -56,7 +56,7 @@ function Iterator(friends, filter) {
         this.invitedFriends = getInvitedFriends(friends, filter);
     }
     this.done = () => this.invitedFriends.length === 0;
-    this.next = () => this.invitedFriends.shift();
+    this.next = () => this.done() ? null : this.invitedFriends.shift();
 }
 
 /**

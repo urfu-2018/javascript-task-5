@@ -81,6 +81,16 @@ describe('Итераторы', () => {
         assert.throws(() => new lib.LimitedIterator(friends, notAFilter, 1), TypeError);
     });
 
+    it('Должен возвращать null, когда больше нечего возвращать', () => {
+        const filter = new lib.Filter();
+        const iterator = new lib.Iterator(friends, filter);
+        while (!iterator.done()) {
+            iterator.next();
+        }
+
+        assert.deepStrictEqual(iterator.next(), null);
+    });
+
     it('должны обойти в правильном порядке друзей и составить пары', () => {
         const maleFilter = new lib.MaleFilter();
         const femaleFilter = new lib.FemaleFilter();
