@@ -1,23 +1,23 @@
 'use strict';
 
-function getChosenFriendsList(friends, circlesCount = 100000) {
+function getChosenFriendsList(friends, circlesCount = Infinity) {
+    if (circlesCount === 0) {
+        return [];
+    }
     friends = friends.sort((x, y) => x.name.localeCompare(y.name));
     let currentCircle = friends.filter(f => f.best);
     let result = currentCircle;
 
-    for (let i = 1; i < circlesCount && result.length < friends.length; i++) {
-        let nextCircle = [];
-        currentCircle.forEach(element => {
-            element.friends.forEach(friendName => {
-                const friendObj = friends.find(e => e.name === friendName);
-                if (!result.includes(friendObj)) {
-                    nextCircle.push(friendObj);
-                    result.push(friendObj);
-                }
-            });
-        });
+    for (let i = 1; i < circlesCount && currentCircle.length; i++) {
+        const usedNames = result.map(e => e.name);
+        const nextCircleNames = currentCircle
+            .reduce((acc, next) => acc.concat(next.friends), [])
+            .filter(n => !usedNames.includes(n));
 
-        currentCircle = nextCircle.length ? nextCircle : friends.find(x => !result.includes(x));
+        currentCircle = friends
+            .filter(e => nextCircleNames.includes(e.name))
+            .sort((x, y) => x.name.localeCompare(y.name));
+        result = result.concat(currentCircle);
     }
 
     return result;
