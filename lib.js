@@ -77,7 +77,7 @@ function friendsOfFriends(addFriends, listInvFriends) {
 
 function addInvFriend(tmp, result, listFriends) {
     for (var j = 0; j < tmp.length; j++) {
-        if (!listFriends.includes(tmp[j]) && tmp.indexOf(tmp[j]) === j) {
+        if (listFriends.indexOf(tmp[j]) === -1) {
             result.push(tmp[j]);
         }
     }
