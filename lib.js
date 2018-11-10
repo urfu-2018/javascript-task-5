@@ -50,7 +50,7 @@ Iterator.prototype = {
     guests: [],
     currentIndex: 0,
     done() {
-        return this.currentIndex === this.guests.length;
+        return this.currentIndex >= this.guests.length;
     },
     next() {
         return this.done ? this.guests[this.currentIndex++] : null;
