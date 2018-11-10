@@ -1,6 +1,20 @@
 'use strict';
 
-const proto = {
+/**
+ * Итератор по друзьям
+ * @constructor
+ * @param {Object[]} friends
+ * @param {Filter} filter
+ */
+function Iterator(friends, filter) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('azaazazazaza');
+    }
+    this.inv = createAPair(friends).filter(f => filter.filterOut(f));
+    this.index = 0;
+}
+
+Iterator.prototype = {
     inv: [],
     index: 0,
     done() {
@@ -11,23 +25,9 @@ const proto = {
     }
 };
 
-Object.setPrototypeOf(Iterator.prototype, proto);
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
-
-/**
- * Итератор по друзьям
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- */
-function Iterator(friends, filter) {
-    console.info(friends, filter);
-    check(filter);
-    this.inv = createAPair(friends).filter(f => filter.filterOut(f));
-    this.index = 0;
-}
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -38,18 +38,14 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
-    check(filter);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('azaazazazaza');
+    }
     this.inv = createAPair(friends, maxLevel)
         .filter(f => filter.filterOut(f));
     this.index = 0;
 }
 
-function check(filter) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError('azaazazazaza');
-    }
-}
 
 function createAPair(friends, maxDepth = friends.length) {
     let depth = 1;
@@ -90,7 +86,6 @@ function addInvFriend(tmp, result, listFriends) {
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
     this.filterOut = () => true;
 }
 
@@ -100,7 +95,6 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
     this.filterOut = (friend) => friend.gender === 'male';
 }
 
@@ -110,7 +104,6 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
     this.filterOut = (friend) => friend.gender === 'female';
 }
 
