@@ -40,13 +40,7 @@ function getFilteredFriends(friends, filter, maxLevel = Infinity) {
 }
 
 function compareFriends(fr1, fr2) {
-    if (fr1.name > fr2.name) {
-        return 1;
-    } else if (fr1.name === fr2.name) {
-        return 0;
-    }
-
-    return -1;
+    return fr1.name.localeCompare(fr2.name);
 }
 
 /**
@@ -61,23 +55,23 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    let pointer = -1;
+    this.pointer = -1;
     this.filteredFriends = getFilteredFriends(friends, filter);
 
-    this.next = function () {
-        if (pointer === this.filteredFriends.length - 1) {
-            return null;
-        }
-        pointer++;
-
-        return this.filteredFriends[pointer];
-    };
-
-    this.done = function () {
-        return pointer === this.filteredFriends.length - 1;
-    };
-
 }
+
+Iterator.prototype.next = function () {
+    if (this.pointer === this.filteredFriends.length - 1) {
+        return null;
+    }
+    this.pointer++;
+
+    return this.filteredFriends[this.pointer];
+};
+
+Iterator.prototype.done = function () {
+    return this.pointer === this.filteredFriends.length - 1;
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
