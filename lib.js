@@ -23,6 +23,9 @@ function getFilteredFriends(friends, filter, maxLevel = Infinity) {
     let prevCycle;
     while (maxLevel > 0 && copiedFriends.length !== 0) {
         const cycle = getCycle(copiedFriends, prevCycle);
+        if (cycle.length === 0) {
+            break;
+        }
         cycle.forEach(function (friend) {
             if (filter.isOk(friend)) {
                 filteredFriends.push(friend);
