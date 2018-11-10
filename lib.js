@@ -46,12 +46,10 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.getNeed = function (array, gender) {
-        return array.filter(element => {
-            return element.gender === gender;
-        });
-    };
+    console.info('Filter');
 }
+
+Filter.prototype.check = () => true;
 
 /**
  * Фильтр друзей
@@ -59,11 +57,14 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    Filter.call(this);
-    this.gender = 'male';
+    console.info('MaleFilter');
 }
 
-MaleFilter.prototype = Object.create(Filter.prototype);
+MaleFilter.prototype = Object.create(Filter.prototype, {
+    check: {
+        value: friend => friend.gender === 'male'
+    }
+});
 
 /**
  * Фильтр друзей-девушек
@@ -71,11 +72,14 @@ MaleFilter.prototype = Object.create(Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    Filter.call(this);
-    this.gender = 'female';
+    console.info('FemaleFilter');
 }
 
-FemaleFilter.prototype = Object.create(Filter.prototype);
+FemaleFilter.prototype = Object.create(Filter.prototype, {
+    check: {
+        value: friend => friend.gender === 'female'
+    }
+});
 
 function getNextCircle(currentCircle, friends, invitedFriends) {
     console.info(currentCircle);
@@ -97,7 +101,7 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
         maxLevel--;
     }
 
-    return filter.getNeed(invitedFriends, filter.gender);
+    return invitedFriends.filter(filter.check);
 }
 
 function getFriends(combinedFriends, friends) {
