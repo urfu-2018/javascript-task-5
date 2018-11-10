@@ -16,7 +16,7 @@ function asOneEnumerable(sequence1, sequence2) {
 function getNextLevelFriends(friends, friendsMap) {
     return friends
         .map(x => x.friends)
-        .reduce(asOneEnumerable, [])
+        .reduce(asOneEnumerable)
         .filter(onlyUnique)
         .map(friendName => friendsMap.get(friendName));
 }
@@ -50,13 +50,18 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be instance of "Filter"');
     }
-
-    if (this.invitedFriends === undefined) {
-        this.invitedFriends = getInvitedFriends(friends, filter);
-    }
-    this.done = () => this.invitedFriends.length === 0;
-    this.next = () => this.done() ? null : this.invitedFriends.shift();
+    this.invitedFriends = getInvitedFriends(friends, filter);
 }
+
+Iterator.prototype = {
+    done() {
+        return this.invitedFriends.length === 0;
+    },
+    next() {
+        return this.done() ? null : this.invitedFriends.shift();
+    }
+};
+
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -67,8 +72,10 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('filter should be instance of "Filter"');
+    }
     this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
-    Iterator.call(this, friends, filter);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
