@@ -75,7 +75,7 @@ function Iterator(friends, filter) {
     friends.forEach(friend => friendsStorage.set(friend.name, friend));
 
     this.done = function () {
-        if (tryGetNext(this, filter) !== -1) {
+        if (tryGetNext(this, filter) !== -1 && currentLevel <= this.maxLevel) {
             return false;
         }
         const nextCycle = getNextCycle(this, friendsStorage);
