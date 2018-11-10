@@ -12,23 +12,8 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    // Контейнер для кругов друзей
-    const friendLevels = [];
-
-    // Первый круг - лучшие друзья
-    const bestFriends = friends.filter((friend) => {
-        return friend.best === true;
-    });
-    friendLevels.push(filterAndSortLevel(bestFriends, filter));
-
-    // Остальные круги - друзья друзей из предыдущего круга
-    for (let level of friendLevels) {
-        const nextLevel = getNextLevel(level, friendLevels);
-        const nextLevelFiltered = filterAndSortLevel(nextLevel, filter);
-        if (nextLevelFiltered.length > 0) {
-            friendLevels.push(nextLevelFiltered);
-        }
-    }
+    // Круги друзей
+    const iterationLevels = makeIterationLevels(friends, filter);
 
     // Индексы для итератора
     const nextElement = {
@@ -41,7 +26,7 @@ function Iterator(friends, filter) {
     };
 
     this.done = function () {
-        return nextElement.level === friendLevels.length;
+        return nextElement.level === iterationLevels.length;
     };
 
     this.next = function () {
@@ -49,10 +34,10 @@ function Iterator(friends, filter) {
             return null;
         }
 
-        const result = friendLevels[nextElement.level][nextElement.index];
+        const result = iterationLevels[nextElement.level][nextElement.index];
 
         // Продвинуть итератор на следующий элемент
-        if (nextElement.index === friendLevels[nextElement.level].length - 1) {
+        if (nextElement.index === iterationLevels[nextElement.level].length - 1) {
             nextElement.level++;
             nextElement.index = 0;
         }
@@ -61,30 +46,34 @@ function Iterator(friends, filter) {
     };
 }
 
-/*
- * Получить следующий круг друзей
- */
-function getNextLevel(previousLevel, levelContainer) {
+function makeIterationLevels(friends, filter) {
 
-    const nextLevel = [];
-    for (let friend of previousLevel) {
-        // Вынесено в отдельную функцию ради снижения вложенности для линтера
-        addFriendsOfAFriend(friend, nextLevel, levelContainer);
-    }
+    const iterationLevels = [];
 
-    return nextLevel;
-}
+    // Первый круг - лучшие друзья
+    const bestFriends = friends.filter((friend) => {
+        return friend.best === true;
+    });
+    iterationLevels.push(filterAndSortLevel(bestFriends, filter));
 
-/*
- * Добавление в очередной круг друзей тех друзей заданного друга, которые ещё не были добавлены
- */
-function addFriendsOfAFriend(friend, level, levelContainer) {
-    for (let friendOfFriend of friend.friends) {
-        if (!containsFriend(level, friendOfFriend) &&
-            !friendAlreadyAdded(levelContainer, friendOfFriend)) {
-            level.push(friendOfFriend);
+    /* Далее первого круга даются лишь имена друзей,
+     * поэтому создаём справочник друзей по именам
+     */
+    const friendsByName = new Map();
+    friends.forEach((friend) => {
+        friendsByName.set(friend.name, friend);
+    });
+
+    // Остальные круги - друзья друзей из предыдущего круга
+    iterationLevels.forEach((level) => {
+        const nextLevel = getNextLevel(level, iterationLevels, friendsByName);
+        const nextLevelFiltered = filterAndSortLevel(nextLevel, filter);
+        if (nextLevelFiltered.length > 0) {
+            iterationLevels.push(nextLevelFiltered);
         }
-    }
+    });
+
+    return iterationLevels;
 }
 
 /*
@@ -95,17 +84,32 @@ function filterAndSortLevel(friends, filter) {
 }
 
 /*
- * Проверить, был ли друг с таким именем добавлен в список итерации
+ * Получить следующий круг друзей
  */
-function friendAlreadyAdded(levelContainer, friend) {
+function getNextLevel(previousLevel, levelContainer, friendsByName) {
 
-    for (let level of levelContainer) {
-        if (containsFriend(level, friend)) {
-            return true;
-        }
-    }
+    const nextLevel = [];
+    previousLevel.forEach((friend) => {
+        friend.friends.map((friendOfFriend) => {
+            // Из имён друзей получаем записи о друзьях
+            return friendsByName.get(friendOfFriend);
+        }).forEach((friendOfFriend) => {
+            // Добавляем только тех друзей, которые ещё не были добавлены
+            if (!friendAlreadyAdded(friendOfFriend, nextLevel, levelContainer)) {
+                nextLevel.push(friendOfFriend);
+            }
+        });
+    });
 
-    return false;
+    return nextLevel;
+}
+
+/*
+ * Проверить, был ли некоторый друг уже добалвен
+ */
+function friendAlreadyAdded(friend, level, levelContainer) {
+    return containsFriend(level, friend) ||
+        levelContainer.some(containsFriend.bind(null, levelContainer, friend));
 }
 
 /*
