@@ -14,15 +14,15 @@ function getFriends(Arcadyfriends, filter, maxLevel = Infinity) {
     let currentLevel = 1;
     let currentLevelFriends = Arcadyfriends.filter(friend => friend.best).sort(compareByName);
 
-    const friends = currentLevelFriends.slice();
+    const friends = [];
 
     while (currentLevelFriends.length > 0 && currentLevel < maxLevel) {
+        friends.push(...currentLevelFriends);
         currentLevelFriends = currentLevelFriends
             .reduce((prev, curr) => [...prev, ...curr.friends], [])
             .map(friendName => getFriendByName(Arcadyfriends, friendName))
             .filter((item, pos, self) => !friends.includes(item) && self.indexOf(item) === pos)
             .sort(compareByName);
-        friends.push(...currentLevelFriends);
         currentLevel++;
     }
 
