@@ -11,18 +11,14 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    this.result = getGuests(friends).filter(filter.filter);
+    this.guests = getGuests(friends).filter(filter.filter);
     this.index = 0;
     this.next = function () {
-        if (!this.done()) {
-            return this.result[this.index++];
-        }
-
-        return null;
+        return this.done() ? null : this.guests[this.index++];
     };
 
     this.done = function () {
-        return !(this.index < this.result.length);
+        return !(this.index < this.guests.length);
     };
 }
 
@@ -36,7 +32,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    this.result = getGuests(friends, maxLevel).filter(filter.filter);
+    this.guests = getGuests(friends, maxLevel).filter(filter.filter);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
