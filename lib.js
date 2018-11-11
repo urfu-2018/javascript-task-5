@@ -122,7 +122,7 @@ function bubbleSortInternal(friends, i, j) {
         if (friendsComparerInternal(friendA.object, friendB.object)) {
             swap(friends, i, j);
         }
-    } else if (friendA.level < friendB.level + 1) {
+    } else if (friendA.level + 1 < friendB.level) {
         if (friendA.object.friends.includes(friendB.object.name)) {
             friendB.level = friendA.level + 1;
         }
