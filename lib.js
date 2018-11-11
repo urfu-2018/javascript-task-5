@@ -6,27 +6,24 @@ function getFriendsQueue(friends, filter, maxLevel = Infinity) {
     friends.forEach(x => {
         tempDic[x.name] = x;
     });
-    const queue = friends.filter(x => x.best === true);
+    const queue = friends.filter(person => person.best === true);
     queue
-        .forEach(x => {
-            friendsLevels[x.name] = 1;
+        .forEach(person => {
+            friendsLevels[person.name] = 1;
         });
 
-    for (let i = 0; i < friends.length; i++) {
-        const friend = queue[i];
-        if (friend === undefined) {
-            continue;
-        }
-        friend.friends
-            .filter(x => !friendsLevels.hasOwnProperty(x))
-            .forEach(x => {
-                friendsLevels[x] = friendsLevels[friend.name] + 1;
-                queue.push(tempDic[x]);
+    for (let i = 0; i < friends.length && i < queue.length; i++) {
+        const person = queue[i];
+        person.friends
+            .filter(friendName => !friendsLevels.hasOwnProperty(friendName))
+            .forEach(friendName => {
+                friendsLevels[friendName] = friendsLevels[person.name] + 1;
+                queue.push(tempDic[friendName]);
             });
     }
 
     return queue
-        .filter(x => filter.filter(x) && friendsLevels[x.name] <= maxLevel)
+        .filter(person => filter.filter(person) && friendsLevels[person.name] <= maxLevel)
         .sort(
             (first, second) => friendsLevels[first.name] - friendsLevels[second.name] ||
                 first.name.localeCompare(second.name));
@@ -73,9 +70,7 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.filter = function () {
-        return true;
-    };
+    this.filter = () => true;
 }
 
 /**
