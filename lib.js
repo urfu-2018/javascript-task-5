@@ -1,37 +1,35 @@
 'use strict';
 
 function getFriendsQueue(friends, filter, maxLevel = Infinity) {
-    const tempDic = {};
     const friendsLevels = {};
-    friends
+    const tempDic = {};
+    friends.forEach(x => {
+        tempDic[x.name] = x;
+    });
+    const queue = friends.filter(x => x.best === true);
+    queue
         .forEach(x => {
-            tempDic[x.name] = ({ ...x });
+            friendsLevels[x.name] = 1;
         });
-    let queue = friends.filter(x => x.best === true)
-        .map(x => ({ ...x }));
 
-    queue.forEach(x => {
-        friendsLevels[x.name] = 1;
-    });
-
-    friends.forEach((_, i) => {
+    for (let i = 0; i < friends.length; i++) {
         const friend = queue[i];
+        if (friend === undefined) {
+            continue;
+        }
         friend.friends
+            .filter(x => !friendsLevels.hasOwnProperty(x))
             .forEach(x => {
-                if (!friendsLevels.hasOwnProperty(x)) {
-                    queue.push({ ...tempDic[x] });
-                    friendsLevels[x] = friendsLevels[friend.name] + 1;
-                }
+                friendsLevels[x] = friendsLevels[friend.name] + 1;
+                queue.push(tempDic[x]);
             });
-    });
+    }
 
-    queue = queue
+    return queue
         .filter(x => filter.filter(x) && friendsLevels[x.name] <= maxLevel)
         .sort(
             (first, second) => friendsLevels[first.name] - friendsLevels[second.name] ||
                 first.name.localeCompare(second.name));
-
-    return queue;
 }
 
 /**
