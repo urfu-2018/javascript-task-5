@@ -7,7 +7,44 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
+    const tempArray = {};
+    friends
+        .forEach(x => {
+            tempArray[x.name] = x;
+        });
+    this.queue = friends.filter(x => x.best === true);
+
+    this.queue.forEach(x => {
+        x.deep = 1;
+        delete tempArray[x.name];
+    });
+
+    friends.forEach((_, i) => {
+        const friend = this.queue[i];
+        friend.friends.forEach(y => {
+            if (tempArray[y] !== undefined) {
+                friend[y] = tempArray[y];
+                friend[y].deep = friend.deep + 1;
+                delete tempArray[y];
+                this.queue.push(friend[y]);
+            }
+        });
+    });
+
+    this.queue = this.queue.sort(
+        (first, second) => first.deep - second.deep || first.name.localeCompare(second.name))
+        .filter(x => filter.filter(x));
+    this.next = function () {
+        return this.queue.shift();
+    };
+
+    this.done = function () {
+        return this.queue.length === 0;
+    };
+
 }
 
 /**
@@ -19,6 +56,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    Object.setPrototypeOf(this, new Iterator(friends, filter));
+    this.queue = this.queue.filter(x => x.deep <= maxLevel);
     console.info(friends, filter, maxLevel);
 }
 
@@ -27,7 +66,9 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    this.filter = function (friend) {
+        return friend.gender === this.gender;
+    };
 }
 
 /**
@@ -36,7 +77,8 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
+    Object.setPrototypeOf(this, new Filter());
+    this.gender = 'male';
 }
 
 /**
@@ -45,7 +87,8 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    Object.setPrototypeOf(this, new Filter());
+    this.gender = 'female';
 }
 
 exports.Iterator = Iterator;
