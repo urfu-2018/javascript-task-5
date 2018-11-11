@@ -41,16 +41,21 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    const guests = getGuests(friends, this.maxLevel).filter(filter.predicate);
-    let index = 0;
-    this.next = function () {
-        return this.done() ? null : guests[index++];
-    };
-
-    this.done = function () {
-        return !(index < guests.length);
-    };
+    this.guests = getGuests(friends, this.maxLevel)
+        .filter(filter.predicate);
+    this.index = 0;
 }
+
+Iterator.prototype = {
+    constructor: Iterator,
+    next: function () {
+        return this.done() ? null : this.guests[this.index++];
+    },
+
+    done: function () {
+        return !(this.index < this.guests.length);
+    }
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -64,6 +69,9 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
 }
+
+LimitedIterator.prototype = Object.create(Iterator.prototype);
+LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
