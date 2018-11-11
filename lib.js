@@ -60,7 +60,8 @@ function addAll(set, iterable) {
 
 class FriendPicker {
     constructor(friends) {
-        this._friends = friends.slice().sort((a, b) => a.name.localeCompare(b.name));
+        this._friends = friends.slice()
+            .sort((a, b) => a.name.localeCompare(b.name));
     }
 
     getFriends(depth) {
@@ -96,7 +97,8 @@ class FriendPicker {
     }
 
     _getBestFriends() {
-        return this._friends.filter(f => f.best).map(f => f.name);
+        return this._friends.filter(f => f.best)
+            .map(f => f.name);
     }
 
 }
@@ -107,37 +109,20 @@ function checkFilter(filter) {
     }
 }
 
-/**
- * Итератор по друзьям
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- */
-function Iterator(friends, filter) {
-    checkFilter(filter);
-    console.info(friends, filter);
-    const pickedFriends = new FriendPicker(friends).getFriends(Number.MAX_SAFE_INTEGER);
+class Iterator extends ArrayIterator {
+    constructor(friends, filter, maxLevel = Number.MAX_SAFE_INTEGER) {
+        checkFilter(filter);
+        console.info(friends, filter);
+        const pickedFriends = new FriendPicker(friends).getFriends(maxLevel);
 
-    return new ArrayIterator(filter.filterAll(pickedFriends));
+        super(filter.filterAll(pickedFriends));
+    }
 }
 
-/**
- * Итератор по друзям с ограничением по кругу
- * @extends Iterator
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- * @param {Number} maxLevel – максимальный круг друзей
- */
-function LimitedIterator(friends, filter, maxLevel) {
-    checkFilter(filter);
-    if (typeof maxLevel !== 'number' || Number.isNaN(maxLevel)) {
-        maxLevel = 0;
+class LimitedIterator extends Iterator {
+    constructor(friends, filter, maxLevel) {
+        super(friends, filter, maxLevel);
     }
-    console.info(friends, filter, maxLevel);
-    const pickedFriends = new FriendPicker(friends).getFriends(maxLevel);
-
-    return new ArrayIterator(filter.filterAll(pickedFriends));
 }
 
 exports.Iterator = Iterator;
