@@ -2,6 +2,7 @@
 
 function getFriendsQueue(friends, filter) {
     const tempDic = {};
+    const isVisited = {};
     friends
         .forEach(x => {
             tempDic[x.name] = ({ ...x });
@@ -9,17 +10,18 @@ function getFriendsQueue(friends, filter) {
     let queue = friends.filter(x => x.best === true)
         .map(x => ({ ...x, deep: 1 }));
 
-    queue.forEach(x => {
-        delete tempDic[x.name];
+    queue.map(x => {
+        isVisited[x.name] = 1;
     });
 
     friends.forEach((_, i) => {
         const friend = queue[i];
         friend.friends
-            .filter(x => tempDic[x] !== undefined)
             .forEach(x => {
-                queue.push({ ...tempDic[x], deep: friend.deep + 1 });
-                delete tempDic[x];
+                if (!isVisited.hasOwnProperty(x)) {
+                    queue.push({ ...tempDic[x], deep: friend.deep + 1 });
+                    isVisited[x] = 1;
+                }
             });
     });
 
@@ -73,8 +75,9 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Object.setPrototypeOf(this, new Iterator(friends, filter));
-    this.queue = this.queue.filter(x => x.deep <= maxLevel);
+    const newFilter = {};
+    newFilter.filter = x => filter.filter(x) && x.deep <= maxLevel;
+    this.queue = getFriendsQueue(friends, newFilter);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
