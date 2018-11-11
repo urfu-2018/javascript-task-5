@@ -93,12 +93,11 @@ function LimitedIterator(friends, filter, maxLevel) {
     const friendsMap = friendsToMap(friends);
     const friendSet = firstCircle(friends);
 
-    let circleCounter = 0;
-    while (circleCounter < maxLevel - 1) {
+    while (friendSet.length !== 0 && maxLevel - 1 > 0) {
         const currentCircle = new Set();
         newCircle(friendSet, currentCircle, friendsMap);
         currentCircle.forEach(friend => friendSet.add(friend));
-        circleCounter++;
+        maxLevel--;
     }
 
     this._collection = filter.filter(Array.from(friendSet));
