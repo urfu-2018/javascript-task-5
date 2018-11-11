@@ -7,6 +7,9 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     this.sortedFriends = setFriends(friends);
     this.filterFriends = [];
     this.sortedFriends.forEach(person => {
