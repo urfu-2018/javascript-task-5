@@ -77,9 +77,10 @@ function FemaleFilter() {
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     let temp = friends
-
-        // .sort(friendsComparer)
         .map(friend => {
             return {
                 object: friend,
