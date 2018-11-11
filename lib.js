@@ -13,9 +13,10 @@ function Iterator(friends, filter) {
     const tempArray = {};
     friends
         .forEach(x => {
-            tempArray[x.name] = x;
+            tempArray[x.name] = ({ ...x });
         });
-    this.queue = friends.filter(x => x.best === true);
+    this.queue = friends.filter(x => x.best === true)
+        .map(x => ({ ...x }));
 
     this.queue.forEach(x => {
         x.deep = 1;
@@ -38,7 +39,16 @@ function Iterator(friends, filter) {
         (first, second) => first.deep - second.deep || first.name.localeCompare(second.name))
         .filter(x => filter.filter(x));
     this.next = function () {
-        return this.queue.shift();
+        let friendWithDeep = this.queue.shift();
+        let foundFriend = {
+            name: friendWithDeep.name,
+            friends: friendWithDeep.friends,
+            gender: friendWithDeep.gender
+        };
+        if (friendWithDeep.best !== undefined) {
+            foundFriend.best = friendWithDeep.best;
+        }
+        return foundFriend;
     };
 
     this.done = function () {
@@ -61,13 +71,15 @@ function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
 }
 
+LimitedIterator.prototype = Object.create(Iterator.prototype);
+
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    this.filter = function (friend) {
-        return friend.gender === this.gender;
+    this.filter = function () {
+        return true;
     };
 }
 
@@ -77,9 +89,10 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    Object.setPrototypeOf(this, new Filter());
-    this.gender = 'male';
+    this.filter = x => x.gender === 'male';
 }
+
+MaleFilter.prototype = Object.create(Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -87,9 +100,10 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    Object.setPrototypeOf(this, new Filter());
-    this.gender = 'female';
+    this.filter = x => x.gender === 'female';
 }
+
+FemaleFilter.prototype = Object.create(Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
