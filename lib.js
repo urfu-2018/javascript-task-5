@@ -148,7 +148,7 @@ function Iterator(friends, filter) {
 function LimitedIterator(friends, filter, maxLevel) {
     checkFilter(filter);
     if (typeof maxLevel !== 'number' || Number.isNaN(maxLevel)) {
-        throw new TypeError('maxLevel is expected to be a Number');
+        maxLevel = 0;
     }
     console.info(friends, filter, maxLevel);
     const pickedFriends = new FriendPicker(friends).getFriends(maxLevel);
