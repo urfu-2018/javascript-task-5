@@ -91,9 +91,8 @@ function getNextCircle(currentCircle, friends, invitedFriends) {
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let invitedFriends = [];
     let currentCircle = friends.filter(friend => friend.best).sort(nameSort);
-    while (maxLevel > 0 && currentCircle.length !== 0) {
+    while (maxLevel > 0 && currentCircle.length > 0) {
         invitedFriends = invitedFriends.concat(currentCircle);
-        console.info(invitedFriends);
         currentCircle = getNextCircle(currentCircle, friends, invitedFriends).sort(nameSort);
         maxLevel--;
     }
