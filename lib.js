@@ -10,97 +10,58 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.sortedFriends = setFriends(friends);
-    this.filterFriends = [];
-    this.sortedFriends.forEach(person => {
-        if (filter.isPermissible(person.friend)) {
-            this.filterFriends.push(person);
-        }
-    });
+    this.filterFriends = getFriends(friends, filter);
     this.pointer = 0;
     this.done = function () {
         return this.pointer + 1 > this.filterFriends.length;
     };
-
     this.next = function () {
-        this.pointer++;
-
-        return this.filterFriends[this.pointer - 1].friend;
+        return this.done() ? null : this.filterFriends[this.pointer++];
     };
 }
 
-function getDictionaryFriends(friends) {
-    let dict = new Map();
-    friends.forEach(friend => {
-        dict.set(friend.name, friend);
-    });
 
-    return dict;
-}
-
-function getBestFriendsName(friends) {
-    let best = [];
-    friends.forEach(friend => {
-        if (friend.best) {
-            best.push(friend.name);
-        }
-    });
-
-    return best;
-}
-
-function sortedFriendsHas(sortedFriends, name) {
-    for (let person of sortedFriends) {
-        if (person.friend.name === name) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function processCurrentLevelNames(currentLevelNames, dictionaryFriends, sortedFriends, level) {
-    let nextLevelNames = [];
-    for (let name of currentLevelNames) {
-        if (dictionaryFriends.has(name) && !sortedFriendsHas(sortedFriends, name)) {
-            sortedFriends.push({ friend: dictionaryFriends.get(name), level });
-            // console.info(dictionaryFriends.get(name));
-            nextLevelNames = nextLevelNames.concat(
-                getNames(dictionaryFriends.get(name).friends, sortedFriends));
-        }
-    }
-
-    return { sortedFriends, nextLevelNames };
-}
-
-
-function setFriends(friends) {
-    let sortedFriends = [];
-    let dictionaryFriends = getDictionaryFriends(friends);
+function getFriends(friends, filter, maxLevel = Infinity) {
+    let filteredFriends = [];
     let level = 0;
-    let currentLevelNames = getBestFriendsName(friends);
+    let currentLevelFriends = friends.filter(friend => friend.best).sort(sortByName);
 
-    while (currentLevelNames.length !== 0) {
-        let result = processCurrentLevelNames(
-            currentLevelNames, dictionaryFriends, sortedFriends, level);
+    while (currentLevelFriends.length !== 0 && level < maxLevel) {
+        let newFilterFriends = [];
+        filteredFriends = filteredFriends.concat(currentLevelFriends);
+
+        newFilterFriends = currentLevelFriends
+            .map((friend) => friend.friends)
+            .reduce((a, b) => a.concat(b))
+            .sort()
+            .map((name) => friends.filter(f => f.name === name))
+            .reduce((a, b) => a.concat(b));
+
+        currentLevelFriends = getUniqueFriends(newFilterFriends, filteredFriends);
         level++;
-        sortedFriends = result.sortedFriends;
-        currentLevelNames = result.nextLevelNames.sort();
     }
 
-    return sortedFriends;
+    return filteredFriends.filter(friend => filter.isPermissible(friend));
 }
 
-function getNames(names, sortedFriends) {
-    let nextLevelNames = [];
-    for (let friendName of names) {
-        if (!nextLevelNames.includes(friendName) &&
-        !sortedFriendsHas(sortedFriends, friendName)) {
-            nextLevelNames.push(friendName);
+function getUniqueFriends(newFilterFriends, filteredFriends) {
+    let currentFriends = [];
+    for (let friend of newFilterFriends) {
+        if (currentFriends.includes(friend) || filteredFriends.includes(friend)) {
+            continue;
         }
+        currentFriends.push(friend);
     }
 
-    return nextLevelNames;
+    return currentFriends;
+}
+
+function sortByName(a, b) {
+    if (a.name === b.name) {
+        return 0;
+    }
+
+    return a.name < b.name ? -1 : 1;
 }
 
 /**
@@ -113,13 +74,8 @@ function getNames(names, sortedFriends) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    let newFilterFriends = [];
-    for (let person of this.filterFriends) {
-        if (person.level < maxLevel) {
-            newFilterFriends.push(person);
-        }
-    }
-    this.filterFriends = newFilterFriends;
+    this.filterFriends = getFriends(friends, filter, maxLevel);
+    console.info(this.filterFriends);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
