@@ -29,7 +29,7 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
         .sort(sortByName);
     const visited = [];
     let level = 0;
-    while (queue.length !== 0 && level !== maxLevel) {
+    while (queue.length !== 0 && level < maxLevel) {
         visited.push(...queue);
         queue = getNextLevelFriends(queue, friendsMap)
             .filter(friend => !visited.includes(friend))
