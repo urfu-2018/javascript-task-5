@@ -18,7 +18,7 @@ function getListOfGuests(friends, maxLevel = Infinity) {
             });
 
             return acc;
-        }, []);
+        }, []).sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
         maxLevel--;
     }
 
