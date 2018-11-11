@@ -1,34 +1,32 @@
 'use strict';
 
-function getFriensQueue(friends, filter) {
-    const tempArray = {};
+function getFriendsQueue(friends, filter) {
+    const tempDic = {};
     friends
         .forEach(x => {
-            tempArray[x.name] = ({ ...x });
+            tempDic[x.name] = ({ ...x });
         });
     let queue = friends.filter(x => x.best === true)
-        .map(x => ({ ...x }));
+        .map(x => ({ ...x, deep: 1 }));
 
     queue.forEach(x => {
-        x.deep = 1;
-        delete tempArray[x.name];
+        delete tempDic[x.name];
     });
 
     friends.forEach((_, i) => {
         const friend = queue[i];
-        friend.friends.forEach(y => {
-            if (tempArray[y] !== undefined) {
-                friend[y] = tempArray[y];
-                friend[y].deep = friend.deep + 1;
-                delete tempArray[y];
-                queue.push(friend[y]);
-            }
-        });
+        friend.friends
+            .filter(x => tempDic[x] !== undefined)
+            .forEach(x => {
+                queue.push({ ...tempDic[x], deep: friend.deep + 1 });
+                delete tempDic[x];
+            });
     });
 
-    return queue.sort(
-        (first, second) => first.deep - second.deep || first.name.localeCompare(second.name))
-        .filter(x => filter.filter(x));
+    return queue
+        .filter(x => filter.filter(x))
+        .sort(
+            (first, second) => first.deep - second.deep || first.name.localeCompare(second.name));
 }
 
 /**
@@ -41,7 +39,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.queue = getFriensQueue(friends, filter);
+    this.queue = getFriendsQueue(friends, filter);
 }
 
 Iterator.prototype = {
@@ -49,7 +47,7 @@ Iterator.prototype = {
         if (this.done()) {
             return null;
         }
-        let friendWithDeep = this.queue.shift();
+        const friendWithDeep = this.queue.shift();
         let foundFriend = {
             name: friendWithDeep.name,
             friends: friendWithDeep.friends,
@@ -77,7 +75,6 @@ Iterator.prototype = {
 function LimitedIterator(friends, filter, maxLevel) {
     Object.setPrototypeOf(this, new Iterator(friends, filter));
     this.queue = this.queue.filter(x => x.deep <= maxLevel);
-    console.info(friends, filter, maxLevel);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
