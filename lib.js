@@ -90,7 +90,7 @@ function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
 
     temp = bubbleSort(temp)
         .filter(friend => filter.apply(friend.object))
-        .filter(friend => friend.level <= maxLevel);
+        .filter(friend => friend.level < maxLevel);
 
     return {
         current: 0,
