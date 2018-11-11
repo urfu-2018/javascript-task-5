@@ -16,7 +16,7 @@ class ArrayIterator {
     }
 }
 
-class SimpleFilter {
+class Filter {
 
     check() {
         return true;
@@ -34,7 +34,7 @@ class SimpleFilter {
     }
 }
 
-class GenderFilter extends SimpleFilter {
+class GenderFilter extends Filter {
     constructor(gender) {
         super();
         this._gender = gender;
@@ -42,6 +42,21 @@ class GenderFilter extends SimpleFilter {
 
     check(friend) {
         return friend.gender === this._gender;
+    }
+}
+
+class MaleFilter extends GenderFilter {
+
+    constructor() {
+        super('male');
+    }
+}
+
+
+class FemaleFilter extends GenderFilter {
+
+    constructor() {
+        super('female');
     }
 }
 
@@ -103,8 +118,8 @@ class FriendPicker {
 }
 
 function checkFilter(filter) {
-    if (!(filter instanceof SimpleFilter)) {
-        throw new TypeError('Expected filter to be a SimpleFilter');
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('Expected filter to be a Filter');
     }
 }
 
@@ -112,11 +127,11 @@ function checkFilter(filter) {
  * Итератор по друзьям
  * @constructor
  * @param {Object[]} friends
- * @param {SimpleFilter} filter
+ * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
     checkFilter(filter);
+    console.info(friends, filter);
     const pickedFriends = new FriendPicker(friends).getFriends(Number.MAX_SAFE_INTEGER);
 
     return new ArrayIterator(filter.filterAll(pickedFriends));
@@ -127,47 +142,15 @@ function Iterator(friends, filter) {
  * @extends Iterator
  * @constructor
  * @param {Object[]} friends
- * @param {SimpleFilter} filter
+ * @param {Filter} filter
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
     checkFilter(filter);
+    console.info(friends, filter, maxLevel);
     const pickedFriends = new FriendPicker(friends).getFriends(maxLevel);
 
     return new ArrayIterator(filter.filterAll(pickedFriends));
-}
-
-/**
- * Фильтр друзей
- * @constructor
- */
-function Filter() {
-    console.info('Filter');
-
-    return new SimpleFilter();
-}
-
-/**
- * Фильтр друзей
- * @extends Filter
- * @constructor
- */
-function MaleFilter() {
-    console.info('MaleFilter');
-
-    return new GenderFilter('male');
-}
-
-/**
- * Фильтр друзей-девушек
- * @extends Filter
- * @constructor
- */
-function FemaleFilter() {
-    console.info('FemaleFilter');
-
-    return new GenderFilter('female');
 }
 
 exports.Iterator = Iterator;
