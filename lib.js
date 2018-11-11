@@ -33,9 +33,6 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    if (maxLevel === 0) {
-        return [];
-    }
     this.guests = getInvitedFriends(friends, filter, maxLevel);
 }
 
