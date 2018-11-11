@@ -81,15 +81,14 @@ function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    let temp = friends
+    let _friends = friends ? friends : [];
+    let temp = _friends
         .map(friend => {
             return {
                 object: friend,
                 level: friend.best ? 1 : Number.POSITIVE_INFINITY
             };
         });
-
-    temp = temp.some(friend => friend.level === 1) ? temp : [];
 
     temp = bubbleSort(temp)
         .filter(friend => filter.apply(friend.object))
