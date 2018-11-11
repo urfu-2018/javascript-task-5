@@ -1,50 +1,5 @@
 'use strict';
 
-// const friendss = [
-//     {
-//         name: 'Sam',
-//         friends: ['Mat', 'Sharon'],
-//         gender: 'male',
-//         best: true
-//     },
-//     {
-//         name: 'Sally',
-//         friends: ['Brad', 'Emily'],
-//         gender: 'female',
-//         best: true
-//     },
-//     {
-//         name: 'Mat',
-//         friends: ['Sam', 'Sharon'],
-//         gender: 'male'
-//     },
-//     {
-//         name: 'Sharon',
-//         friends: ['Sam', 'Itan', 'Mat'],
-//         gender: 'female'
-//     },
-//     {
-//         name: 'Brad',
-//         friends: ['Sally', 'Emily', 'Julia'],
-//         gender: 'male'
-//     },
-//     {
-//         name: 'Emily',
-//         friends: ['Sally', 'Brad'],
-//         gender: 'female'
-//     },
-//     {
-//         name: 'Itan',
-//         friends: ['Sharon', 'Julia'],
-//         gender: 'male'
-//     },
-//     {
-//         name: 'Julia',
-//         friends: ['Brad', 'Itan'],
-//         gender: 'female'
-//     }
-// ];
-
 /**
  * Сравнение для имен
  * @constructor
@@ -63,7 +18,6 @@ function compareForName(person1, person2) {
 
     return result;
 }
-// console.info(friendss.sort(compareForName));
 
 /**
  * Итератор по друзьям
@@ -72,13 +26,10 @@ function compareForName(person1, person2) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    // console.info(friends, filter);
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    // friends = (friends.filter(person => filter.isNecessary(person)));
     friends = (friends.sort(compareForName)); // нужные в алфавитном порядке
-    // friends = friends.map(fr => fr.name);
     let currentFriendList = getBestFriends(friends); // список имен
     let listOfAllFriends = currentFriendList;
     while (listOfAllFriends.length < friends.length) {
@@ -87,8 +38,6 @@ function Iterator(friends, filter) {
         listOfAllFriends = getFriendsList(currentFriendList, listOfAllFriends);
     }
     listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr));
-    // listOfAllFriends = listOfAllFriends.map(fr => fr.name);
-    // console.info(listOfAllFriends, 'XXXXXXXXXXXXXXX');
     this.index = 0;
     this.done = function () {
         return this.index >= listOfAllFriends.length;
@@ -101,14 +50,6 @@ function Iterator(friends, filter) {
 
 }
 
-// let mf = new FemaleFilter();
-// let iter = new LimitedIterator(friendss, mf);
-// while (!iter.done()) {
-//     console.info(iter.next());
-// }
-// console.info(iter.next());
-// console.info(iter instanceof Iterator);
-
 /**
  * Итератор по друзям с ограничением по кругу
  * @extends Iterator
@@ -118,24 +59,19 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    // console.info(friends, filter, maxLevel);
-    // friends = (friends.filter(person => filter.isNecessary(person)));
+
     friends = (friends.sort(compareForName)); // нужные в алфавитном порядке
     const basicIterator = new Iterator(friends, filter);
     const limitedIterator = Object.create(basicIterator);
     limitedIterator.index = basicIterator.index;
-    // ////////////////////////////////////////
     let currentFriendList = getBestFriends(friends); // список имен
     let listOfAllFriends = currentFriendList;
-    // console.info(currentFriendList);
     for (let i = 1; i < maxLevel; i++) {
         currentFriendList = getCircle(currentFriendList);
         currentFriendList = getVertex(friends, currentFriendList);
         listOfAllFriends = getFriendsList(currentFriendList, listOfAllFriends);
     }
     listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr));
-    // listOfAllFriends = listOfAllFriends.map(fr => fr.name);
-    // console.info(listOfAllFriends);
     limitedIterator.done = function () {
         return limitedIterator.index >= listOfAllFriends.length || maxLevel === 0;
     };
@@ -167,8 +103,6 @@ function getVertex(friends, currentFriendList) {
 
 function getBestFriends(friends) {
     friends = friends.filter(person => person.best);
-    // friends = friends.map(person => person.name);
-    // friends = friends.sort(compareForName);
 
     return friends;
 }
@@ -176,11 +110,7 @@ function getBestFriends(friends) {
 function getCircle(currentFriendList) {
     let result = [];
     for (let person of currentFriendList) {
-        // result = (person.friends.filter(fr =>
-        //     !listOfAllFriends.includes(fr)));
         let currentRes = person.friends;
-        // currentRes = currentRes.filter(fr => !listOfAllFriends.includes(fr));
-        // console.info(currentRes);
         result = result.concat(currentRes);
     }
     result.sort(compareForName);
@@ -221,27 +151,6 @@ function FemaleFilter() {
 
     return genderFilter;
 }
-
-// const maleFilter = new MaleFilter();
-// const femaleFilter = new FemaleFilter();
-// const maleIterator = new LimitedIterator(friendss, maleFilter, 2);
-// const femaleIterator = new Iterator(friendss, femaleFilter);
-//
-// const invitedFriends = [];
-//
-// while (!maleIterator.done() && !femaleIterator.done()) {
-//     invitedFriends.push([
-//         maleIterator.next(),
-//         femaleIterator.next()
-//     ]);
-// }
-//
-// while (!femaleIterator.done()) {
-//     // console.info(femaleIterator.index);
-//     invitedFriends.push(femaleIterator.next());
-// }
-//
-// console.info(invitedFriends);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
