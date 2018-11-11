@@ -102,6 +102,12 @@ class FriendPicker {
 
 }
 
+function checkFilter(filter) {
+    if (!(filter instanceof SimpleFilter)) {
+        throw new TypeError('Expected filter to be a SimpleFilter');
+    }
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -110,6 +116,7 @@ class FriendPicker {
  */
 function Iterator(friends, filter) {
     console.info(friends, filter);
+    checkFilter(filter);
     const pickedFriends = new FriendPicker(friends).getFriends(Number.MAX_SAFE_INTEGER);
 
     return new ArrayIterator(filter.filterAll(pickedFriends));
@@ -125,6 +132,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
+    checkFilter(filter);
     const pickedFriends = new FriendPicker(friends).getFriends(maxLevel);
 
     return new ArrayIterator(filter.filterAll(pickedFriends));
