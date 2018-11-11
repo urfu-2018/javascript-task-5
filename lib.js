@@ -95,7 +95,7 @@ function getNextLevelFriends(friends, guests, friendsByName) {
     return friends
         .reduce((result, friend) => result.concat(friend.friends), [])
         .map(name => friendsByName.get(name))
-        .filter(friend => !guests.includes(friend))
+        .filter((friend, index, self) => !guests.includes(friend) && index === self.indexOf(friend))
         .sort((a, b) => a.name > b.name);
 }
 
