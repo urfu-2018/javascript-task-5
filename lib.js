@@ -52,7 +52,6 @@ class MaleFilter extends GenderFilter {
     }
 }
 
-
 class FemaleFilter extends GenderFilter {
 
     constructor() {
@@ -80,6 +79,7 @@ class FriendPicker {
         for (let i = 0; i < depth && friends.length > 0; i++) {
             currentStepFriends = FriendPicker._performFriendPickStep(friends,
                 currentStepFriends, pickedFriends);
+
             if (prevPickedFriendsLength === pickedFriends.length) {
                 break;
             }
@@ -147,6 +147,9 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     checkFilter(filter);
+    if (typeof maxLevel !== 'number' || Number.isNaN(maxLevel)) {
+        throw new TypeError('maxLevel is expected to be a Number');
+    }
     console.info(friends, filter, maxLevel);
     const pickedFriends = new FriendPicker(friends).getFriends(maxLevel);
 
