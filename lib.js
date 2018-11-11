@@ -1,21 +1,18 @@
 'use strict';
 
 function getChosenFriendsList(friends, circlesCount = Infinity) {
-    if (circlesCount < 1) {
-        return [];
-    }
     friends = friends.sort((x, y) => x.name.localeCompare(y.name));
     let currentCircle = friends.filter(f => f.best);
-    let result = currentCircle;
+    let result = [];
 
-    for (let i = 1; i < circlesCount && currentCircle.length; i++) {
+    for (let i = 0; i < circlesCount && currentCircle.length; i++) {
+        result = result.concat(currentCircle);
         const usedNames = result.map(e => e.name);
         const nextCircleNames = currentCircle
             .reduce((acc, next) => acc.concat(next.friends), [])
             .filter(n => !usedNames.includes(n));
 
         currentCircle = friends.filter(e => nextCircleNames.includes(e.name));
-        result = result.concat(currentCircle);
     }
 
     return result;
