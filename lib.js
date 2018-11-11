@@ -19,7 +19,7 @@ function Iterator(friends, filter) {
         return this.guests.length === 0;
     };
     this.next = () => {
-        return this.guests.shift();
+        return this.done() ? null : this.guests.shift();
     };
 }
 
