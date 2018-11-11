@@ -114,7 +114,7 @@ function bubbleSortInternal(friends, i, j) {
     const friendB = friends[j];
 
     if (friendA.level === friendB.level) {
-        if (friendA.object.name >= friendB.object.name) {
+        if (friendA.object.name.toLowerCase() >= friendB.object.name.toLowerCase()) {
             swap(friends, i, j);
         }
     } else if (friendA.level < friendB.level) {
