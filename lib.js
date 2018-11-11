@@ -14,9 +14,11 @@ function Iterator(friends, filter) {
     this.result = getGuests(friends).filter(filter.filter);
     this.index = 0;
     this.next = function () {
-        if (this.index < this.result.length) {
+        if (!this.done()) {
             return this.result[this.index++];
         }
+
+        return null;
     };
 
     this.done = function () {
