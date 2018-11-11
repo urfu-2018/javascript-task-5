@@ -10,7 +10,7 @@ function getFriendsQueue(friends, filter) {
     let queue = friends.filter(x => x.best === true)
         .map(x => ({ ...x, deep: 1 }));
 
-    queue.map(x => {
+    queue.forEach(x => {
         isVisited[x.name] = 1;
     });
 
