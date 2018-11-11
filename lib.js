@@ -76,7 +76,7 @@ function FemaleFilter() {
 
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
-function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
+function filterAndOrder(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
@@ -84,14 +84,14 @@ function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
         .map(friend => {
             return {
                 object: friend,
-                level: friend.best ? 1 : Number.POSITIVE_INFINITY
+                level: friend.best ? 1 : Infinity
             };
         });
 
     temp = bubbleSort(temp)
         .filter(friend => filter.apply(friend.object))
         .filter(friend => friend.level <= maxLevel &&
-            friend.level !== Number.POSITIVE_INFINITY);
+            friend.level !== Infinity);
 
     return {
         current: 0,
