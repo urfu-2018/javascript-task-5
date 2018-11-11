@@ -7,7 +7,6 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    // console.info(friends, filter);
     this.sortedFriends = setFriends(friends);
     console.info(this.sortedFriends);
     this.filterFriends = [];
@@ -17,11 +16,11 @@ function Iterator(friends, filter) {
         }
     });
     this.pointer = 0;
-    this.done = () => {
+    this.done = function () {
         return this.pointer + 1 > this.filterFriends.length;
     };
 
-    this.next = () => {
+    this.next = function () {
         this.pointer++;
 
         return this.filterFriends[this.pointer - 1].friend;
@@ -50,7 +49,6 @@ function getBestFriendsName(friends) {
 
 function sortedFriendsHas(sortedFriends, name) {
     for (let person of sortedFriends) {
-        // console.info(person);
         if (person.friend.name === name) {
             return true;
         }
@@ -77,7 +75,6 @@ function processCurrentLevelNames(currentLevelNames, dictionaryFriends, sortedFr
 function setFriends(friends) {
     let sortedFriends = [];
     let dictionaryFriends = getDictionaryFriends(friends);
-    // console.info(dictionaryFriends);
     let level = 0;
     let currentLevelNames = getBestFriendsName(friends);
 
@@ -123,14 +120,14 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.filterFriends = newFilterFriends;
 }
 
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
+
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    this.isPermissible = () => {
-        return true;
-    };
+    this.isPermissible = () => true;
 }
 
 /**
@@ -139,11 +136,10 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    Filter.call(this);
-    this.isPermissible = (person) => {
-        return person.gender === 'male';
-    };
+    this.isPermissible = (person) => person.gender === 'male';
 }
+
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -151,11 +147,10 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    Filter.call(this);
-    this.isPermissible = (person) => {
-        return person.gender === 'female';
-    };
+    this.isPermissible = (person) => person.gender === 'female';
 }
+
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
