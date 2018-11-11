@@ -30,6 +30,7 @@ function getFriendsQueue(friends, filter, maxLevel = Infinity) {
         .sort(
             (first, second) => friendsLevels[first.name] - friendsLevels[second.name] ||
                 first.name.localeCompare(second.name));
+
     return queue;
 }
 
