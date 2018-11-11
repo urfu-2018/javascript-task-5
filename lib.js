@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 'use strict';
 
 /**
@@ -92,6 +93,8 @@ function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
         .filter(friend => filter.apply(friend.object))
         .filter(friend => friend.level <= maxLevel &&
             friend.level !== Number.POSITIVE_INFINITY);
+
+    temp = temp.some(friend => friend.level === 1) ? temp : [];
 
     return {
         current: 0,
