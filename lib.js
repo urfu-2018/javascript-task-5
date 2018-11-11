@@ -7,8 +7,50 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('filter must be instance of Filter');
+    }
+
+    this._friends = friends;
+    this._filter = filter;
+    this._friendsToInvite = this._getFriendsToInvite(this._maxLevel);
+
+    this._index = 0;
 }
+
+Iterator.prototype = {
+
+    _getFriendsToInvite(level = Infinity) {
+        const friendsToInvite = [];
+
+        let currentLevel = this._friends.filter(friend => friend.best);
+
+        while (currentLevel.length !== 0 && level > 0) {
+            currentLevel.sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
+            friendsToInvite.push(...currentLevel);
+
+            currentLevel = this._getNextLevel(currentLevel, friendsToInvite);
+            level--;
+        }
+
+        return friendsToInvite.filter(friend => this._filter.test(friend));
+    },
+
+    _getNextLevel(level, friendsToInvite) {
+        return level
+            .reduce((friendNames, friend) => friendNames.concat(friend.friends), [])
+            .map(friendName => this._friends.find(friend => friend.name === friendName))
+            .filter(friend => !friendsToInvite.includes(friend));
+    },
+
+    done() {
+        return this._friendsToInvite[this._index] === undefined;
+    },
+
+    next() {
+        return this.done() ? null : this._friendsToInvite[this._index++];
+    }
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -19,15 +61,18 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
+    this._maxLevel = maxLevel;
+    Iterator.call(this, friends, filter);
 }
+
+LimitedIterator.prototype = Object.create(Iterator.prototype);
 
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    this.test = () => true;
 }
 
 /**
@@ -36,8 +81,10 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
+    this.test = friend => friend.gender === 'male';
 }
+
+MaleFilter.prototype = Object.create(Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -45,8 +92,10 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    this.test = friend => friend.gender === 'female';
 }
+
+FemaleFilter.prototype = Object.create(Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
