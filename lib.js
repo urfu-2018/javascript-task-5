@@ -10,7 +10,7 @@ const alphabeticalCompare = (a, b) => a.name.localeCompare(b.name);
  */
 function Iterator(friends, filter) {
     console.info(friends, filter);
-    if (!(filter instanceof Filter)) {
+    if (!Filter.prototype.isPrototypeOf(filter)) { // аналог !(filter instanceof Filter)
         throw new TypeError('`filter` parameter must be a prototype of Filter!');
     }
     this._pointer = 0;
@@ -34,11 +34,12 @@ Iterator.prototype = {
     },
 
     _getNextCircle(circle, guestList, friends) {
-        return circle
+        const newCircle = circle
             .reduce((result, person) => [...result, ...person.friends], [])
             .map(name => this._getFriend(name, friends))
-            .filter(friend => !guestList.includes(friend))
-            .sort(alphabeticalCompare);
+            .filter(friend => !guestList.includes(friend));
+
+        return [...newCircle].sort(alphabeticalCompare);
     },
 
     _getFriend(friendName, friends) {
