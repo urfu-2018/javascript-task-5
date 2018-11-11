@@ -10,7 +10,7 @@ const alphabeticalCompare = (a, b) => a.name.localeCompare(b.name);
  */
 function Iterator(friends, filter) {
     console.info(friends, filter);
-    if (!(Filter.prototype.isPrototypeOf(filter))) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError('`filter` parameter must be a prototype of Filter!');
     }
     this._pointer = 0;
