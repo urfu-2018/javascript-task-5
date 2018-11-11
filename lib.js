@@ -7,12 +7,14 @@ function getInvitedFriends(friends, filter, maxLevel) {
 
     let level = 1;
     let currentLevel = friends
-        .filter(friend => friend.best)
-        .sort((f1, f2) => f1.name.localeCompare(f2.name));
+        .filter(friend => friend.best);
     const resultNames = new Set();
 
     while (currentLevel.length !== 0 && level <= maxLevel) {
-        currentLevel.forEach(friend => resultNames.add(friend.name));
+        currentLevel
+            .sort((f1, f2) => f1.name.localeCompare(f2.name))
+            .forEach(friend => resultNames.add(friend.name));
+
         currentLevel = [...currentLevel
             .reduce(
                 (set, friend) => {
@@ -22,7 +24,6 @@ function getInvitedFriends(friends, filter, maxLevel) {
                 },
                 new Set())]
             .filter(name => !resultNames.has(name))
-            .sort((name1, name2) => name1.localeCompare(name2))
             .map(name => allFriends.get(name));
 
         level++;
