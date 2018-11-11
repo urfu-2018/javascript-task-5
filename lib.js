@@ -1,5 +1,35 @@
 'use strict';
 
+function getGuests(friends, maxTier = Infinity) {
+    const friendsMap = new Map(friends.map(friend => [friend.name, friend]));
+
+    let currentTier = friends.filter(f => f.best)
+        .map(f => f.name)
+        .sort((a, b) => a.localeCompare(b));
+
+    let guests = [];
+    for (; maxTier > 0; maxTier--) {
+        guests = guests.concat(currentTier);
+        currentTier = getNextTierGuests(currentTier, guests, friendsMap);
+        if (currentTier.length === 0) {
+            break;
+        }
+    }
+
+    return guests.map(g => friendsMap.get(g));
+}
+
+function getNextTierGuests(currentTier, guests, friendsMap) {
+    const newGuests = new Set();
+    currentTier.forEach(currentFriend =>
+        friendsMap.get(currentFriend)
+            .friends
+            .filter(friend => !guests.includes(friend))
+            .forEach(x => newGuests.add(x)));
+
+    return [...newGuests].sort((a, b) => a.localeCompare(b));
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -7,7 +37,19 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
+
+    const guests = getGuests(friends, this.maxLevel).filter(filter.predicate);
+    let index = 0;
+    this.next = function () {
+        return this.done() ? null : guests[index++];
+    };
+
+    this.done = function () {
+        return !(index < guests.length);
+    };
 }
 
 /**
@@ -19,7 +61,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
+    this.maxLevel = maxLevel;
+    Iterator.call(this, friends, filter);
 }
 
 /**
@@ -27,8 +70,13 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    this.gender = undefined;
+    this.predicate = function (record) {
+        return !this.gender || this.gender === record.gender;
+    }.bind(this);
 }
+
+const filterPrototype = new Filter();
 
 /**
  * Фильтр друзей
@@ -36,8 +84,11 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
+    Filter.call(this);
+    this.gender = 'male';
 }
+
+MaleFilter.prototype = filterPrototype;
 
 /**
  * Фильтр друзей-девушек
@@ -45,8 +96,11 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    Filter.call(this);
+    this.gender = 'female';
 }
+
+FemaleFilter.prototype = filterPrototype;
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
