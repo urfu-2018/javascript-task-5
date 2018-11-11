@@ -1,4 +1,3 @@
-/* eslint-disable linebreak-style */
 'use strict';
 
 /**
@@ -81,8 +80,7 @@ function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    let _friends = friends ? friends : [];
-    let temp = _friends
+    let temp = friends
         .map(friend => {
             return {
                 object: friend,
