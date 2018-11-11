@@ -48,6 +48,7 @@ function Iterator(friends, filter) {
         if (friendWithDeep.best !== undefined) {
             foundFriend.best = friendWithDeep.best;
         }
+
         return foundFriend;
     };
 
