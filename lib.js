@@ -80,11 +80,11 @@ FemaleFilter.prototype = Object.create(Filter.prototype, {
 
 function getNextCircle(currentCircle, friends, invitedFriends) {
     console.info(currentCircle);
-    let objectFriends = currentCircle.reduce((array, friend) => {
-        return array.concat(friend.friends);
-    }, []).map(guest => friends.find(friend => friend.name === guest));
 
-    return objectFriends.filter(friend => !invitedFriends.includes(friend));
+    return currentCircle.reduce((array, friend) => array.concat(friend.friends), [])
+        .map(guest => friends.find(friend => friend.name === guest))
+        .filter((friend, index, array) => !invitedFriends.includes(friend) &&
+            array.indexOf(friend) === index);
 }
 
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
