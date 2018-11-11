@@ -21,26 +21,26 @@ function Iterator(friends, filter) {
 Iterator.prototype = {
 
     _getFriendsToInvite(level = Infinity) {
-        const friendsToInvite = [];
+        const friendsToInvite = new Set();
 
         let currentLevel = this._friends.filter(friend => friend.best);
 
         while (currentLevel.length !== 0 && level > 0) {
             currentLevel.sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
-            friendsToInvite.push(...currentLevel);
+            currentLevel.forEach(friend => friendsToInvite.add(friend));
 
             currentLevel = this._getNextLevel(currentLevel, friendsToInvite);
             level--;
         }
 
-        return friendsToInvite.filter(friend => this._filter.test(friend));
+        return Array.from(friendsToInvite).filter(friend => this._filter.test(friend));
     },
 
     _getNextLevel(level, friendsToInvite) {
         return level
             .reduce((friendNames, friend) => friendNames.concat(friend.friends), [])
             .map(friendName => this._friends.find(friend => friend.name === friendName))
-            .filter(friend => !friendsToInvite.includes(friend));
+            .filter(friend => !friendsToInvite.has(friend));
     },
 
     done() {
