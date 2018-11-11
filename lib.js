@@ -23,14 +23,7 @@ class Filter {
     }
 
     filterAll(array) {
-        const filtered = [];
-        for (const element of array) {
-            if (this.check(element)) {
-                filtered.push(element);
-            }
-        }
-
-        return filtered;
+        return array.filter(e => this.check(e));
     }
 }
 
@@ -67,8 +60,7 @@ function addAll(set, iterable) {
 
 class FriendPicker {
     constructor(friends) {
-        this._friends = friends.slice();
-        this._friends.sort((a, b) => a.name.localeCompare(b.name));
+        this._friends = friends.slice().sort((a, b) => a.name.localeCompare(b.name));
     }
 
     getFriends(depth) {
@@ -90,14 +82,13 @@ class FriendPicker {
     }
 
     static _performFriendPickStep(friends, currentStepFriends, pickedFriends) {
-        let nextStepFriends = new Set();
+        const nextStepFriends = new Set();
         for (let j = 0; j < friends.length; j++) {
             const friend = friends[j];
             if (currentStepFriends.has(friend.name)) {
                 pickedFriends.push(friend);
-                friends.splice(j, 1);
-                j--;
-                addAll(nextStepFriends, friend.friends);
+                friends.splice(j--, 1);
+                addAll(nextStepFriends, friend.friends.filter(f => !pickedFriends.includes(f)));
             }
         }
 
@@ -105,14 +96,7 @@ class FriendPicker {
     }
 
     _getBestFriends() {
-        const bestFriends = [];
-        for (const friend of this._friends) {
-            if (friend.best) {
-                bestFriends.push(friend.name);
-            }
-        }
-
-        return bestFriends;
+        return this._friends.filter(f => f.best).map(f => f.name);
     }
 
 }
