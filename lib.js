@@ -8,7 +8,6 @@
  */
 function Iterator(friends, filter) {
     this.sortedFriends = setFriends(friends);
-    console.info(this.sortedFriends);
     this.filterFriends = [];
     this.sortedFriends.forEach(person => {
         if (filter.isPermissible(person.friend)) {
