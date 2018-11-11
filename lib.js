@@ -60,10 +60,15 @@ class FriendPicker {
     getFriends(depth) {
         const friends = this._friends.slice();
         const pickedFriends = [];
+        let prevPickedFriendsLength = 0;
         let currentStepFriends = new Set(this._getBestFriends());
         for (let i = 0; i < depth && friends.length > 0; i++) {
             currentStepFriends = FriendPicker._performFriendPickStep(friends,
                 currentStepFriends, pickedFriends);
+            if (prevPickedFriendsLength === pickedFriends.length) {
+                break;
+            }
+            prevPickedFriendsLength = pickedFriends.length;
         }
 
         return pickedFriends;
