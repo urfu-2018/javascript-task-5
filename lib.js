@@ -1,5 +1,36 @@
 'use strict';
 
+function getFriensQueue(friends, filter) {
+    const tempArray = {};
+    friends
+        .forEach(x => {
+            tempArray[x.name] = ({ ...x });
+        });
+    let queue = friends.filter(x => x.best === true)
+        .map(x => ({ ...x }));
+
+    queue.forEach(x => {
+        x.deep = 1;
+        delete tempArray[x.name];
+    });
+
+    friends.forEach((_, i) => {
+        const friend = queue[i];
+        friend.friends.forEach(y => {
+            if (tempArray[y] !== undefined) {
+                friend[y] = tempArray[y];
+                friend[y].deep = friend.deep + 1;
+                delete tempArray[y];
+                queue.push(friend[y]);
+            }
+        });
+    });
+
+    return queue.sort(
+        (first, second) => first.deep - second.deep || first.name.localeCompare(second.name))
+        .filter(x => filter.filter(x));
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -10,35 +41,14 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    const tempArray = {};
-    friends
-        .forEach(x => {
-            tempArray[x.name] = ({ ...x });
-        });
-    this.queue = friends.filter(x => x.best === true)
-        .map(x => ({ ...x }));
+    this.queue = getFriensQueue(friends, filter);
+}
 
-    this.queue.forEach(x => {
-        x.deep = 1;
-        delete tempArray[x.name];
-    });
-
-    friends.forEach((_, i) => {
-        const friend = this.queue[i];
-        friend.friends.forEach(y => {
-            if (tempArray[y] !== undefined) {
-                friend[y] = tempArray[y];
-                friend[y].deep = friend.deep + 1;
-                delete tempArray[y];
-                this.queue.push(friend[y]);
-            }
-        });
-    });
-
-    this.queue = this.queue.sort(
-        (first, second) => first.deep - second.deep || first.name.localeCompare(second.name))
-        .filter(x => filter.filter(x));
-    this.next = function () {
+Iterator.prototype = {
+    next() {
+        if (this.done()) {
+            return null;
+        }
         let friendWithDeep = this.queue.shift();
         let foundFriend = {
             name: friendWithDeep.name,
@@ -50,13 +60,11 @@ function Iterator(friends, filter) {
         }
 
         return foundFriend;
-    };
-
-    this.done = function () {
+    },
+    done() {
         return this.queue.length === 0;
-    };
-
-}
+    }
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -72,7 +80,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
 }
 
-LimitedIterator.prototype = Object.create(Iterator.prototype);
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
  * Фильтр друзей
@@ -93,7 +101,7 @@ function MaleFilter() {
     this.filter = x => x.gender === 'male';
 }
 
-MaleFilter.prototype = Object.create(Filter.prototype);
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -104,7 +112,7 @@ function FemaleFilter() {
     this.filter = x => x.gender === 'female';
 }
 
-FemaleFilter.prototype = Object.create(Filter.prototype);
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
