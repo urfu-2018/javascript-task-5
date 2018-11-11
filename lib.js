@@ -39,7 +39,7 @@ Iterator.prototype = {
             .map(name => this._getFriend(name, friends))
             .filter(friend => !guestList.includes(friend));
 
-        return [...newCircle].sort(alphabeticalCompare);
+        return [...new Set(newCircle)].sort(alphabeticalCompare);
     },
 
     _getFriend(friendName, friends) {
