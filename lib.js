@@ -98,12 +98,6 @@ function filterAndOrder(friends, filter, maxLevel = Number.POSITIVE_INFINITY) {
     };
 }
 
-function friendsComparerInternal(friendA, friendB) {
-    return !(friendA.best === friendB.best
-        ? friendA.name < friendB.name
-        : friendA.best);
-}
-
 function bubbleSort(friends) {
     for (let i = 0; i < friends.length; i++) {
         for (let j = i + 1; j < friends.length; j++) {
@@ -119,17 +113,22 @@ function bubbleSortInternal(friends, i, j) {
     const friendB = friends[j];
 
     if (friendA.level === friendB.level) {
-        if (friendsComparerInternal(friendA.object, friendB.object)) {
+        if (friendA.object.name >= friendB.object.name) {
             swap(friends, i, j);
         }
-    } else if (friendA.level + 1 < friendB.level) {
-        if (friendA.object.friends.includes(friendB.object.name)) {
-            friendB.level = friendA.level + 1;
-        }
+    } else if (friendA.level < friendB.level) {
+        correctLevel(friendA, friendB);
     } else if (friendA.level > friendB.level) {
+        correctLevel(friendB, friendA);
         swap(friends, i, j);
     }
 
+}
+
+function correctLevel(lowLevelFriend, highLevelFriend) {
+    if (lowLevelFriend.object.friends.includes(highLevelFriend.object.name)) {
+        highLevelFriend.level = lowLevelFriend.level + 1;
+    }
 }
 
 function swap(friends, i, j) {
