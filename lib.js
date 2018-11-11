@@ -6,7 +6,9 @@ function getInvitedFriends(friends, filter, maxLevel) {
         new Map());
 
     let level = 1;
-    let currentLevel = friends.filter(friend => friend.best);
+    let currentLevel = friends
+        .filter(friend => friend.best)
+        .sort((f1, f2) => f1.name.localeCompare(f2.name));
     const resultNames = new Set();
 
     while (currentLevel.length !== 0 && level <= maxLevel) {
