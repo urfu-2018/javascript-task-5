@@ -102,7 +102,7 @@ function MaleFilter() {
         return x.gender === 'male';
     };
 }
-Object.setPrototypeOf(MaleFilter, Filter);
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -114,7 +114,7 @@ function FemaleFilter() {
         return x.gender === 'female';
     };
 }
-Object.setPrototypeOf(FemaleFilter, Filter);
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
