@@ -80,7 +80,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
     this.allSortedFriends = this.allSortedFriends.filter(x => x.level <= maxLevel);
 }
-Object.setPrototypeOf(LimitedIterator, Iterator);
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
  * Фильтр друзей
