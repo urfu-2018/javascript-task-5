@@ -11,7 +11,7 @@ function getFriendsForInviting(friends, maxLevel) {
     for (let i = 0; i < maxLevel - 1; i++) {
         friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
         toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
-        if (friends.length === 0 || toInvite[i].length === 0) {
+        if (friends.length === 0 || toInvite[i + 1].length === 0) {
             break; // если всех добавили, или все оставшиеся не связаны.
         }
     }
