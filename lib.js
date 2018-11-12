@@ -21,7 +21,7 @@ function getAllFriends(friends) {
  */
 function getFriends(friends, filter, maxLevel = Infinity) {
     let guestFilter = [];
-    let summonMate = friends.filter(friend => friend.best);
+    let summonMate = friends.filter(friend => friend.best).sort((a, b) => a.name > b.name);
     let notSummon = friend => !guestFilter.includes(friend);
     while (maxLevel > 0 && summonMate.length > 0) {
         guestFilter = guestFilter.concat(summonMate);
