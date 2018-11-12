@@ -1,30 +1,18 @@
 'use strict';
 
+function getNextRound(friends, currentRound, invitedFriends) {
+    return currentRound
+        .reduce((arrNames, currentFriend) => arrNames.concat(currentFriend.friends), [])
+        .map(friendName => friends.find(friend => friend.name === friendName))
+        .filter((friend, i, arrFriends) =>
+            arrFriends.indexOf(friend) === i &&
+            !invitedFriends.includes(friend))
+        .sort(sortByName);
+}
 
 function sortByName(firstPerson, secondPerson) {
 
     return firstPerson.name.localeCompare(secondPerson.name);
-}
-
-function getFriendsOfFriends(friend, otherFriends) {
-    const friendsOfFriends = [];
-    for (const nameFriend of friend.friends) {
-        const newGuest = findFriend(nameFriend, otherFriends);
-        friendsOfFriends.push(newGuest);
-    }
-
-    return friendsOfFriends;
-}
-
-function findFriend(nameFriend, otherFriends) {
-    for (let i = 0; i < otherFriends.length; i++) {
-        if (otherFriends[i].name === nameFriend) {
-            const finedFriend = otherFriends[i];
-            otherFriends.splice(i, 1);
-
-            return finedFriend;
-        }
-    }
 }
 
 function plusNumber(maxLevel) {
@@ -42,23 +30,16 @@ function getFirstRound(currentRound, filter, maxLevel) {
 
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = filter.sortBestFriends(friends);
-    let otherFriends = filter.sortCommonFriends(friends);
     let countCicle = 1;
-    let nextRound = [];
     maxLevel = plusNumber(maxLevel);
     let invitedFriends = getFirstRound(currentRound, filter, maxLevel);
-    while (countCicle < maxLevel && otherFriends.length && currentRound.length) {
-        for (const currentFriend of currentRound) {
-            nextRound = nextRound
-                .concat(getFriendsOfFriends(currentFriend, otherFriends, invitedFriends));
-        }
-        currentRound = nextRound.filter(elArr => Boolean(elArr));
-        nextRound = [];
-        invitedFriends = invitedFriends.concat(filter.filterGender(currentRound));
+    while (countCicle < maxLevel && currentRound.length) {
+        currentRound = getNextRound(friends, currentRound, invitedFriends);
+        invitedFriends = invitedFriends.concat(currentRound);
         countCicle++;
     }
 
-    return invitedFriends;
+    return filter.filterGender(invitedFriends);
 }
 
 
@@ -117,10 +98,6 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    this.sortCommonFriends = (arrFriends) => arrFriends
-        .filter(friend => !friend.best)
-        .sort(sortByName);
-
     this.sortBestFriends = (arrFriends) => arrFriends
         .filter(friend => friend.best)
         .sort(sortByName);
