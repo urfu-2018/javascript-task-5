@@ -41,11 +41,11 @@ class Iterator {
      * @param {Filter} filter
      * @param {Number} maxLevel
      */
-    constructor(friends, filter, maxLevel = Infinity) {
+    constructor(friends, filter) {
         if (!(filter instanceof Filter)) {
             throw new TypeError('filter не является экземпляром Filter');
         }
-        this.friends = getInvitedFriends(friends, filter, maxLevel);
+        this.friends = getInvitedFriends(friends, filter, Infinity);
         this.index = 0;
     }
 
@@ -150,7 +150,8 @@ class LimitedIterator extends Iterator {
      * @param {Number} maxLevel – максимальный круг друзей
      */
     constructor(friends, filter, maxLevel) {
-        super(friends, filter, maxLevel);
+        super(friends, filter);
+        this.friends = getInvitedFriends(friends, filter, maxLevel);
     }
 }
 
