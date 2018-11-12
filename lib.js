@@ -11,7 +11,7 @@ const alphabet = (x, y) => x.localeCompare(y);
 function Iterator(friends, filter) {
 //    console.info(friends, filter);
     if (!(filter instanceof Filter)) {
-        return new TypeError();
+        throw new TypeError();
     }
     this.friends = friends;
     this.index = 0;
