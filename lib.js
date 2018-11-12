@@ -1,14 +1,37 @@
 'use strict';
 
-function friendsComaprer(a, b) {
-    if (a.best && !b.best) {
-        return -1;
-    }
-    if (!a.best && b.best) {
-        return 1;
+function getFriendsByCircles(friends, depth = Infinity) {
+    const friendsMap = new Map();
+    friends.forEach(friend => friendsMap.set(friend.name, friend));
+
+    let circle = friends.filter(f => f.best)
+        .map(f => f.name)
+        .sort((a, b) => a.localeCompare(b));
+
+    let guests = [];
+    for (let i = 0; i < depth; i++) {
+        guests = guests.concat(circle);
+        circle = getNextCircle(circle, guests, friendsMap);
+        if (circle.length === 0) {
+            break;
+        }
     }
 
-    return a.name.localeCompare(b.name);
+    return guests.map(g => friendsMap.get(g));
+}
+
+function getNextCircle(currentCircle, guests, friendsMap) {
+    guests = new Set(guests);
+    const nextCircle = new Set();
+    for (let friend of currentCircle) {
+        friendsMap.get(friend).friends.forEach(name => {
+            if (!guests.has(name)) {
+                nextCircle.add(name);
+            }
+        });
+    }
+
+    return [...nextCircle].sort((a, b) => a.localeCompare(b));
 }
 
 /**
@@ -18,32 +41,21 @@ function friendsComaprer(a, b) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
-    friends = friends.filter(filter);
-    friends.sort(friendsComaprer);
-    const iterator = {
-        isDone: false,
-        index: 0,
-        friends: friends,
-
-        next: function () {
-            if (this.friends.length > this.index) {
-                this.index += 1;
-
-                return this.friends[this.index - 1];
-            }
-            this.isDone = true;
-
-            return null;
-        },
-
-        done: function () {
-            return this.isDone;
-        }
-    };
-
-    return iterator;
+    this.guests = getFriendsByCircles(friends, this.maxLevel)
+        .filter(filter.predicate);
+    this.index = 0;
 }
+
+Iterator.prototype = {
+    constructor: Iterator,
+    next: function () {
+        return this.done() ? null : this.guests[this.index++];
+    },
+
+    done: function () {
+        return !(this.index < this.guests.length);
+    }
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -54,39 +66,19 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
-    friends = getFriendsByCircleDepth(friends, maxLevel);
-
-    return new Iterator(friends, filter);
+    this.maxLevel = maxLevel;
+    Iterator.call(this, friends, filter);
 }
 
-function getFriendsByCircleDepth(friends, depth) {
-    let friendsMap = new Map();
-    friends.forEach(x => friendsMap.set(x.name, x));
-    let circle = friends.filter(x => x.best);
-    circle.sort(friendsComaprer);
-    circle = new Set(circle);
-    for (let i = 1; i < depth; i++) {
-        let newCircle = [];
-        for (let friend of circle) {
-            friend.friends.forEach(name => newCircle.push(friendsMap.get(name)));
-        }
-        newCircle.sort(friendsComaprer);
-        circle = new Set([...circle, ...newCircle]);
-    }
-
-    return [...circle];
-}
+LimitedIterator.prototype = Object.create(Iterator.prototype);
+LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
-    this.condition = function () {
-        return true;
-    };
+    this.predicate = undefined;
 }
 
 /**
@@ -95,16 +87,10 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
-    this.condition = function (friend) {
-        return friend.gender === 'male';
-    };
-
-    return this.condition;
+    this.predicate = friend => friend.gender === 'male';
 }
 
-MaleFilter.prototype = Object.create(Filter.prototype);
-MaleFilter.prototype.constructor = MaleFilter;
+MaleFilter.prototype = new Filter();
 
 /**
  * Фильтр друзей-девушек
@@ -112,17 +98,10 @@ MaleFilter.prototype.constructor = MaleFilter;
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
-    this.condition = function (friend) {
-        return friend.gender === 'female';
-    };
-
-    return this.condition;
+    this.predicate = friend => friend.gender === 'female';
 }
 
-
-FemaleFilter.prototype = Object.create(Filter.prototype);
-FemaleFilter.prototype.constructor = FemaleFilter;
+FemaleFilter.prototype = new Filter();
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
