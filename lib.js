@@ -15,16 +15,11 @@ function sortByName(firstPerson, secondPerson) {
     return firstPerson.name.localeCompare(secondPerson.name);
 }
 
-function plusNumber(maxLevel) {
-    return typeof maxLevel === 'number' && maxLevel > 0 ? maxLevel : 0;
-}
-
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = friends.filter(friend => friend.best).sort(sortByName);
     let countCicle = 0;
-    maxLevel = plusNumber(maxLevel);
     let invitedFriends = [];
-    while (countCicle < maxLevel && currentRound.length && maxLevel > 0) {
+    while (countCicle < maxLevel && currentRound.length > 0 && maxLevel > 0) {
         invitedFriends = invitedFriends.concat(currentRound);
         currentRound = getNextRound(friends, currentRound, invitedFriends);
         countCicle++;
