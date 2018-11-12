@@ -36,7 +36,7 @@ Iterator.prototype = {
         let previousFront = removeDuplicatesAndSort(this.friends
             .filter(friend => friend.best).sort(sortByName));
         let invited = (previousFront.map(friend => friend.name));
-        let result = previousFront;
+        let result = new Set(previousFront);
         let front = 0;
 
         while (front < maxLevel && invited.length !== this.friends.length) {
@@ -51,10 +51,10 @@ Iterator.prototype = {
                 });
             });
 
-            result = result.concat(currentFront.sort(sortByName));
+            currentFront.sort(sortByName).forEach(friend => result.add(friend));
             if (currentFront.length === 0) {
 
-                result = result.concat(this.friends.filter(friend =>
+                result.add(this.friends.filter(friend =>
                     invited.indexOf(friend.name) === -1).sort(sortByName));
             }
 
@@ -62,7 +62,7 @@ Iterator.prototype = {
             front++;
         }
 
-        return result.filter(friend => this.filter.gender(friend));
+        return Array.from(result).filter(friend => this.filter.gender(friend));
 
     },
     done() {
