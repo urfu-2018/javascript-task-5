@@ -82,8 +82,10 @@ LimitedIterator.prototype.constructor = LimitedIterator;
  * @constructor
  */
 function Filter() {
-    this.predicate = undefined;
+    this.predicate = () => true;
 }
+
+const filter = new Filter();
 
 /**
  * Фильтр друзей
@@ -96,7 +98,7 @@ function MaleFilter() {
     this.predicate.bind(this);
 }
 
-MaleFilter.prototype = new Filter();
+MaleFilter.prototype = filter;
 
 /**
  * Фильтр друзей-девушек
@@ -109,7 +111,7 @@ function FemaleFilter() {
     this.predicate.bind(this);
 }
 
-FemaleFilter.prototype = new Filter();
+FemaleFilter.prototype = filter;
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
