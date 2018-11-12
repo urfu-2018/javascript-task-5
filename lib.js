@@ -8,11 +8,10 @@ function getSortedFriends(friends, filter, maxLevel = Infinity) {
         sortedFriends.push(...prevCircle);
         const nextCircleNames = [];
         prevCircle.forEach(friend => nextCircleNames.push(...friend.friends));
-        const nextCircle = [...new Set(nextCircleNames)]
+        const nextCircle = nextCircleNames
             .map(name => friends.find(friend => friend.name === name))
-            .filter(friend => !sortedFriends.includes(friend))
-            .sort(compareFriends);
-        prevCircle = nextCircle;
+            .filter(friend => !sortedFriends.includes(friend));
+        prevCircle = [...new Set(nextCircle)].sort(compareFriends);
     }
 
     return sortedFriends.filter(filter.filterFriends);
