@@ -69,9 +69,6 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError('Not instance of Filter');
-    }
     this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
     this.count = 0;
     this.next = next.bind(this, this);
