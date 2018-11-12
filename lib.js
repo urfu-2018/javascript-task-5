@@ -28,22 +28,6 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     return invitedFriends.filter(filter.filterGender);
 }
 
-
-function next(context) {
-    if (context.count < context.invitedFriends.length) {
-
-        return context.invitedFriends[context.count++];
-    }
-
-    return null;
-}
-
-function done(context) {
-
-    return !(context.count < context.invitedFriends.length);
-}
-
-
 /**
  * Итератор по друзьям
  * @constructor
@@ -56,8 +40,17 @@ function Iterator(friends, filter) {
     }
     this.invitedFriends = getInvitedFriends(friends, filter);
     this.count = 0;
-    this.next = next.bind(null, this);
-    this.done = done.bind(null, this);
+    this.next = () => {
+        if (this.count < this.invitedFriends.length) {
+            return this.invitedFriends[this.count++];
+        }
+
+        return null;
+    }
+
+    this.done = () => {
+        return !(this.count < this.invitedFriends.length);
+    }
 }
 
 /**
@@ -69,10 +62,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    Iterator.call(this, friends, filter);
     this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
-    this.count = 0;
-    this.next = next.bind(this, this);
-    this.done = done.bind(this, this);
 }
 
 /**
