@@ -20,6 +20,7 @@ function Iterator(friends, filter) {
 }
 
 Iterator.prototype = {
+    constructor: Iterator,
     next() {
         if (this.index < this.sortedFriends.length) {
 
