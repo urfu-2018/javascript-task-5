@@ -109,7 +109,7 @@ function filterFriends(friends, filter) {
 function getBestFriendsIndexes(friends, maxLevel) {
     const bestFriendsIndexes = [];
     friends.forEach(function (i, index) {
-        if (i.hasOwnProperty('best')) {
+        if (i.best) {
             bestFriendsIndexes.push(index);
         }
     });
@@ -212,11 +212,13 @@ function FemaleFilter() {
 }
 
 function friendsSortFunction(firstFriend, secondFriend) {
-    const isBest = secondFriend.hasOwnProperty('best') - firstFriend.hasOwnProperty('best');
+    const isSecondIsBest = (secondFriend.best) ? 1 : 0;
+    const isFirstIsBest = (firstFriend.best) ? 1 : 0;
+    const isBest = isSecondIsBest - isFirstIsBest;
     if (isBest) {
         return isBest;
     }
-    if (firstFriend.hasOwnProperty('best')) {
+    if (firstFriend.best) {
         return firstFriend.name.localeCompare(secondFriend.name, 'kn');
     }
 
