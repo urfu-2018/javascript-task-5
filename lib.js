@@ -41,15 +41,15 @@ function Iterator(friends, filter) {
 
     this.filteredFriends = sortAndFilterFriends(friends, filter);
     this.index = 0;
-
-    this.next = function () {
-        return this.done() ? null : this.filteredFriends[this.index++];
-    };
-
-    this.done = function () {
-        return this.filteredFriends.length === this.index;
-    };
 }
+
+Iterator.prototype.next = function () {
+    return this.done() ? null : this.filteredFriends[this.index++];
+};
+
+Iterator.prototype.done = function () {
+    return this.filteredFriends.length === this.index;
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
