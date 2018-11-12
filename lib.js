@@ -37,9 +37,8 @@ Iterator.prototype = {
         if (!(this.done())) {
             return this.guestsList[this.currentIndex++];
         }
-        else {
-            return null;
-        }
+
+        return null;
     }
 };
 
