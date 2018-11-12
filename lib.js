@@ -6,7 +6,9 @@ function assignCirclesFromBestFriend(bestFriend, friends) {
     while (queue.length) {
         let friend = queue.shift();
         let friendsOfFriend = friends.filter(
-            f => friend.friends.includes(f.name) && !(f.circle <= friend.circle)
+            f =>
+                friend.friends.includes(f.name) &&
+                (typeof f.circle === 'undefined' || f.circle > friend.circle)
         );
         queue.push(...friendsOfFriend);
         friendsOfFriend.forEach(f => (f.circle = friend.circle + 1));
