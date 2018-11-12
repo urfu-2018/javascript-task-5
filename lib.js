@@ -121,7 +121,7 @@ Iterator.prototype = {
 
     done: function () {
         let isDone = this.next() === null;
-        if (isDone === null) {
+        if (isDone) {
             this.finished = true;
         } else {
             this.index--;
