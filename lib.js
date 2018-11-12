@@ -8,24 +8,23 @@ class FriendData {
 }
 
 function getAllSortedFriends(friends, filter) {
-    const allFriends = new Map(friends.map(x => [x.name, x]));
+    const allFriends = new Map(friends.map(friend => [friend.name, friend]));
     const visitedFriends = new Set();
-    let currentLevel = filterLevel(friends.filter(x => x.best), visitedFriends);
+    let currentLevel = filterLevel(friends.filter(x => x.best));
     let allSortedFriends = [];
     let currentLevelNum = 1;
 
     while (currentLevel.length !== 0) {
-        currentLevel.forEach(x => visitedFriends.add(x.name));
+        currentLevel.forEach(friend => visitedFriends.add(friend.name));
         fillSortedFriends(allSortedFriends, currentLevel, currentLevelNum);
         currentLevel = filterLevel(currentLevel
             .map(x => x.name)
             .reduce((list, name) => {
-                allFriends.get(name).friends
-                    .forEach(friend => list.push(allFriends.get(friend)));
+                allFriends.get(name).friends.forEach(friend => list.push(allFriends.get(friend)));
 
                 return list;
             }, []
-            ), visitedFriends);
+            ));
         currentLevelNum += 1;
     }
 
@@ -36,16 +35,15 @@ function getAllSortedFriends(friends, filter) {
         crLvl.forEach(x => allSortedFriend.push(new FriendData(x, num)));
     }
 
-    function filterLevel(a, vf) {
-        return a.filter(x => !vf.has(x.name))
+    function filterLevel(currLevel) {
+        return currLevel.filter(x => !visitedFriends.has(x.name))
             .sort((x, y) => x.name.localeCompare(y.name));
     }
 
     function removeDuplicates(arr) {
         const names = new Set();
 
-        return arr.filter(item => !names.has(item.name)
-            ? names.add(item.name) : false);
+        return arr.filter(item => !names.has(item.name) ? names.add(item.name) : false);
 
     }
 }
