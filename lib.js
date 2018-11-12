@@ -1,20 +1,18 @@
 'use strict';
 
 /**
- * Создает массив уровней друзей из графа
+ * Создает массив друзей, разделенных на уровни близости, из графа
  * @param {Object[]} friends
  * @param {Number} maxLevel
  * @returns {[Object[]]}
  */
 function getFriendsForInviting(friends, maxLevel) {
-    const friendsToInvite = [];
-    friendsToInvite[0] = friends.filter(friend => friend.best);
-    friends = friends.filter(friend => !friendsToInvite[0].includes(friend));
+    const friendsToInvite = [friends.filter(friend => friend.best)];
     for (let i = 1; i < maxLevel; i++) {
+        friends = friends.filter(friend => !friendsToInvite[i - 1].includes(friend));
         friendsToInvite[i] = getNextLevelOfFriends(friendsToInvite[i - 1], friends);
-        friends = friends.filter(friend => !friendsToInvite[i].includes(friend));
         if (friends.length === 0 || friendsToInvite[i].length === 0) {
-            break;
+            break; // если всех добавили, или все оставшиеся не связаны.
         }
     }
 
@@ -29,11 +27,10 @@ function getFriendsForInviting(friends, maxLevel) {
  */
 function getNextLevelOfFriends(friendsToInvite, allFriends) {
     const nextLevel = [];
-    for (let prevLevelFriend of friendsToInvite) {
+    friendsToInvite.map(prevLevelFriend =>
         allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name))
-            .map(friend => nextLevel.push(friend));
-    }
-    nextLevel.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+            .map(friend => nextLevel.push(friend)));
+    nextLevel.sort((a, b) => a.name.localeCompare(b.name));
 
     return nextLevel;
 }
@@ -49,9 +46,8 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    this.friendsToInvite = getFriendsForInviting(friends, maxLevel)
-        .reduce((flat, part) => flat.concat(part)); // .flat()
-    this.friendsToInvite = filter.doFiltering(this.friendsToInvite).reverse();
+    this.friendsToInvite = filter.doFiltering(getFriendsForInviting(friends, maxLevel)
+        .reduce((flat, part) => flat.concat(part))); // .flat()
 }
 
 Iterator.prototype.done = function () {
@@ -59,11 +55,7 @@ Iterator.prototype.done = function () {
 };
 
 Iterator.prototype.next = function () {
-    if (this.friendsToInvite.length === 0) {
-        return null;
-    }
-
-    return this.friendsToInvite.pop();
+    return this.done() ? null : this.friendsToInvite.shift();
 };
 
 /**
