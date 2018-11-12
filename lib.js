@@ -1,5 +1,11 @@
 'use strict';
 
+
+function sortByName(firstPerson, secondPerson) {
+
+    return firstPerson.name.localeCompare(secondPerson.name);
+}
+
 function getNextRound(friends, currentRound, invitedFriends) {
     return currentRound
         .reduce((arrNames, currentFriend) => arrNames.concat(currentFriend.friends), [])
@@ -10,16 +16,11 @@ function getNextRound(friends, currentRound, invitedFriends) {
         .sort(sortByName);
 }
 
-function sortByName(firstPerson, secondPerson) {
-
-    return firstPerson.name.localeCompare(secondPerson.name);
-}
-
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = friends.filter(friend => friend.best).sort(sortByName);
-    let countCicle = 0;
+    let countCicle = 1;
     let invitedFriends = [];
-    while (countCicle < maxLevel && currentRound.length > 0 && maxLevel > 0) {
+    while (countCicle <= maxLevel && currentRound.length > 0 && maxLevel > 0) {
         invitedFriends = invitedFriends.concat(currentRound);
         currentRound = getNextRound(friends, currentRound, invitedFriends);
         countCicle++;
@@ -41,7 +42,7 @@ function Iterator(friends, filter) {
     this.invitedFriends = getInvitedFriends(friends, filter);
     this.count = 0;
     this.next = () => {
-        if (this.count < this.invitedFriends.length) {
+        if (!this.done()) {
             return this.invitedFriends[this.count++];
         }
 
