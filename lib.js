@@ -31,6 +31,7 @@ Iterator.prototype.next = function () {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    Iterator.call(this, friends, filter);
     this.collection = prepareFriendsList(friends, filter, maxLevel);
 }
 
@@ -72,7 +73,7 @@ FemaleFilter.prototype.constructor = FemaleFilter;
 
 function prepareFriendsList(friends, filter, maxLevel = friends.length) {
     let invitedFriends = friends
-        .filter(friend => friend.best !== undefined && friend.best === true)
+        .filter(friend => friend.best === true)
         .sort(alphabetSort);
 
     let nextLevelFriends = getNextLevelFriends(invitedFriends, invitedFriends, friends);
