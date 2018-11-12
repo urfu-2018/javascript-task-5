@@ -27,12 +27,16 @@ function findFriend(nameFriend, otherFriends) {
     }
 }
 
+function checkLevel(maxLevel) {
+    return typeof maxLevel === 'number' && maxLevel > 0 ? maxLevel : 0;
+}
+
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = filter.sortBestFriends(friends);
     let otherFriends = filter.sortCommonFriends(friends);
     let countCicle = 1;
     let nextRound = [];
-    maxLevel = typeof maxLevel === 'number' && maxLevel > 0 ? maxLevel : 0;
+    maxLevel = checkLevel(maxLevel);
     let invitedFriends = filter.filterGender(currentRound);
     while (countCicle < maxLevel && otherFriends.length && invitedFriends.length) {
         for (const currentFriend of currentRound) {
