@@ -57,7 +57,7 @@ Iterator.prototype = {
             });
         });
 
-        return nextLevel;
+        return nextLevel.sort(alphabet);
     },
 
     hasThisFriend(name, friendsGroup) {
