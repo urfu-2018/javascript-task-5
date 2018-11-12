@@ -51,16 +51,8 @@ class LimitedFilter extends Filter {
     }
 
     filter(person, iterator) {
-        return iterator.friendLevel.get(person.name) < this.maxLevel;
+        return iterator.friendLevel.get(person.name) <= this.maxLevel;
     }
-}
-
-function friendSortFunc(first, second) {
-    if ((first.best || false) === (second.best || false)) {
-        return first.name.localeCompare(second.name);
-    }
-
-    return Number(second.best || false) - Number(first.best || false);
 }
 
 class Iterator {
@@ -80,7 +72,7 @@ class Iterator {
             .filter(friend => filter.filter(friend, this))
             .sort((first, second) => {
                 if (this.friendLevel.get(first.name) === this.friendLevel.get(second.name)) {
-                    return friendSortFunc(first, second);
+                    return first.name.localeCompare(second.name);
                 }
 
                 return this.friendLevel.get(first.name) - this.friendLevel.get(second.name);
@@ -109,7 +101,9 @@ class Queue {
         this.first = null;
         this.last = null;
         this.queueLength = 0;
-        iterable.forEach(item => this.enqueue(item));
+        if (iterable) {
+            iterable.forEach(item => this.enqueue(item));
+        }
     }
 
     enqueue(item) {
@@ -143,7 +137,7 @@ class Queue {
 function getFriendLevel(friends) {
     const friendMap = new Map(friends.map(friend => [friend.name, friend]));
     const bestFriends = friends.filter(friend => friend.best);
-    const friendLevel = new Map(bestFriends.map(friend => [friend.name, 0]));
+    const friendLevel = new Map(bestFriends.map(friend => [friend.name, 1]));
     const queue = new Queue(bestFriends);
     while (queue.length > 0) {
         const currentFriend = queue.dequeue();
