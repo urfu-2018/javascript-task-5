@@ -42,8 +42,13 @@ const friends = [
     },
     {
         name: 'Julia',
-        friends: ['Brad', 'Itan'],
+        friends: ['Brad', 'Itan', 'Huan'],
         gender: 'female'
+    },
+    {
+        name: 'Huan',
+        friends: ['Julia'],
+        gender: 'Attack Helicopter'
     }
 ];
 

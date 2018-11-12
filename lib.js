@@ -1,25 +1,6 @@
 'use strict';
 
 /**
- * Создает массив друзей, разделенных на уровни близости, из графа
- * @param {Object[]} friends
- * @param {Number} maxLevel
- * @returns {[Object[]]}
- */
-function getFriendsForInviting(friends, maxLevel) {
-    const toInvite = [friends.filter(friend => friend.best)];
-    for (let i = 0; i < maxLevel - 1; i++) {
-        friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
-        toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
-        if (friends.length === 0 || toInvite[i + 1].length === 0) {
-            break; // если всех добавили, или все оставшиеся не связаны.
-        }
-    }
-
-    return toInvite;
-}
-
-/**
  * Формирует очередной уровень друзей по предыдущему
  * @param {Object[]} friendsToInvite
  * @param {Object[]} allFriends
@@ -43,8 +24,16 @@ function Iterator(friends, filter, maxLevel = Infinity) {
         throw new TypeError('filter should be an instance of Filter');
     }
     friends.sort((a, b) => a.name.localeCompare(b.name));
-    this.friendsToInvite = filter.doFiltering(
-        getFriendsForInviting(friends, maxLevel).reduce((flat, part) => flat.concat(part)), []);
+    const toInvite = [friends.filter(friend => friend.best)];
+    for (let i = 0; i < maxLevel - 1; i++) {
+        friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
+        toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
+        if (friends.length === 0 || toInvite[i + 1].length === 0) {
+            break; // если всех добавили, или все оставшиеся не связаны.
+        }
+    }
+    this.friendsToInvite =
+        filter.doFiltering(toInvite.reduce((flat, part) => flat.concat(part), []));
 }
 
 Iterator.prototype.done = function () {
