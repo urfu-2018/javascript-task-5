@@ -6,8 +6,7 @@ function addPowerFor(friends, names, level) {
     for (var name of names) {
         if (friends.has(name)) {
             var friend = friends.get(name);
-            friend.power = level;
-            buildFriends.push(friend);
+            buildFriends.push({ friend, power: level });
             friends.delete(name);
             newNames = newNames.concat(friend.friends);
         }
@@ -25,18 +24,16 @@ function addPowerFriend(friends) {
     var names = [];
     for (var friend of friends.values()) {
         if (friend.best) {
-            friend.power = 1;
             names = names.concat(friend.friends);
-            newFriends.push(friend);
+            newFriends.push({ friend, power: 1 });
             friends.delete(friend.name);
         }
     }
+
     newFriends = newFriends
         .concat(addPowerFor(friends, names, 2))
-        .concat(Array.from(friends.values()).filter(f => {
-            f.power = Infinity;
-
-            return f;
+        .concat(Array.from(friends.values()).map(f => {
+            return { friend: f, power: Infinity };
         }));
 
     return newFriends;
@@ -61,11 +58,12 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
+    var copyFriend = Array.from(friends);
     var current = 0;
-    var f = addPowerFriend(toMap(friends));
+    var f = addPowerFriend(toMap(copyFriend));
     this.selfFriends = f.sort((a, b) => {
         if (a.power === b.power) {
-            return a.name.localeCompare(b.name);
+            return a.friend.name.localeCompare(b.friend.name);
         }
         if (a.power < b.power) {
             return -1;
@@ -77,7 +75,7 @@ function Iterator(friends, filter) {
     this.isCorrect = function (i) {
         return (
             i < this.selfFriends.length &&
-            !filter.isCorrect(this.selfFriends[i])
+            !filter.isCorrect(this.selfFriends[i].friend)
         );
     };
     this.done = function () {
@@ -87,7 +85,7 @@ function Iterator(friends, filter) {
         }
 
         return !(
-            i < this.selfFriends.length && filter.isCorrect(this.selfFriends[i])
+            i < this.selfFriends.length && filter.isCorrect(this.selfFriends[i].friend)
         );
     };
 
@@ -101,7 +99,7 @@ function Iterator(friends, filter) {
         }
         current++;
 
-        return this.selfFriends[current - 1];
+        return this.selfFriends[current - 1].friend;
     };
 }
 
@@ -119,7 +117,7 @@ function LimitedIterator(friends, filter, maxLevel) {
         return (
             i < this.selfFriends.length &&
             !(
-                filter.isCorrect(this.selfFriends[i]) &&
+                filter.isCorrect(this.selfFriends[i].friend) &&
                 this.selfFriends[i].power <= maxLevel
             )
         );
