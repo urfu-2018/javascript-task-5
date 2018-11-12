@@ -88,6 +88,27 @@ describe('Итераторы', () => {
         //     friend('Sharon'), friend('Julia')
         // ]);
     });
+    it('maleFilter и femaleFilter должны наледоваться от Filter', () => {
+        const maleFilter = new lib.MaleFilter();
+        const femaleFilter = new lib.FemaleFilter();
+        assert.equal((maleFilter instanceof lib.Filter), true);
+        assert.equal((femaleFilter instanceof lib.Filter), true);
+    });
+    it('все мальчики', () => {
+        const maleFilter = new lib.MaleFilter();
+        const maleIterator = new lib.Iterator(friends, maleFilter);
+
+        const invitedFriends = [];
+
+        while (!maleIterator.done()) {
+            invitedFriends.push(maleIterator.next());
+        }
+
+        assert.deepStrictEqual(invitedFriends, [
+            friend('Sam'), friend('Brad'), friend('Mat'), friend('Itan')
+        ]);
+    });
+    // it('', () => {});
 
     function friend(name) {
         let len = friends.length;

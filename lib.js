@@ -12,8 +12,7 @@ function Iterator(friends, filter) {
     }
 
     // this.maxLevel = Infinity;
-    // const friendsList = getFriendsList(friends, this.maxLevel)
-    //     .filter(filter.predicate);
+    // const friendsList = getFriendsList(friends, this.maxLevel);
 
     this.friendsList = getFriendsList(friends, filter);
     let pointer = 0;
@@ -40,8 +39,9 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.friendsList = getFriendsList(friends, filter, maxLevel);
 }
 
-LimitedIterator.prototype = Object.create(Iterator.prototype);
-LimitedIterator.prototype.constructor = LimitedIterator;
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
+// LimitedIterator.prototype = Object.create(Iterator.prototype);
+// LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
@@ -54,7 +54,7 @@ function Filter() {
     // };
 }
 
-const filterProto = new Filter();
+// const filterProto = new Filter();
 
 /**
  * Фильтр друзей
@@ -66,7 +66,8 @@ function MaleFilter() {
     this.predicate = person => person.gender === 'male';
 }
 
-MaleFilter.prototype = filterProto;
+// MaleFilter.prototype = filterProto;
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -77,7 +78,8 @@ function FemaleFilter() {
     this.predicate = person => person.gender === 'female';
 }
 
-FemaleFilter.prototype = filterProto;
+// FemaleFilter.prototype = filterProto;
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 function getFriendsList(friends, filter, maxLevel = Infinity) {
     const friendsList = [];
@@ -89,23 +91,19 @@ function getFriendsList(friends, filter, maxLevel = Infinity) {
 
 function getFriendCircles(friendsBook, maxLevel) {
     const friendsCircles = [];
-    let previousFriendsCircle = friendsBook.filter(friend => friend.best);
-    friendsCircles.push(previousFriendsCircle);
+    let previous = friendsBook.filter(friend => friend.best);
     let level = 0;
 
-    do {
-        if (level === maxLevel) {
-            break;
-        }
-        previousFriendsCircle.sort((a, b) => a.name.localeCompare(b.name));
-        const friendsCircle = [];
-        friendsCircles.push(friendsCircle);
-        previousFriendsCircle.forEach(friend => {
-            friendsCircle.push(...friend.friends
-                .map(name => friendsBook.find(person => person.name === name))
+    while (previous.length !== 0 && level < maxLevel) {
+        previous.sort((a, b) => a.name.localeCompare(b.name));
+        friendsCircles.push(previous);
+        const current = [];
+        previous.forEach(friend => {
+            current.push(...friend.friends
+                .map(name => getFriendByName(name, friendsBook))
                 .filter(person => {
                     for (const circle of friendsCircles) {
-                        if (circle.includes(person)) {
+                        if (circle.includes(person) || current.includes(person)) {
                             return false;
                         }
                     }
@@ -114,12 +112,15 @@ function getFriendCircles(friendsBook, maxLevel) {
                 })
             );
         });
-        previousFriendsCircle = friendsCircle;
+        previous = current;
         level++;
     }
-    while (previousFriendsCircle.length !== 0);
 
-    return friendsCircles.slice(0, -1);
+    return friendsCircles;
+}
+
+function getFriendByName(name, friends) {
+    return friends.find(friend => friend.name === name);
 }
 
 exports.Iterator = Iterator;
