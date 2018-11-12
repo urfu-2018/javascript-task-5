@@ -10,8 +10,7 @@ class FriendData {
 function getAllSortedFriends(friends, filter) {
     const allFriends = new Map(friends.map(x => [x.name, x]));
     const visitedFriends = new Set();
-    let currentLevel = filterLevel(friends
-        .filter(x => x.hasOwnProperty('best') && x.best), visitedFriends);
+    let currentLevel = filterLevel(friends.filter(x => x.best), visitedFriends);
     let allSortedFriends = [];
     let currentLevelNum = 1;
 
@@ -37,14 +36,8 @@ function getAllSortedFriends(friends, filter) {
     }
 
     function filterLevel(a, vf) {
-        // console.info(a);
-
-        const c = a.filter(x => !vf.has(x.name))
+        return a.filter(x => !vf.has(x.name))
             .sort((x, y) => x.name.localeCompare(y.name));
-        // console.info('sfser gsrthvrthrth', c);
-
-        return c;
-
     }
 }
 
@@ -60,7 +53,6 @@ function Iterator(friends, filter) {
     }
 
     this.allSortedFriends = getAllSortedFriends(friends, filter);
-    // console.info(this.allSortedFriends);
     this.pointer = 0;
 
     this.next = () => this.done() ? null : this.allSortedFriends[this.pointer++].friend;
@@ -87,9 +79,7 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.isCorrect = function () {
-        return true;
-    };
+    this.isCorrect = () => true;
 }
 
 /**
@@ -98,9 +88,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.isCorrect = x => {
-        return x.gender === 'male';
-    };
+    this.isCorrect = x => x.gender === 'male';
 }
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
@@ -110,9 +98,8 @@ Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    this.isCorrect = x => {
-        return x.gender === 'female';
-    };
+    this.isCorrect = x => x.gender === 'female';
+
 }
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
