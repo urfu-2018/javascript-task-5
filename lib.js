@@ -34,7 +34,7 @@ function checkLevel(maxLevel) {
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = filter.sortBestFriends(friends);
     let otherFriends = filter.sortCommonFriends(friends);
-    let countCicle = 1;
+    let countCicle = 0;
     let nextRound = [];
     maxLevel = checkLevel(maxLevel);
     let invitedFriends = filter.filterGender(currentRound);
