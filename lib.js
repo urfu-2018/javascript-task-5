@@ -32,12 +32,21 @@ function getAllSortedFriends(friends, filter) {
     return allSortedFriends.filter(x => filter.isCorrect(x.friend));
 
     function fillSortedFriends(allSortedFriend, crLvl, num) {
+        crLvl = removeDuplicates(crLvl);
         crLvl.forEach(x => allSortedFriend.push(new FriendData(x, num)));
     }
 
     function filterLevel(a, vf) {
         return a.filter(x => !vf.has(x.name))
             .sort((x, y) => x.name.localeCompare(y.name));
+    }
+
+    function removeDuplicates(arr) {
+        const names = new Set();
+
+        return arr.filter(item => !names.has(item.name)
+            ? names.add(item.name) : false);
+
     }
 }
 
