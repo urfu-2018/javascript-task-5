@@ -17,8 +17,7 @@ function getNextLevelFriends(friends, friendsMap) {
         .map(x => x.friends)
         .reduce(asOneEnumerable)
         .filter(onlyUnique)
-        .map(friendName => friendsMap.get(friendName))
-        .sort(sortByName);
+        .map(friendName => friendsMap.get(friendName));
 }
 
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
@@ -32,7 +31,8 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     while (queue.length !== 0 && level !== maxLevel) {
         visited.push(...queue);
         queue = getNextLevelFriends(queue, friendsMap)
-            .filter(friend => !visited.includes(friend));
+            .filter(friend => !visited.includes(friend))
+            .sort(sortByName);
         level++;
     }
 
@@ -47,7 +47,7 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
  */
 function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
-        throw new TypeError();
+        throw new TypeError('filter should be instance of "Filter"');
     }
 
     if (this.invitedFriends === undefined) {
