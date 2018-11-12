@@ -20,7 +20,7 @@ Iterator.prototype = {
     addFriendsOfFriends(friends, maxLevel = Infinity) {
         let currentFriends = friends
             .filter(friend => friend.best)
-            .sort((first, second) => first.name > second.name);
+            .sort((first, second) => first.name.localeCompare(second.name));
         const friendsOfFriends = [];
 
         while (currentFriends.length > 0 && maxLevel > 0) {
@@ -32,7 +32,7 @@ Iterator.prototype = {
 
             currentFriends = friends.filter(friend => !friendsOfFriends.includes(friend) &&
                 subFriendList.includes(friend.name))
-                .sort((first, second) => first.name > second.name);
+                .sort((first, second) => first.name.localeCompare(second.name));
 
             maxLevel -= 1;
         }
