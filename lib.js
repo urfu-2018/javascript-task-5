@@ -59,7 +59,7 @@ Iterator.prototype.next = function () {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    this.friendsToInvite = getFriendsForInviting(friends, maxLevel)
+    this.friendsToInvite = getFriendsForInviting(friends, maxLevel - 1)
         .reduce((flat, part) => flat.concat(part)); // .flat()
     this.friendsToInvite = filter.doFiltering(this.friendsToInvite).reverse();
 }
