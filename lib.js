@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Создает массив уровней друзей из графа
+ * @param {Object[]} friends
+ * @param {Number} maxLevel
+ * @returns {[Object[]]}
+ */
 function getFriendsForInviting(friends, maxLevel) {
     const friendsToInvite = [];
     friendsToInvite[0] = friends.filter(friend => friend.best);
@@ -15,6 +21,12 @@ function getFriendsForInviting(friends, maxLevel) {
     return friendsToInvite;
 }
 
+/**
+ * Формирует очередной уровень друзей по предыдущему
+ * @param {Object[]} friendsToInvite
+ * @param {Object[]} allFriends
+ * @returns {Object[]}
+ */
 function getNextLevelOfFriends(friendsToInvite, allFriends) {
     const nextLevel = [];
     for (let prevLevelFriend of friendsToInvite) {
@@ -31,12 +43,13 @@ function getNextLevelOfFriends(friendsToInvite, allFriends) {
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
+ * @param {Number} maxLevel
  */
-function Iterator(friends, filter) {
+function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    this.friendsToInvite = getFriendsForInviting(friends, Infinity)
+    this.friendsToInvite = getFriendsForInviting(friends, maxLevel)
         .reduce((flat, part) => flat.concat(part)); // .flat()
     this.friendsToInvite = filter.doFiltering(this.friendsToInvite).reverse();
 }
@@ -46,6 +59,10 @@ Iterator.prototype.done = function () {
 };
 
 Iterator.prototype.next = function () {
+    if (this.friendsToInvite.length === 0) {
+        return null;
+    }
+
     return this.friendsToInvite.pop();
 };
 
@@ -58,10 +75,7 @@ Iterator.prototype.next = function () {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
-    this.friendsToInvite = getFriendsForInviting(friends, maxLevel - 1)
-        .reduce((flat, part) => flat.concat(part)); // .flat()
-    this.friendsToInvite = filter.doFiltering(this.friendsToInvite).reverse();
+    Iterator.call(this, friends, filter, maxLevel);
 }
 LimitedIterator.prototype = Object.create(Iterator.prototype);
 
