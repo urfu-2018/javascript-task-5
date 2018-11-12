@@ -24,6 +24,7 @@ function Iterator(friends, filter, maxLevel = Infinity) {
         throw new TypeError('filter should be an instance of Filter');
     }
     const toInvite = [friends.filter(friend => friend.best)];
+    toInvite[0].sort((a, b) => a.name.localeCompare(b.name));
     for (let i = 0; i < maxLevel - 1; i++) {
         friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
         toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
