@@ -8,16 +8,14 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    Object.setPrototypeOf(this, {
-        currentIndex: 0,
-        listOfGuests: [],
-        next() {
-            return this.done() ? null : this.listOfGuests[this.currentIndex++];
-        },
-        done() {
-            return this.currentIndex >= this.listOfGuests.length;
-        }
-    });
+    this.currentIndex = 0;
+    this.listOfGuests = [];
+    this.next = function () {
+        return this.done() ? null : this.listOfGuests[this.currentIndex++];
+    };
+    this.done = function () {
+        return this.currentIndex >= this.listOfGuests.length;
+    };
     if (filter instanceof Filter) {
         this.listOfGuests = chooseFriends(friends).filter(friend => filter.isAppropriate(friend));
         this.currentIndex = 0;
@@ -25,6 +23,7 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 }
+
 
 /**
  * Итератор по друзям с ограничением по кругу
