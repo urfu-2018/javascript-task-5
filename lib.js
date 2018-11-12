@@ -1,5 +1,6 @@
 'use strict';
 
+
 function sortByName(person1, person2) {
     return person1.name.localeCompare(person2.name);
 }
@@ -15,7 +16,7 @@ function asOneEnumerable(sequence1, sequence2) {
 function getNextLevelFriends(friends, friendsMap) {
     return friends
         .map(x => x.friends)
-        .reduce(asOneEnumerable)
+        .reduce(asOneEnumerable, [])
         .filter(onlyUnique)
         .map(friendName => friendsMap.get(friendName));
 }
