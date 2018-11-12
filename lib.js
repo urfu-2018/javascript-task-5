@@ -35,7 +35,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Object.setPrototypeOf(this, new Iterator(friends, filter));
+    Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
+    Iterator.call(this, friends, filter);
     this.listOfGuests = chooseFriends(friends, maxLevel)
         .filter(friend => filter.isAppropriate(friend));
 }
