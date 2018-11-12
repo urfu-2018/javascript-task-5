@@ -7,7 +7,7 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    this.friendsWrapper = filterAndOrder(friends, filter);
+    this.friendsWrapper = filterAndOrder(friends, filter, arguments[2]);
 }
 
 Object.assign(Iterator.prototype, {
