@@ -30,7 +30,6 @@ function getNextLevelOfFriends(friendsToInvite, allFriends) {
     friendsToInvite.map(prevLevelFriend =>
         allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name))
             .map(friend => nextLevel.push(friend)));
-    nextLevel.sort((a, b) => a.name.localeCompare(b.name));
 
     return nextLevel;
 }
@@ -46,6 +45,7 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
+    friends.sort((a, b) => a.name.localeCompare(b.name));
     this.friendsToInvite = filter.doFiltering(
         getFriendsForInviting(friends, maxLevel).reduce((flat, part) => flat.concat(part)), []);
 }
@@ -76,10 +76,10 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.gender = /./;
+    this.gender = '';
 }
 Filter.prototype.doFiltering = function (friends) {
-    return friends.filter(friend => friend.gender.match(this.gender));
+    return friends.filter(friend => friend.gender === this.gender || this.gender === '');
 };
 
 /**
@@ -88,7 +88,7 @@ Filter.prototype.doFiltering = function (friends) {
  * @constructor
  */
 function MaleFilter() {
-    this.gender = /^male/;
+    this.gender = 'male';
 }
 MaleFilter.prototype = Object.create(Filter.prototype);
 
@@ -99,7 +99,7 @@ MaleFilter.prototype = Object.create(Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    this.gender = /^female/;
+    this.gender = 'female';
 }
 FemaleFilter.prototype = Object.create(Filter.prototype);
 
