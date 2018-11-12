@@ -1,29 +1,54 @@
+/* eslint-env mocha */
 'use strict';
 
-/**
- * Итератор по друзьям
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- */
-function Iterator(friends, filter) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError();
+const assert = require('assert');
+
+const lib = require('./lib');
+
+const friendss = [
+    {
+        name: 'Sam',
+        friends: ['Mat', 'Sharon'],
+        gender: 'male',
+        best: true
+    },
+    {
+        name: 'Mat',
+        friends: ['Sam', 'Sharon'],
+        gender: 'male'
+    },
+    {
+        name: 'Sharon',
+        friends: ['Sam', 'Itan', 'Mat'],
+        gender: 'female'
+    },
+    {
+        name: 'Brad',
+        friends: ['Sally', 'Emily', 'Julia'],
+        gender: 'male'
+    },
+    {
+        name: 'Emily',
+        friends: ['Sally', 'Brad'],
+        gender: 'female'
+    },
+    {
+        name: 'Itan',
+        friends: ['Sharon', 'Julia'],
+        gender: 'male'
+    },
+    {
+        name: 'Sally',
+        friends: ['Emily', 'Brad'],
+        gender: 'female',
+        best: true
+    },
+    {
+        name: 'Julia',
+        friends: ['Brad', 'Itan'],
+        gender: 'female'
     }
-
-    this.generator = generateSequence(friends, filter, Infinity);
-    this.actual = this.generator.next();
-    this.next = function () {
-        let result = this.actual.value;
-        this.actual = this.generator.next();
-
-        return result;
-    };
-
-    this.done = function () {
-        return this.actual.done;
-    };
-}
+];
 
 class InitializeBFSCarcass {
     constructor(friends) {
@@ -100,29 +125,12 @@ function* generateSequence(friends, filter, maxLevel) {
 }
 
 /**
- * Итератор по друзям с ограничением по кругу
- * @extends Iterator
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- * @param {Number} maxLevel – максимальный круг друзей
- */
-function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
-    Iterator.call(this, friends, filter);
-    this.generator = generateSequence(friends, filter, maxLevel);
-}
-
-/**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
     this.it = () => true;
 }
-
-LimitedIterator.prototype = Object.create(Iterator.prototype);
-LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
@@ -152,9 +160,12 @@ FemaleFilter.prototype.constructor = FemaleFilter;
 const femaleFilter = new FemaleFilter();
 const maleFilter = new MaleFilter();
 
-exports.Iterator = Iterator;
-exports.LimitedIterator = LimitedIterator;
+var generator = generateSequence(friendss, maleFilter, 2);
 
-exports.Filter = Filter;
-exports.MaleFilter = MaleFilter;
-exports.FemaleFilter = FemaleFilter;
+console.info(new InitializeBFSCarcass(friendss));
+
+console.info(generator.next());
+console.info(generator.next());
+console.info(generator.next());
+console.info(generator.next());
+
