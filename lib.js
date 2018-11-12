@@ -32,6 +32,7 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let otherFriends = filter.sortCommonFriends(friends);
     let countCicle = 1;
     let nextRound = [];
+    maxLevel = typeof maxLevel === 'number' && maxLevel > 0 ? maxLevel : 0;
     let invitedFriends = filter.filterGender(currentRound);
     while (countCicle < maxLevel && otherFriends.length && invitedFriends.length) {
         for (const currentFriend of currentRound) {
