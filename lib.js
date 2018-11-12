@@ -26,12 +26,9 @@ function getFriendsForInviting(friends, maxLevel) {
  * @returns {Object[]}
  */
 function getNextLevelOfFriends(friendsToInvite, allFriends) {
-    const nextLevel = [];
-    friendsToInvite.map(prevLevelFriend =>
-        allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name))
-            .map(friend => nextLevel.push(friend)));
-
-    return nextLevel;
+    return friendsToInvite.map(prevLevelFriend =>
+        allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name)))
+        .reduce((flat, part) => flat.concat(part), []);
 }
 
 /**
