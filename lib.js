@@ -1,51 +1,70 @@
 'use strict';
 
-/**
- * Итератор по друзьям
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- */
-function Iterator(friends, filter) {
-    console.info(friends, filter);
+class Filter {
+    check() {
+        return true;
+    }
 }
 
-/**
- * Итератор по друзям с ограничением по кругу
- * @extends Iterator
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- * @param {Number} maxLevel – максимальный круг друзей
- */
-function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
+class MaleFilter extends Filter {
+    constructor() {
+        super();
+    }
+
+    check(friend) {
+        return friend.gender === 'male';
+    }
 }
 
-/**
- * Фильтр друзей
- * @constructor
- */
-function Filter() {
-    console.info('Filter');
+class FemaleFilter extends Filter {
+    constructor() {
+        super();
+    }
+
+    check(friend) {
+        return friend.gender === 'female';
+    }
 }
 
-/**
- * Фильтр друзей
- * @extends Filter
- * @constructor
- */
-function MaleFilter() {
-    console.info('MaleFilter');
+class Iterator {
+    constructor(friends, filter, maxLevel = Infinity) {
+        if (!(filter instanceof Filter)) {
+            throw new TypeError();
+        }
+        console.info(friends, filter);
+
+        let iteration = friends
+            .filter(friend => friend.best)
+            .sort((a, b) => a.name.localeCompare(b.name));
+        let guests = [];
+        for (let i = 0; i < maxLevel && iteration.length > 0; i++) {
+            guests.push(...iteration);
+            iteration = iteration
+                .map(p => p.friends)
+                .reduce((result, f) => result.concat(f), [])
+                .map(n => friends
+                    .find(f => f.name === n))
+                .filter(friend => !guests.includes(friend));
+        }
+
+        const pickedFriends = guests.filter(filter.check);
+        this.collection = pickedFriends.filter(e => filter.check(e));
+        this.index = 0;
+    }
+
+    next() {
+        return this.done() ? null : this.collection[this.index++];
+    }
+
+    done() {
+        return this.index === this.collection.length;
+    }
 }
 
-/**
- * Фильтр друзей-девушек
- * @extends Filter
- * @constructor
- */
-function FemaleFilter() {
-    console.info('FemaleFilter');
+class LimitedIterator extends Iterator {
+    constructor(friends, filter, maxLevel) {
+        super(friends, filter, maxLevel);
+    }
 }
 
 exports.Iterator = Iterator;
