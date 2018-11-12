@@ -20,17 +20,40 @@ function firstCircle(friends) {
     return friendSet;
 }
 
-function newCircle(previousCircle, accumulator, friendsMap) {
-    previousCircle.forEach(friend => {
-        const currentCircle = new Set();
-        friend.friends.forEach(name => {
-            currentCircle.add(friendsMap[name]);
-        });
+function getCurrentCircleFriends(friendSet, friendsMap) {
+    const currentCircle = new Set();
+    friendSet.forEach(friend =>
+        friend.friends.forEach(name =>
+            currentCircle.add(friendsMap[name])
+        )
+    );
+
+    return currentCircle;
+}
+
+function formCollectionOfInvitedFriends(friends, filter, maxLevel = Infinity) {
+    const notFilteredInvited = new Set();
+
+    let friendSet = firstCircle(friends);
+    friendSet.forEach(friend => notFilteredInvited.add(friend));
+
+    const friendsMap = friendsToMap(friends);
+    for (let i = maxLevel - 1; i > 0; i--) {
+        const currentCircle = getCurrentCircleFriends(friendSet, friendsMap);
+        const previousInvitedListLength = notFilteredInvited.length;
         sortNamesLexicographic(Array.from(currentCircle))
-            .forEach(person => {
-                accumulator.add(person);
-            });
-    });
+            .forEach(friend => notFilteredInvited.add(friend));
+        friendSet = currentCircle;
+        if (notFilteredInvited.length === previousInvitedListLength) {
+            break;
+        }
+    }
+
+    if (maxLevel === Infinity && notFilteredInvited.length !== friends.length) {
+        friends.forEach(friend => notFilteredInvited.add(friend));
+    }
+
+    return filter.filter(Array.from(notFilteredInvited));
 }
 
 function friendsToMap(friends) {
@@ -42,17 +65,14 @@ function friendsToMap(friends) {
     return friendsMap;
 }
 
-Iterator.prototype = {
-
-};
-
 /**
  * Итератор по друзьям
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
+ * @param {number} maxLevel
  */
-function Iterator(friends, filter) {
+function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
@@ -71,11 +91,7 @@ function Iterator(friends, filter) {
         return result;
     };
 
-    const friendsMap = friendsToMap(friends);
-    const friendSet = firstCircle(friends);
-    newCircle(friendSet, friendSet, friendsMap);
-
-    this._collection = filter.filter(Array.from(friendSet));
+    this._collection = formCollectionOfInvitedFriends(friends, filter, maxLevel);
     this._counter = 0;
 }
 
@@ -88,20 +104,7 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
-
-    const friendsMap = friendsToMap(friends);
-    const friendSet = firstCircle(friends);
-
-    while (friendSet.length !== 0 && maxLevel - 1 > 0) {
-        const currentCircle = new Set();
-        newCircle(friendSet, currentCircle, friendsMap);
-        currentCircle.forEach(friend => friendSet.add(friend));
-        maxLevel--;
-    }
-
-    this._collection = filter.filter(Array.from(friendSet));
-    this._counter = 0;
+    Iterator.call(this, friends, filter, maxLevel);
 }
 
 /**
@@ -120,7 +123,9 @@ function Filter() {
  * @constructor
  */
 function BestFriendsFilter() {
-    this.filter = (friends) => friends.filter(friend => friend.best);
+    this.filter = function (friends) {
+        return friends.filter(friend => friend.best);
+    };
 }
 
 /**
@@ -129,7 +134,9 @@ function BestFriendsFilter() {
  * @constructor
  */
 function MaleFilter() {
-    this.filter = (friends) => friends.filter(friend => friend.gender === 'male');
+    this.filter = function (friends) {
+        return friends.filter(friend => friend.gender === 'male');
+    };
 }
 
 /**
@@ -138,7 +145,9 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    this.filter = (friends) => friends.filter(friend => friend.gender === 'female');
+    this.filter = function (friends) {
+        return friends.filter(friend => friend.gender === 'female');
+    };
 }
 
 exports.Iterator = Iterator;
