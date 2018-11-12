@@ -54,7 +54,7 @@ function chooseFriends(friends, maxLevel = friends.length) {
             .reduce((acc, friend) => acc.concat(friend.friends), [])
             .map(name => friends.find(friend => friend.name === name))
             .filter(function (friend, index, arr) {
-                return !(selection.includes(friend) || arr.indexOf(friend) !== index);
+                return !selection.includes(friend) && arr.indexOf(friend) === index;
             });
         currentLevel++;
     }
