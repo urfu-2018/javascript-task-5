@@ -35,7 +35,7 @@ function sortAndFilterFriends(friends, filter, level = Infinity) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    if (!Filter.prototype.isPrototypeOf(filter)) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
 
@@ -64,6 +64,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.filteredFriends = sortAndFilterFriends(friends, filter, maxLevel);
 }
 LimitedIterator.prototype = Object.create(Iterator.prototype);
+LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
@@ -82,6 +83,7 @@ function MaleFilter() {
     this.genderFilter = (friend) => friend.gender === 'male';
 }
 MaleFilter.prototype = Object.create(Filter.prototype);
+MaleFilter.prototype.constructor = MaleFilter;
 
 /**
  * Фильтр друзей-девушек
@@ -92,6 +94,7 @@ function FemaleFilter() {
     this.genderFilter = (friend) => friend.gender === 'female';
 }
 FemaleFilter.prototype = Object.create(Filter.prototype);
+FemaleFilter.prototype.constructor = FemaleFilter;
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
