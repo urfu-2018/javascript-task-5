@@ -68,7 +68,7 @@ function chooseFriends(friends, maxLevel = friends.length + 1) {
  * @constructor
  */
 function Filter() {
-    Object.defineProperty(this, 'isAvailable', {
+    Object.defineProperty(this, 'isAppropriate', {
         value: function () {
 
             return true;
