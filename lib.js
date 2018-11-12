@@ -47,11 +47,10 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let nextRound = [];
     maxLevel = plusNumber(maxLevel);
     let invitedFriends = getFirstRound(currentRound, filter, maxLevel);
-    while (countCicle < maxLevel && otherFriends.length && invitedFriends.length) {
+    while (countCicle < maxLevel && otherFriends.length && currentRound.length) {
         for (const currentFriend of currentRound) {
             nextRound = nextRound
-                .concat(getFriendsOfFriends(currentFriend, otherFriends))
-                .sort(sortByName);
+                .concat(getFriendsOfFriends(currentFriend, otherFriends, invitedFriends));
         }
         currentRound = nextRound.filter(elArr => Boolean(elArr));
         nextRound = [];
@@ -64,7 +63,7 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
 
 
 function next(context) {
-    if (!context.done()) {
+    if (context.count < context.invitedFriends.length) {
         context.count++;
 
         return context.invitedFriends[context.count - 1];
