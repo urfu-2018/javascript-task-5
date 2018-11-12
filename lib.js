@@ -72,12 +72,12 @@ FemaleFilter.prototype = Object.create(Filter.prototype);
 FemaleFilter.prototype.constructor = FemaleFilter;
 
 function prepareFriendsList(friends, filter, maxLevel = friends.length) {
-    let invitedFriends = friends
+    let invitedFriends = [];
+
+    let nextLevelFriends = friends
         .filter(friend => friend.best === true)
         .sort(alphabetSort);
-
-    let nextLevelFriends = getNextLevelFriends(invitedFriends, invitedFriends, friends);
-    let level = 1;
+    let level = 0;
 
     while (nextLevelFriends.length !== 0 && level < maxLevel) {
         invitedFriends = invitedFriends.concat(nextLevelFriends);
@@ -85,20 +85,13 @@ function prepareFriendsList(friends, filter, maxLevel = friends.length) {
         ++level;
     }
 
-    return invitedFriends.filter(friend => filter.getAppropriateItem(friend));
+    return invitedFriends.filter(filter.getAppropriateItem);
 }
 
 function getNextLevelFriends(currentFriends, invitedFriends, phonebook) {
-    let nextLevelFriends = [];
-    currentFriends.forEach(friend => {
-        friend.friends.forEach(nextLevelFriend => {
-            if (!nextLevelFriends.includes(nextLevelFriend)) {
-                nextLevelFriends.push(nextLevelFriend);
-            }
-        });
-    });
-
-    return nextLevelFriends
+    return currentFriends
+        .reduce((friends, friend) => friends.concat(friend.friends), [])
+        .filter((friend, index, self) => self.indexOf(friend) === index)
         .filter(friend => invitedFriends.every(invitedFriend => invitedFriend.name !== friend))
         .map(friend => phonebook.find(friendInPhonebook => friendInPhonebook.name === friend))
         .sort(alphabetSort);
@@ -107,6 +100,7 @@ function getNextLevelFriends(currentFriends, invitedFriends, phonebook) {
 function alphabetSort(first, secont) {
     return first.name.localeCompare(secont.name);
 }
+
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
 
