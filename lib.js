@@ -64,7 +64,7 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
 
 
 function next(context) {
-    if (context.count < context.invitedFriends.length) {
+    if (!context.done()) {
         context.count++;
 
         return context.invitedFriends[context.count - 1];
