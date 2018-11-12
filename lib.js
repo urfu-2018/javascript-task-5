@@ -1,6 +1,6 @@
 'use strict';
 
-function AssignCirclesFromBestFriend(bestFriend, friends) {
+function assignCirclesFromBestFriend(bestFriend, friends) {
     const queue = [bestFriend];
 
     while (queue.length) {
@@ -22,7 +22,7 @@ function AssignCirclesFromBestFriend(bestFriend, friends) {
 function Iterator(friends, filter) {
     for (const bestFriend of friends.filter(f => f.best)) {
         bestFriend.circle = 1;
-        AssignCirclesFromBestFriend(bestFriend, friends);
+        assignCirclesFromBestFriend(bestFriend, friends);
     }
     this.friends = friends
         .sort((x, y) => (x.circle + x.name).localeCompare(y.circle + y.name))
@@ -41,11 +41,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    this.done = () => {
-        console.info(this.friends[0].circle);
-        console.info(this.friends[0].circle >= maxLevel);
-        return !this.friends.length || this.friends[0].circle > maxLevel;
-    };
+    this.done = () => !this.friends.length || this.friends[0].circle > maxLevel;
 }
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
