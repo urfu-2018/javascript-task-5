@@ -6,8 +6,7 @@ function getNextRound(friends, currentRound, invitedFriends) {
         .map(friendName => friends.find(friend => friend.name === friendName))
         .filter((friend, i, arrFriends) =>
             arrFriends.indexOf(friend) === i &&
-            !invitedFriends.includes(friend))
-        .sort(sortByName);
+            !invitedFriends.includes(friend));
 }
 
 function sortByName(firstPerson, secondPerson) {
