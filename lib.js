@@ -39,7 +39,7 @@ class Iterator {
         let guests = [];
         for (let i = 0; i < maxLevel && iteration.length > 0; i++) {
             guests.push(...iteration);
-            iteration = [...new Set(iteration
+            iteration = [...(iteration
                 .map(p => p.friends)
                 .reduce((result, f) => result.concat(f), [])
                 .map(n => friends
@@ -47,9 +47,7 @@ class Iterator {
                 .filter(friend => !guests.includes(friend)))]
                 .sort((a, b) => a.name.localeCompare(b.name));
         }
-
-        const pickedFriends = guests; // getGuests(friends, filter, maxLevel).filter(filter.check);
-        this.collection = pickedFriends.filter(e => filter.check(e));
+        this.collection = guests.filter(e => filter.check(e));
         this.index = 0;
     }
 
