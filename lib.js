@@ -56,6 +56,9 @@ function toFriendsMap(friends) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('filter is not instance of Filter');
+    }
     this.wave = getFriendsSorted(getBest(friends));
     this.friendsMap = toFriendsMap(friends);
     this.used = new Set();
@@ -118,9 +121,10 @@ Iterator.prototype = {
 
     done: function () {
         let isDone = this.next() === null;
-        this.index--;
         if (isDone === null) {
             this.finished = true;
+        } else {
+            this.index--;
         }
 
         return isDone;
@@ -151,7 +155,11 @@ LimitedIterator.prototype = Object.create(Iterator.prototype, {
  * @constructor
  */
 // eslint-disable-next-line no-empty-function
-function Filter() { }
+function Filter() {
+    this.isValid = function () {
+        return true;
+    };
+}
 
 Filter.prototype = {
     constructor: {
