@@ -48,10 +48,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    this.done = () => !this.friends.length || this.friends[0].circle > maxLevel;
-    if (typeof maxLevel !== 'number') {
-        this.done = () => true;
-    }
+    this.done = () => !this.friends.length || this.friends[0].circle > maxLevel || isNaN(maxLevel);
 }
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
