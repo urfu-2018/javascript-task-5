@@ -28,6 +28,7 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     for (let i = 0; i < maxLevel - 1; i++) {
         friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
         toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
+        toInvite[i + 1].sort((a, b) => a.name.localeCompare(b.name));
         if (friends.length === 0 || toInvite[i + 1].length === 0) {
             break; // если всех добавили, или все оставшиеся не связаны.
         }
