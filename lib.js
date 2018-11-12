@@ -1,6 +1,6 @@
 'use strict';
 
-const alphabet = (x, y) => x.localeCompare(y);
+const alphabet = (x, y) => x.name.localeCompare(y.name);
 
 /**
  * Итератор по друзьям
@@ -36,7 +36,7 @@ Iterator.prototype = {
         let sortedFriends = [];
         let currentFriends = this.friends
             .filter(friend => friend.best)
-            .sort((x, y) => alphabet(x.name, y.name));
+            .sort(alphabet);
         let currentLevel = 0;
         while (currentLevel < maxLevel && currentFriends.length !== 0) {
             currentFriends.forEach(friend => sortedFriends.push(friend));
