@@ -44,10 +44,15 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.apply = function () {
-        return true;
-    };
+    this.gender = 'all';
 }
+
+Object.assign(Filter.prototype, {
+    apply(friend) {
+        return friend.gender === this.gender ||
+            this.gender === 'all';
+    }
+});
 
 /**
  * Фильтр друзей
@@ -55,9 +60,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.apply = function (friend) {
-        return friend.gender === 'male';
-    };
+    this.gender = 'male';
 }
 
 MaleFilter.prototype = Object.create(Filter.prototype);
@@ -68,9 +71,7 @@ MaleFilter.prototype = Object.create(Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    this.apply = function (friend) {
-        return friend.gender === 'female';
-    };
+    this.gender = 'female';
 }
 
 FemaleFilter.prototype = Object.create(Filter.prototype);
