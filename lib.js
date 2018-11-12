@@ -34,7 +34,7 @@ Object.assign(Iterator.prototype, {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    this.friendsWrapper = filterAndOrder(friends, filter, maxLevel);
+    Iterator.call(this, friends, filter, maxLevel);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
