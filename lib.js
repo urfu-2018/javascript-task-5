@@ -46,12 +46,13 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter is not instance of Filter');
     }
-    this.wave = getSorted(getBest(friends));
+    this.wave = [];
+    this.firstWave = getSorted(getBest(friends));
     this.friendsMap = toFriendsMap(friends);
     this.used = new Set();
     this.index = 0;
     this.finished = false;
-    this.maxLevel = -1;
+    this.maxLevel = Infinity;
     this.level = 0;
     this.filter = filter;
 }
@@ -64,11 +65,16 @@ Iterator.prototype = {
     updateWaveIfNecessary: function () {
         if (this.wave.length === this.index) {
             this.level++;
-            if (this.level === this.maxLevel) {
+            if (this.level > this.maxLevel) {
                 return;
             }
-            this.wave = getNextWave(this.friendsMap, this.wave, this.used);
-            this.index = 0;
+            if (this.firstWave !== null) {
+                this.wave = this.firstWave;
+                this.firstWave = null;
+            } else {
+                this.wave = getNextWave(this.friendsMap, this.wave, this.used);
+                this.index = 0;
+            }
         }
     },
 
