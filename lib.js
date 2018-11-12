@@ -61,7 +61,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    if (!this.maxLevel) {
+    if (!(this instanceof LimitedIterator) && !this.maxLevel) {
         this.maxLevel = Infinity;
     }
     var copyFriend = Array.from(friends);
