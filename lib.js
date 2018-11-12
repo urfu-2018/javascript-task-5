@@ -12,6 +12,12 @@ function getNextLevelOfFriends(friendsToInvite, allFriends) {
         .reduce((flat, part) => flat.concat(part), []);
 }
 
+function sortAndUniq(array) {
+    array.sort((a, b) => a.name.localeCompare(b.name));
+
+    return Array.from(new Set(array));
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -24,11 +30,11 @@ function Iterator(friends, filter, maxLevel = Infinity) {
         throw new TypeError('filter should be an instance of Filter');
     }
     const toInvite = [friends.filter(friend => friend.best)];
-    toInvite[0].sort((a, b) => a.name.localeCompare(b.name));
+    toInvite[0] = sortAndUniq(toInvite[0]);
     for (let i = 0; i < maxLevel - 1; i++) {
         friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
         toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
-        toInvite[i + 1].sort((a, b) => a.name.localeCompare(b.name));
+        toInvite[i + 1] = sortAndUniq(toInvite[i + 1]);
         if (friends.length === 0 || toInvite[i + 1].length === 0) {
             break; // если всех добавили, или все оставшиеся не связаны.
         }
@@ -78,7 +84,6 @@ function MaleFilter() {
     this.gender = 'male';
 }
 MaleFilter.prototype = Object.create(Filter.prototype);
-
 
 /**
  * Фильтр друзей-девушек
