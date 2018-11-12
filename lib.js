@@ -103,7 +103,7 @@ class Queue {
     }
 }
 
-function getFriendLevel(friends, maxLevel) {
+function getFriendLevel(friends) {
     const friendMap = new Map(friends.map(friend => [friend.name, friend]));
     const bestFriends = friends.filter(friend => friend.best);
     const friendLevel = new Map(bestFriends.map(friend => [friend.name, 1]));
@@ -126,7 +126,7 @@ function getInvitedFriends(friends, filter, maxLevel) {
     const friendLevel = getFriendLevel(friends, maxLevel);
 
     return friends
-        .filter(friend => friendLevel.has(friend.name))
+        .filter(friend => friendLevel.has(friend.name) && friendLevel.get(friend.name) <= maxLevel)
         .filter(friend => filter.isValid(friend))
         .sort((first, second) => {
             if (friendLevel.get(first.name) === friendLevel.get(second.name)) {
