@@ -51,10 +51,6 @@ class LimitedFilter extends Filter {
     }
 
     isValid(person, iterator) {
-        if (this.maxLevel === Infinity) {
-            return true;
-        }
-
         return iterator.friendLevel.get(person.name) <= this.maxLevel;
     }
 }
@@ -152,6 +148,11 @@ function getFriendLevel(friends) {
                 friendLevel.set(friend, friendLevel.get(currentFriend.name) + 1);
             });
     }
+
+    friends
+        .map(friend => friend.name)
+        .filter(name => !friendLevel.has(name))
+        .forEach(name => friendLevel.set(name, Infinity));
 
     return friendLevel;
 }
