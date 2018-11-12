@@ -20,40 +20,17 @@ function firstCircle(friends) {
     return friendSet;
 }
 
-function getCurrentCircleFriends(friendSet, friendsMap) {
+function newCircle(previousCircle, accumulator, friendsMap) {
     const currentCircle = new Set();
-    friendSet.forEach(friend =>
-        friend.friends.forEach(name =>
-            currentCircle.add(friendsMap[name])
-        )
-    );
-
-    return currentCircle;
-}
-
-function formCollectionOfInvitedFriends(friends, filter, maxLevel = Infinity) {
-    const notFilteredInvited = new Set();
-
-    let friendSet = firstCircle(friends);
-    friendSet.forEach(friend => notFilteredInvited.add(friend));
-
-    const friendsMap = friendsToMap(friends);
-    for (let i = maxLevel - 1; i > 0; i--) {
-        const currentCircle = getCurrentCircleFriends(friendSet, friendsMap);
-        const previousInvitedListLength = notFilteredInvited.length;
-        sortNamesLexicographic(Array.from(currentCircle))
-            .forEach(friend => notFilteredInvited.add(friend));
-        friendSet = currentCircle;
-        if (notFilteredInvited.length === previousInvitedListLength) {
-            break;
-        }
-    }
-
-    if (maxLevel === Infinity && notFilteredInvited.length !== friends.length) {
-        friends.forEach(friend => notFilteredInvited.add(friend));
-    }
-
-    return filter.filter(Array.from(notFilteredInvited));
+    previousCircle.forEach(friend => {
+        friend.friends.forEach(name => {
+            currentCircle.add(friendsMap[name]);
+        });
+    });
+    sortNamesLexicographic(Array.from(currentCircle))
+        .forEach(person => {
+            accumulator.add(person);
+        });
 }
 
 function friendsToMap(friends) {
@@ -70,9 +47,8 @@ function friendsToMap(friends) {
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
- * @param {number} maxLevel
  */
-function Iterator(friends, filter, maxLevel = Infinity) {
+function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
@@ -91,7 +67,18 @@ function Iterator(friends, filter, maxLevel = Infinity) {
         return result;
     };
 
-    this._collection = formCollectionOfInvitedFriends(friends, filter, maxLevel);
+    const friendsMap = friendsToMap(friends);
+    const friendSet = firstCircle(friends);
+
+    while (friendSet.size !== friends.length) {
+        const prevLength = friendSet.size;
+        newCircle(friendSet, friendSet, friendsMap);
+        if (prevLength === friendSet.size) {
+            break;
+        }
+    }
+
+    this._collection = filter.filter(Array.from(friendSet));
     this._counter = 0;
 }
 
@@ -104,7 +91,20 @@ function Iterator(friends, filter, maxLevel = Infinity) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter, maxLevel);
+    Iterator.call(this, friends, filter);
+
+    const friendsMap = friendsToMap(friends);
+    const friendSet = firstCircle(friends);
+
+    while (maxLevel - 1 > 0) {
+        const currentCircle = new Set();
+        newCircle(friendSet, currentCircle, friendsMap);
+        currentCircle.forEach(friend => friendSet.add(friend));
+        maxLevel--;
+    }
+
+    this._collection = filter.filter(Array.from(friendSet));
+    this._counter = 0;
 }
 
 /**
@@ -123,9 +123,7 @@ function Filter() {
  * @constructor
  */
 function BestFriendsFilter() {
-    this.filter = function (friends) {
-        return friends.filter(friend => friend.best);
-    };
+    this.filter = (friends) => friends.filter(friend => friend.best);
 }
 
 /**
@@ -134,9 +132,7 @@ function BestFriendsFilter() {
  * @constructor
  */
 function MaleFilter() {
-    this.filter = function (friends) {
-        return friends.filter(friend => friend.gender === 'male');
-    };
+    this.filter = (friends) => friends.filter(friend => friend.gender === 'male');
 }
 
 /**
@@ -145,9 +141,7 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    this.filter = function (friends) {
-        return friends.filter(friend => friend.gender === 'female');
-    };
+    this.filter = (friends) => friends.filter(friend => friend.gender === 'female');
 }
 
 exports.Iterator = Iterator;
