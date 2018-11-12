@@ -64,12 +64,12 @@ function LimitedIterator(friends, filter, maxLevel) {
     listOfAllFriends = getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel);
     listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr));
     limitedIterator.done = function () {
-        return limitedIterator.index >= listOfAllFriends.length;
+        return limitedIterator.index >= listOfAllFriends.length || maxLevel === 0;
     };
     limitedIterator.next = function () {
         limitedIterator.index++;
 
-        return listOfAllFriends[limitedIterator.index - 1]
+        return listOfAllFriends[limitedIterator.index - 1] && maxLevel !== 0
             ? listOfAllFriends[limitedIterator.index - 1] : null;
     };
 
