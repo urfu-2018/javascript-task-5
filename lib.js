@@ -71,6 +71,7 @@ function Iterator(friends, filter) {
                 next = iter.next();
             }
             let value = next.done ? null : next.value;
+            delete value.priority;
             next = iter.next();
 
             return value;
