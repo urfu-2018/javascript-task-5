@@ -67,6 +67,9 @@ function LimitedIterator(friends, filter, maxLevel) {
         return limitedIterator.index >= listOfAllFriends.length || maxLevel === 0;
     };
     limitedIterator.next = function () {
+        if (limitedIterator.done()) {
+            return null;
+        }
         limitedIterator.index++;
 
         return listOfAllFriends[limitedIterator.index - 1] && maxLevel !== 0
