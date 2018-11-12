@@ -19,11 +19,10 @@ function getNextRound(friends, currentRound, invitedFriends) {
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = friends.filter(friend => friend.best).sort(sortByName);
     let invitedFriends = [];
-    let countCicle = 0;
-    while (countCicle < maxLevel && currentRound.length > 0 && maxLevel > 0) {
+    while (currentRound.length > 0 && maxLevel > 0) {
         invitedFriends = invitedFriends.concat(currentRound);
         currentRound = getNextRound(friends, currentRound, invitedFriends);
-        countCicle++;
+        maxLevel--;
     }
 
     return invitedFriends.filter(filter.filterGender);
@@ -40,7 +39,6 @@ function Iterator(friends, filter) {
         throw new TypeError('Not instance of Filter');
     }
     this.invitedFriends = getInvitedFriends(friends, filter);
-    this.count = 0;
     this.done = () => {
         return this.invitedFriends.length === 0;
     };
