@@ -1,5 +1,70 @@
 'use strict';
 
+
+function sortByName(firstPerson, secondPerson) {
+
+    return firstPerson.name.localeCompare(secondPerson.name);
+}
+
+function getFriendsOfFriends(friend, otherFriends) {
+    const friendsOfFriends = [];
+    for (const nameFriend of friend.friends) {
+        const newGuest = findFriend(nameFriend, otherFriends);
+        friendsOfFriends.push(newGuest);
+    }
+
+    return friendsOfFriends;
+}
+
+function findFriend(nameFriend, otherFriends) {
+    for (let i = 0; i < otherFriends.length; i++) {
+        if (otherFriends[i].name === nameFriend) {
+            const finedFriend = otherFriends[i];
+            otherFriends.splice(i, 1);
+
+            return finedFriend;
+        }
+    }
+}
+
+function getInvitedFriends(friends, filter, maxLevel = Infinity) {
+    let currentRound = filter.sortBestFriends(friends);
+    let otherFriends = filter.sortCommonFriends(friends);
+    let countCicle = 1;
+    let nextRound = [];
+    let invitedFriends = filter.filterGender(currentRound);
+    while (countCicle < maxLevel && otherFriends.length > 0) {
+        for (const currentFriend of currentRound) {
+            nextRound = nextRound
+                .concat(getFriendsOfFriends(currentFriend, otherFriends))
+                .sort(sortByName);
+        }
+        currentRound = nextRound.filter(elArr => Boolean(elArr));
+        nextRound = [];
+        invitedFriends = invitedFriends.concat(filter.filterGender(currentRound));
+        countCicle++;
+    }
+
+    return invitedFriends;
+}
+
+
+function next(context) {
+    if (context.count <= context.invitedFriends.length) {
+        context.count++;
+
+        return context.invitedFriends[context.count - 1];
+    }
+
+    return null;
+}
+
+function done(context) {
+
+    return !(context.count < context.invitedFriends.length);
+}
+
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -7,7 +72,13 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('Not instance of Filter');
+    }
+    this.invitedFriends = getInvitedFriends(friends, filter);
+    this.count = 0;
+    this.next = next.bind(this, this);
+    this.done = done.bind(this, this);
 }
 
 /**
@@ -19,7 +90,13 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('Not instance of Filter');
+    }
+    this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
+    this.count = 0;
+    this.next = next.bind(this, this);
+    this.done = done.bind(this, this);
 }
 
 /**
@@ -27,7 +104,13 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    this.sortCommonFriends = (arrFriends) => arrFriends
+        .filter(friend => !friend.best)
+        .sort(sortByName);
+
+    this.sortBestFriends = (arrFriends) => arrFriends
+        .filter(friend => friend.best)
+        .sort(sortByName);
 }
 
 /**
@@ -35,8 +118,11 @@ function Filter() {
  * @extends Filter
  * @constructor
  */
+MaleFilter.prototype = new Filter();
+
 function MaleFilter() {
-    console.info('MaleFilter');
+    this.filterGender = (arrFriends) =>
+        arrFriends.filter(friend => friend.gender === 'male');
 }
 
 /**
@@ -44,8 +130,11 @@ function MaleFilter() {
  * @extends Filter
  * @constructor
  */
+FemaleFilter.prototype = new Filter();
+
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    this.filterGender = (arrFriends) =>
+        arrFriends.filter(friend => friend.gender === 'female');
 }
 
 exports.Iterator = Iterator;
