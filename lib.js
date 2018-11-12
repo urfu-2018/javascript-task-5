@@ -73,7 +73,7 @@ function addPriorities(friends) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Object.setPrototypeOf(this, new Iterator(friends, filter));
-    if (maxLevel === 0) {
+    if (maxLevel <= 0) {
         this.friendsIndexes = [];
 
         return this;
@@ -147,7 +147,7 @@ function goThrough(bestFriendsIndexes, maxLevel, friends) {
         currentStep++;
     }
 
-    return visitedNodes.concat(queue).sort();
+    return visitedNodes.concat(queue);
 }
 
 function findFriendIndex(friends, friendName) {
