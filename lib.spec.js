@@ -263,29 +263,3 @@ describe('Нет лучших друзей', () => {
     });
 });
 
-
-const friends6 = undefined;
-
-describe('undefined', () => {
-    it('никто не прийдет', () => {
-        const maleFilter = new lib.MaleFilter();
-        const femaleFilter = new lib.FemaleFilter();
-        const maleIterator = new lib.LimitedIterator(friends6, maleFilter, 2);
-        const femaleIterator = new lib.Iterator(friends6, femaleFilter);
-
-        const invitedFriends = [];
-
-        while (!maleIterator.done() && !femaleIterator.done()) {
-            invitedFriends.push([
-                maleIterator.next(),
-                femaleIterator.next()
-            ]);
-        }
-
-        while (!femaleIterator.done()) {
-            invitedFriends.push(femaleIterator.next());
-        }
-
-        assert.deepStrictEqual(invitedFriends, []);
-    });
-});
