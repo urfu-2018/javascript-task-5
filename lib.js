@@ -29,7 +29,8 @@ Iterator.prototype = {
             currentFriends = currentFriends
                 .reduce((acc, friend) => acc.concat(friend.friends), [])
                 .map(name => friends.find(friend => friend.name === name))
-                .filter(friend => !friendsOfFriends.includes(friend))
+                .filter((friend, index, arr) => !friendsOfFriends.includes(friend) &&
+                    arr.includes(friend))
                 .sort((first, second) => first.name > second.name);
             maxLevel -= 1;
         }
