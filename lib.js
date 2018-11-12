@@ -6,7 +6,7 @@
  */
 
 class Filter {
-    filter() {
+    isValid() {
         return true;
     }
 }
@@ -16,7 +16,7 @@ class Filter {
  * @extends Filter
  */
 class MaleFilter extends Filter {
-    filter(person) {
+    isValid(person) {
         return person.gender === 'male';
     }
 }
@@ -26,7 +26,7 @@ class MaleFilter extends Filter {
  * @extends Filter
  */
 class FemaleFilter extends Filter {
-    filter(person) {
+    isValid(person) {
         return person.gender === 'female';
     }
 }
@@ -37,9 +37,9 @@ class FilterCollection extends Filter {
         this.filters = filters;
     }
 
-    filter(person, iterator) {
+    isValid(person, iterator) {
         return this.filters
-            .map(filter => filter.filter(person, iterator))
+            .map(filter => filter.isValid(person, iterator))
             .every(value => value);
     }
 }
@@ -50,7 +50,11 @@ class LimitedFilter extends Filter {
         this.maxLevel = maxLevel;
     }
 
-    filter(person, iterator) {
+    isValid(person, iterator) {
+        if (this.maxLevel === Infinity) {
+            return true;
+        }
+
         return iterator.friendLevel.get(person.name) <= this.maxLevel;
     }
 }
@@ -65,11 +69,11 @@ class Iterator {
      */
     constructor(friends, filter) {
         if (!(filter instanceof Filter)) {
-            throw new TypeError('filter не является экземпляром Filter');
+            throw new TypeError('isValid не является экземпляром Filter');
         }
         this.friendLevel = getFriendLevel(friends);
         this.friends = friends
-            .filter(friend => filter.filter(friend, this))
+            .filter(friend => filter.isValid(friend, this))
             .sort((first, second) => {
                 if (this.friendLevel.get(first.name) === this.friendLevel.get(second.name)) {
                     return first.name.localeCompare(second.name);
@@ -109,7 +113,7 @@ class Queue {
     enqueue(item) {
         this.queueLength++;
         const queueItem = { item: item, next: null };
-        if (this.last === null) {
+        if (this.first === null) {
             this.first = queueItem;
             this.last = queueItem;
         } else {
@@ -119,14 +123,14 @@ class Queue {
     }
 
     dequeue() {
-        const item = this.first;
+        const item = this.first.item;
         this.first = this.first.next;
         if (this.first === null) {
             this.last = null;
         }
         this.queueLength--;
 
-        return item.item;
+        return item;
     }
 
     get length() {
