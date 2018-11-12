@@ -22,23 +22,21 @@ function getNextLevelFriends(friends, friendsMap) {
 }
 
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
-    const invitedFriends = [];
     const friendsMap = new Map();
     friends.forEach(friend => friendsMap.set(friend.name, friend));
     let queue = friends
         .filter(friend => friend.best)
         .sort(sortByName);
-    const visited = new Set(queue);
+    const visited = [];
     let level = 0;
     while (queue.length !== 0 && level !== maxLevel) {
-        invitedFriends.push(...queue.filter(filter.filterFunction));
+        visited.push(...queue);
         queue = getNextLevelFriends(queue, friendsMap)
-            .filter(friend => !visited.has(friend));
-        queue.forEach(friend => visited.add(friend));
+            .filter(friend => !visited.includes(friend));
         level++;
     }
 
-    return invitedFriends;
+    return visited.filter(filter.filterFunction);
 }
 
 /**
@@ -49,14 +47,14 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
  */
 function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
-        throw new TypeError('filter should be instance of "Filter"');
+        throw new TypeError();
     }
 
     if (this.invitedFriends === undefined) {
         this.invitedFriends = getInvitedFriends(friends, filter);
     }
     this.done = () => this.invitedFriends.length === 0;
-    this.next = () => this.invitedFriends.shift();
+    this.next = () => this.done() ? null : this.invitedFriends.shift();
 }
 
 /**
@@ -71,6 +69,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
     Iterator.call(this, friends, filter);
 }
+
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
@@ -101,6 +100,7 @@ Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 function FemaleFilter() {
     this.filterFunction = person => person.gender === 'female';
 }
+
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 
