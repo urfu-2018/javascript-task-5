@@ -15,14 +15,12 @@ function Iterator(friends, filter) {
         .filter(filter.isValid);
 }
 
-const compareNames = (a, b) => a.name.localeCompare(b.name);
-
 Iterator.prototype = {
     constructor: Iterator,
     addFriendsOfFriends(friends, maxLevel = Infinity) {
         let currentFriends = friends
             .filter(friend => friend.best)
-            .sort(compareNames);
+            .sort((first, second) => first.name > second.name);
         const friendsOfFriends = [];
 
         while (currentFriends.length > 0 && maxLevel > 0) {
@@ -34,7 +32,7 @@ Iterator.prototype = {
 
             currentFriends = friends.filter(friend => !friendsOfFriends.includes(friend) &&
                 subFriendList.includes(friend.name))
-                .sort(compareNames);
+                .sort((first, second) => first.name > second.name);
 
             maxLevel -= 1;
         }
@@ -45,7 +43,7 @@ Iterator.prototype = {
         return this.friends.length === 0;
     },
     next() {
-        return this.friends.shift();
+        return this.done() ? null : this.friends.shift();
     }
 };
 
@@ -72,8 +70,6 @@ LimitedIterator.prototype.constructor = LimitedIterator;
 function Filter() {
     console.info('Filter');
 }
-
-Filter.prototype.isValid = () => true;
 
 /**
  * Фильтр друзей-парней
