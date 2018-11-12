@@ -18,12 +18,14 @@ function Iterator(friends, filter) {
             sortedFriends: priorityFriends,
             next: function () {
                 return (this.done()) ? null
-                    : priorityFriends[this.friendsIndexes[this.currentIndex++]];
+                    : this.sortedFriends[this.friendsIndexes[this.currentIndex++]];
             },
 
             done: function () {
                 if (this.friendsIndexes === undefined) {
-                    this.friendsIndexes = filterFriends(priorityFriends, filter);
+                    const bestFriendsIndexes = new Set(getBestFriendsIndexes(this.sortedFriends));
+                    this.friendsIndexes = filterIndexes(filter, bestFriendsIndexes,
+                        this.sortedFriends);
 
                     return this.currentIndex === this.friendsIndexes.length;
                 } else if (this.friendsIndexes.length === 0) {
@@ -95,17 +97,6 @@ function filterIndexes(filter, bestFriendsIndexes, friends) {
     return result;
 }
 
-function filterFriends(friends, filter) {
-    var resultIndexes = [];
-    friends.forEach(function (values, index) {
-        if (filter.isAvailable(values)) {
-            resultIndexes.push(index);
-        }
-    });
-
-    return resultIndexes;
-}
-
 function getBestFriendsIndexes(friends, maxLevel) {
     const bestFriendsIndexes = [];
     friends.forEach(function (i, index) {
@@ -117,10 +108,12 @@ function getBestFriendsIndexes(friends, maxLevel) {
         return bestFriendsIndexes;
     }
 
-    return goThrough(bestFriendsIndexes, maxLevel, friends);
+    // return collectFriends(friends, maxLevel);
+
+    return goThrough(bestFriendsIndexes, friends, maxLevel);
 }
 
-function goThrough(bestFriendsIndexes, maxLevel, friends) {
+function goThrough(bestFriendsIndexes, friends, maxLevel = friends.length) {
     // bestfriends indexes
     // maxlevel
     // friends all
