@@ -2,20 +2,23 @@
 
 /**
  * Формирует очередной уровень друзей по предыдущему
- * @param {Object[]} friendsToInvite
+ * @param {Object[]} previousLevel
  * @param {Object[]} allFriends
  * @returns {Object[]}
  */
-function getNextLevelOfFriends(friendsToInvite, allFriends) {
-    return friendsToInvite.map(prevLevelFriend =>
+function getNextLevelOfFriends(previousLevel, allFriends) {
+    return previousLevel.map(prevLevelFriend =>
         allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name)))
         .reduce((flat, part) => flat.concat(part), []);
 }
 
+/**
+ * Возвращает отсортированый по .name массив без повторений
+ * @param {Object[]} array
+ * @returns {Object[]}
+ */
 function sortAndUniq(array) {
-    array.sort((a, b) => a.name.localeCompare(b.name));
-
-    return Array.from(new Set(array));
+    return Array.from(new Set(array.sort((a, b) => a.name.localeCompare(b.name))));
 }
 
 /**
@@ -29,26 +32,21 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    const toInvite = [friends.filter(friend => friend.best)];
-    toInvite[0] = sortAndUniq(toInvite[0]);
+    const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
     for (let i = 0; i < maxLevel - 1; i++) {
-        friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
-        toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
-        toInvite[i + 1] = sortAndUniq(toInvite[i + 1]);
-        if (friends.length === 0 || toInvite[i + 1].length === 0) {
+        friends = friends.filter(friend => !toInvite[i].includes(friend));
+        toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
+        if (!friends.length || !toInvite[i + 1].length) {
             break; // если всех добавили, или все оставшиеся не связаны.
         }
     }
-    this.friendsToInvite =
-        filter.doFiltering(toInvite.reduce((flat, part) => flat.concat(part), []));
+    this.previousLevel = filter.filter(toInvite.reduce((flat, part) => flat.concat(part), []));
 }
-
 Iterator.prototype.done = function () {
-    return this.friendsToInvite.length === 0;
+    return !this.previousLevel.length;
 };
-
 Iterator.prototype.next = function () {
-    return this.done() ? null : this.friendsToInvite.shift();
+    return this.done() ? null : this.previousLevel.shift();
 };
 
 /**
@@ -71,7 +69,7 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
 function Filter() {
     this.gender = '';
 }
-Filter.prototype.doFiltering = function (friends) {
+Filter.prototype.filter = function (friends) {
     return friends.filter(friend => friend.gender === this.gender || this.gender === '');
 };
 
