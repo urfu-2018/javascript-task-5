@@ -47,10 +47,7 @@ function chooseFriends(friends, maxLevel = friends.length + 1) {
     var currentLevelFriends = friends.filter(friend => friend.best);
 
     while (currentLevelFriends.length > 0 && currentLevel <= maxLevel) {
-        selection.push(...currentLevelFriends
-            .sort((first, second) => first.name.localeCompare(second.name))
-        );
-
+        selection.push(...currentLevelFriends.sort(nameComparator));
         currentLevelFriends = currentLevelFriends
             .reduce((acc, friend) => acc.concat(friend.friends), [])
             .map(name => friends.find(friend => friend.name === name))
@@ -61,6 +58,10 @@ function chooseFriends(friends, maxLevel = friends.length + 1) {
     }
 
     return selection;
+}
+
+function nameComparator(firstFriend, secondFriend) {
+    return firstFriend.name.localeCompare(secondFriend.name);
 }
 
 /**
