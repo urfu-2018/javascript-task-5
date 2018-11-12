@@ -42,15 +42,11 @@ function Iterator(friends, filter) {
     this.invitedFriends = getInvitedFriends(friends, filter);
     this.count = 0;
     this.next = () => {
-        if (!this.done()) {
-            return this.invitedFriends[this.count++];
-        }
-
-        return null;
+        return this.done() ? null : this.guests.shift();
     };
 
     this.done = () => {
-        return !(this.count < this.invitedFriends.length);
+        return this.invitedFriends.length === 0;
     };
 }
 
