@@ -113,9 +113,8 @@ function getFriendLevel(friends) {
         currentFriend.friends
             .filter(friend => !friendLevel.has(friend))
             .forEach(friend => {
-                const level = friendLevel.get(currentFriend.name) + 1;
                 queue.enqueue(friendMap.get(friend));
-                friendLevel.set(friend, level);
+                friendLevel.set(friend, friendLevel.get(currentFriend.name) + 1);
             });
     }
 
