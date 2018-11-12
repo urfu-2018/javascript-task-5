@@ -1,6 +1,6 @@
 'use strict';
 
-function addPowerFor(friends, names, level) {
+function addPowerFor(friends, names, level, maxLevel) {
     var newNames = [];
     var buildFriends = [];
     for (var name of names) {
@@ -12,14 +12,14 @@ function addPowerFor(friends, names, level) {
         }
     }
 
-    if (newNames.length > 0) {
-        return buildFriends.concat(addPowerFor(friends, newNames, level + 1));
+    if (newNames.length > 0 && level + 1 < maxLevel) {
+        return buildFriends.concat(addPowerFor(friends, newNames, level + 1, maxLevel));
     }
 
     return buildFriends;
 }
 
-function addPowerFriend(friends) {
+function addPowerFriend(friends, maxLevel) {
     var newFriends = [];
     var names = [];
     for (var friend of friends.values()) {
@@ -31,10 +31,13 @@ function addPowerFriend(friends) {
     }
 
     newFriends = newFriends
-        .concat(addPowerFor(friends, names, 2))
-        .concat(Array.from(friends.values()).map(f => {
+        .concat(addPowerFor(friends, names, 2, maxLevel));
+
+    if (friends.size > 0 && !isFinite(maxLevel)) {
+        newFriends = newFriends.concat(Array.from(friends.values()).map(f => {
             return { friend: f, power: Infinity };
         }));
+    }
 
     return newFriends;
 }
@@ -58,9 +61,12 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
+    if (!this.maxLevel) {
+        this.maxLevel = Infinity;
+    }
     var copyFriend = Array.from(friends);
     var current = 0;
-    var f = addPowerFriend(toMap(copyFriend));
+    var f = addPowerFriend(toMap(copyFriend), this.maxLevel);
     this.selfFriends = f.sort((a, b) => {
         if (a.power === b.power) {
             return a.friend.name.localeCompare(b.friend.name);
@@ -112,6 +118,7 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
     this.isCorrect = function (i) {
         return (
