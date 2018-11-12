@@ -12,7 +12,7 @@ function addPowerFor(friends, names, level, maxLevel) {
         }
     }
 
-    if (newNames.length > 0 && level + 1 < maxLevel) {
+    if (newNames.length > 0 && level + 1 <= maxLevel) {
         return buildFriends.concat(addPowerFor(friends, newNames, level + 1, maxLevel));
     }
 
