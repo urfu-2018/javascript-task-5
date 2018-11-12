@@ -61,6 +61,9 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (!(maxLevel > 0)) {
+        this.done = () => true;
+    }
     Iterator.call(this, friends, filter);
     this.friends = getFriends(friends, filter, maxLevel);
 }
