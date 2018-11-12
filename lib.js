@@ -125,7 +125,7 @@ function LimitedIterator(friends, filter, maxLevel) {
             i < this.selfFriends.length &&
             !(
                 filter.isCorrect(this.selfFriends[i].friend) &&
-                this.selfFriends[i].power <= maxLevel
+                this.selfFriends[i].power <= this.maxLevel
             )
         );
     };
