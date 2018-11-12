@@ -6,7 +6,8 @@ function getNextRound(friends, currentRound, invitedFriends) {
         .map(friendName => friends.find(friend => friend.name === friendName))
         .filter((friend, i, arrFriends) =>
             arrFriends.indexOf(friend) === i &&
-            !invitedFriends.includes(friend));
+            !invitedFriends.includes(friend))
+        .sort(sortByName);
 }
 
 function sortByName(firstPerson, secondPerson) {
@@ -18,27 +19,18 @@ function plusNumber(maxLevel) {
     return typeof maxLevel === 'number' && maxLevel > 0 ? maxLevel : 0;
 }
 
-function getFirstRound(currentRound, filter, maxLevel) {
-    if (maxLevel && currentRound.length) {
-
-        return filter.filterGender(currentRound);
-    }
-
-    return [];
-}
-
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
-    let currentRound = filter.sortBestFriends(friends);
-    let countCicle = 1;
+    let currentRound = friends.filter(friend => friend.best).sort(sortByName);
+    let countCicle = 0;
     maxLevel = plusNumber(maxLevel);
-    let invitedFriends = getFirstRound(currentRound, filter, maxLevel);
-    while (countCicle < maxLevel && currentRound.length) {
-        currentRound = getNextRound(friends, currentRound, invitedFriends);
+    let invitedFriends = [];
+    while (countCicle < maxLevel && currentRound.length && maxLevel > 0) {
         invitedFriends = invitedFriends.concat(currentRound);
+        currentRound = getNextRound(friends, currentRound, invitedFriends);
         countCicle++;
     }
 
-    return filter.filterGender(invitedFriends);
+    return invitedFriends.filter(filter.filterGender);
 }
 
 
@@ -97,9 +89,7 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    this.sortBestFriends = (arrFriends) => arrFriends
-        .filter(friend => friend.best)
-        .sort(sortByName);
+    this.filterGender = () => true;
 }
 
 /**
@@ -107,11 +97,11 @@ function Filter() {
  * @extends Filter
  * @constructor
  */
-MaleFilter.prototype = new Filter();
+MaleFilter.prototype = Object.create(Filter.prototype);
+MaleFilter.prototype.constructor = MaleFilter;
 
 function MaleFilter() {
-    this.filterGender = (arrFriends) =>
-        arrFriends.filter(friend => friend.gender === 'male');
+    this.filterGender = friend => friend.gender === 'male';
 }
 
 /**
@@ -119,11 +109,11 @@ function MaleFilter() {
  * @extends Filter
  * @constructor
  */
-FemaleFilter.prototype = new Filter();
+FemaleFilter.prototype = Object.create(Filter.prototype);
+FemaleFilter.prototype.constructor = FemaleFilter;
 
 function FemaleFilter() {
-    this.filterGender = (arrFriends) =>
-        arrFriends.filter(friend => friend.gender === 'female');
+    this.filterGender = friend => friend.gender === 'female';
 }
 
 exports.Iterator = Iterator;
