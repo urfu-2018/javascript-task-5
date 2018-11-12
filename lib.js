@@ -45,7 +45,7 @@ function getNextCircle(circle, guestList, friends) {
         .map(name => friends.find(friend => friend.name === name))
         .filter(friend => !guestList.includes(friend));
 
-    return [...new Set(newCircle)].sort((a, b) => a.name.localeCompare(b.name));
+    return [...newCircle].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 
