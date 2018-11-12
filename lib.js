@@ -1,18 +1,10 @@
 'use strict';
 
-function compareComparable(first, second) {
-    if (first < second) {
-        return -1;
-    }
+function getSorted(arr) {
+    arr = arr.slice();
+    arr.sort();
 
-    return (first === second) ? 0 : 1;
-}
-
-function getFriendsSorted(friends) {
-    friends = friends.slice();
-    friends.sort((first, second) => compareComparable(first, second));
-
-    return friends;
+    return arr;
 }
 
 function notUsed(items, used) {
@@ -25,18 +17,13 @@ function getNextWave(friendsMap, wave, used) {
         newWave.push(...notUsed(friendsMap.get(name).friends, used));
     }
 
-    return getFriendsSorted(newWave);
+    return getSorted(newWave.filter((item, index) => newWave.indexOf(item) === index));
 }
 
 function getBest(friends) {
-    let best = [];
-    for (let friend of friends) {
-        if (friend.best) {
-            best.push(friend.name);
-        }
-    }
-
-    return best;
+    return friends
+        .filter(friend => friend.best)
+        .map(friend => friend.name);
 }
 
 function toFriendsMap(friends) {
@@ -59,7 +46,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter is not instance of Filter');
     }
-    this.wave = getFriendsSorted(getBest(friends));
+    this.wave = getSorted(getBest(friends));
     this.friendsMap = toFriendsMap(friends);
     this.used = new Set();
     this.index = 0;
