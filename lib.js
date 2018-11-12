@@ -40,7 +40,7 @@ Iterator.prototype = {
             .sort(alphabet);
         let currentLevel = 0;
         while (currentLevel < maxLevel && currentFriends.length !== 0) {
-            currentFriends.forEach(friend => sortedFriends.push(friend));
+            sortedFriends.push(...currentFriends);
             currentFriends = this.getNextLevel(currentFriends, sortedFriends);
             currentLevel += 1;
         }
@@ -49,21 +49,13 @@ Iterator.prototype = {
     },
 
     getNextLevel(currentFriends, sortedFriends) {
-        let nextLevel = [];
-        currentFriends.forEach(friend => {
-            friend.friends.forEach(name => {
-                if (!this.hasThisFriend(name, sortedFriends)) {
-                    nextLevel.push(this.friends.find(y => y.name === name));
-                }
-            });
-        });
+        let nextLevelNames = [];
+        currentFriends.forEach(friend => nextLevelNames.push(...friend.friends));
+        let nextLevel = nextLevelNames
+            .map(name => this.friends.find(x => x.name === name))
+            .filter(friend => !sortedFriends.includes(friend));
 
-        return nextLevel.sort(alphabet);
-    },
-
-    hasThisFriend(name, friendsGroup) {
-        return friendsGroup.map(x => x.name)
-            .includes(name);
+        return [...new Set(nextLevel)].sort(alphabet);
     }
 };
 
