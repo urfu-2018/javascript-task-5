@@ -18,9 +18,9 @@ function getNextRound(friends, currentRound, invitedFriends) {
 
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = friends.filter(friend => friend.best).sort(sortByName);
-    let countCicle = 1;
+    let countCicle = 0;
     let invitedFriends = [];
-    while (countCicle <= maxLevel && currentRound.length > 0 && maxLevel > 0) {
+    while (countCicle < maxLevel && currentRound.length > 0 && maxLevel > 0) {
         invitedFriends = invitedFriends.concat(currentRound);
         currentRound = getNextRound(friends, currentRound, invitedFriends);
         countCicle++;
@@ -80,8 +80,7 @@ function Filter() {
  * @extends Filter
  * @constructor
  */
-MaleFilter.prototype = Object.create(Filter.prototype);
-MaleFilter.prototype.constructor = MaleFilter;
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 function MaleFilter() {
     this.filterGender = friend => friend.gender === 'male';
@@ -92,8 +91,7 @@ function MaleFilter() {
  * @extends Filter
  * @constructor
  */
-FemaleFilter.prototype = Object.create(Filter.prototype);
-FemaleFilter.prototype.constructor = FemaleFilter;
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 function FemaleFilter() {
     this.filterGender = friend => friend.gender === 'female';
