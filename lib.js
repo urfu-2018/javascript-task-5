@@ -36,9 +36,8 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
 
 function next(context) {
     if (context.count < context.invitedFriends.length) {
-        context.count++;
 
-        return context.invitedFriends[context.count - 1];
+        return context.invitedFriends[context.count++];
     }
 
     return null;
@@ -62,8 +61,8 @@ function Iterator(friends, filter) {
     }
     this.invitedFriends = getInvitedFriends(friends, filter);
     this.count = 0;
-    this.next = next.bind(this, this);
-    this.done = done.bind(this, this);
+    this.next = next.bind(null, this);
+    this.done = done.bind(null, this);
 }
 
 /**
