@@ -35,18 +35,17 @@ function getResultFriends(friends, filter, maxLvl = Infinity) {
     }
     sortByName(friends);
     let bestFriends = getBestFriends(friends);
+    if (bestFriends.length === 0) {
+        return [];
+    }
     let resultFriends = bestFriends;
-    while (maxLvl > 1) {
+    for (; maxLvl > 1; maxLvl--) {
         const newNames = getNewNames(bestFriends, resultFriends);
         if (newNames.length === 0) {
             break;
         }
         bestFriends = getArrayOfObjectFriends(newNames, friends);
-        if (bestFriends.length === 0) {
-            break;
-        }
         resultFriends = resultFriends.concat(bestFriends);
-        maxLvl--;
     }
 
     return filterFriends(resultFriends, filter);
