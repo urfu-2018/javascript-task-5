@@ -93,6 +93,7 @@ function Filter() {
 function MaleFilter() {
     Filter.call(this);
     this.predicate = friend => friend.gender === 'male';
+    this.predicate.bind(this);
 }
 
 MaleFilter.prototype = new Filter();
@@ -105,6 +106,7 @@ MaleFilter.prototype = new Filter();
 function FemaleFilter() {
     Filter.call(this);
     this.predicate = friend => friend.gender === 'female';
+    this.predicate.bind(this);
 }
 
 FemaleFilter.prototype = new Filter();
