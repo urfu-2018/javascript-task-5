@@ -48,7 +48,7 @@ Iterator.prototype.next = function () {
 };
 
 Iterator.prototype.done = function () {
-    return this.filteredFriends.length === this.index;
+    return this.filteredFriends.length <= this.index;
 };
 
 /**
