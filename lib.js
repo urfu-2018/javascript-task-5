@@ -78,6 +78,10 @@ function Iterator(friends, filter) {
         }
     }
 
+    if (friendSet.size < friends.length) {
+        friends.forEach(friend => friendSet.add(friend));
+    }
+
     this._collection = filter.filter(Array.from(friendSet));
     this._counter = 0;
 }
