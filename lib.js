@@ -43,6 +43,9 @@ function getFriends(friends, filter, maxLevel = Infinity) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     this.friends = getFriends(friends, filter);
     this.count = 0;
     this.done = () => this.friends.length === this.count;
