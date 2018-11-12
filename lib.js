@@ -11,13 +11,13 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    this.friends = this.addFriendsOfFriends(friends, this.maxLevel)
+    this.friends = this.getFriendsOfFriends(friends, this.maxLevel)
         .filter(filter.isValid);
 }
 
 Iterator.prototype = {
     constructor: Iterator,
-    addFriendsOfFriends(friends, maxLevel = Infinity) {
+    getFriendsOfFriends(friends, maxLevel = Infinity) {
         let currentFriends = friends
             .filter(friend => friend.best)
             .sort((first, second) => first.name > second.name);
@@ -26,14 +26,11 @@ Iterator.prototype = {
         while (currentFriends.length > 0 && maxLevel > 0) {
             friendsOfFriends.push(...currentFriends);
 
-            const subFriendList = currentFriends
-                .map(friend => friend.friends)
-                .reduce((acc, friendList) => acc.concat(friendList));
-
-            currentFriends = friends.filter(friend => !friendsOfFriends.includes(friend) &&
-                subFriendList.includes(friend.name))
+            currentFriends = currentFriends
+                .reduce((acc, friend) => acc.concat(friend.friends), [])
+                .map(name => friends.find(friend => friend.name === name))
+                .filter(friend => !friendsOfFriends.includes(friend))
                 .sort((first, second) => first.name > second.name);
-
             maxLevel -= 1;
         }
 
@@ -68,7 +65,7 @@ LimitedIterator.prototype.constructor = LimitedIterator;
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    this.isValid = () => true;
 }
 
 /**
@@ -77,17 +74,11 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
+    this.isValid = (friend) => friend.gender === 'male';
 }
 
-MaleFilter.prototype = Object.create(Filter.prototype, {
-    constructor: {
-        value: MaleFilter
-    },
-    isValid: {
-        value: friend => friend.gender === 'male'
-    }
-});
+MaleFilter.prototype = Object.create(Filter.prototype);
+MaleFilter.prototype.constructor = FemaleFilter;
 
 /**
  * Фильтр друзей-девушек
@@ -95,17 +86,11 @@ MaleFilter.prototype = Object.create(Filter.prototype, {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    this.isValid = (friend) => friend.gender === 'female';
 }
 
-FemaleFilter.prototype = Object.create(Filter.prototype, {
-    constructor: {
-        value: FemaleFilter
-    },
-    isValid: {
-        value: friend => friend.gender === 'female'
-    }
-});
+FemaleFilter.prototype = Object.create(Filter.prototype);
+FemaleFilter.prototype.constructor = FemaleFilter;
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
