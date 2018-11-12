@@ -1,4 +1,5 @@
 /* eslint-env mocha */
+/* eslint-disable */
 'use strict';
 
 const assert = require('assert');
@@ -88,3 +89,109 @@ describe('Итераторы', () => {
         }
     }
 });
+
+const friends2 = [
+    {
+        name: 'Sam',
+        friends: ['Mat', 'Sharon'],
+        gender: 'male',
+        best: true
+    }
+];
+
+describe('Один парень', () => {
+    it('один парень не пригласится', () => {
+        const maleFilter = new lib.MaleFilter();
+        const femaleFilter = new lib.FemaleFilter();
+        const maleIterator = new lib.LimitedIterator(friends2, maleFilter, 2);
+        const femaleIterator = new lib.Iterator(friends2, femaleFilter);
+
+        const invitedFriends = [];
+
+        while (!maleIterator.done() && !femaleIterator.done()) {
+            invitedFriends.push([
+                maleIterator.next(),
+                femaleIterator.next()
+            ]);
+        }
+
+        while (!femaleIterator.done()) {
+            invitedFriends.push(femaleIterator.next());
+        }
+
+        assert.deepStrictEqual(invitedFriends, []);
+    });
+});
+
+
+
+const friends3 = [
+    {
+        name: 'Sally',
+        friends: ['Mat', 'Sharon'],
+        gender: 'female',
+        best: true
+    }
+];
+
+describe('Одна девушка', () => {
+    it('Пригласится', () => {
+        const maleFilter = new lib.MaleFilter();
+        const femaleFilter = new lib.FemaleFilter();
+        const maleIterator = new lib.LimitedIterator(friends3, maleFilter, 2);
+        const femaleIterator = new lib.Iterator(friends3, femaleFilter);
+
+        const invitedFriends = [];
+
+        while (!maleIterator.done() && !femaleIterator.done()) {
+            invitedFriends.push([
+                maleIterator.next(),
+                femaleIterator.next()
+            ]);
+        }
+
+        while (!femaleIterator.done()) {
+            invitedFriends.push(femaleIterator.next());
+        }
+
+        assert.deepStrictEqual(invitedFriends, [friend('Sally')]);
+    });
+
+    function friend(name) {
+        let len = friends3.length;
+
+        while (len--) {
+            if (friends3[len].name === name) {
+                return friends3[len];
+            }
+        }
+    }
+});
+
+const friends4 = [
+];
+
+describe('Никто', () => {
+    it('Не крашнет прогу', () => {
+        const maleFilter = new lib.MaleFilter();
+        const femaleFilter = new lib.FemaleFilter();
+        const maleIterator = new lib.LimitedIterator(friends4, maleFilter, 2);
+        const femaleIterator = new lib.Iterator(friends4, femaleFilter);
+
+        const invitedFriends = [];
+
+        while (!maleIterator.done() && !femaleIterator.done()) {
+            invitedFriends.push([
+                maleIterator.next(),
+                femaleIterator.next()
+            ]);
+        }
+
+        while (!femaleIterator.done()) {
+            invitedFriends.push(femaleIterator.next());
+        }
+
+        assert.deepStrictEqual(invitedFriends, []);
+    });
+});
+

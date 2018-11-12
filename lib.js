@@ -7,19 +7,16 @@
  * @returns {[Object[]]}
  */
 function getFriendsForInviting(friends, maxLevel) {
-    if (friends === undefined) {
-        return [];
-    }
-    const friendsToInvite = [friends.filter(friend => friend.best)];
-    for (let i = 1; i < maxLevel; i++) {
-        friends = friends.filter(friend => !friendsToInvite[i - 1].includes(friend));
-        friendsToInvite[i] = getNextLevelOfFriends(friendsToInvite[i - 1], friends);
-        if (friends.length === 0 || friendsToInvite[i].length === 0) {
+    const toInvite = [friends.filter(friend => friend.best)];
+    for (let i = 0; i < maxLevel - 1; i++) {
+        friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать добавленных
+        toInvite[i + 1] = getNextLevelOfFriends(toInvite[i], friends); // добавить уровень
+        if (friends.length === 0 || toInvite[i].length === 0) {
             break; // если всех добавили, или все оставшиеся не связаны.
         }
     }
 
-    return friendsToInvite;
+    return toInvite;
 }
 
 /**
@@ -49,10 +46,8 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    this.friendsToInvite = filter.doFiltering(getFriendsForInviting(friends, maxLevel));
-    if (this.friendsToInvite.length > 0) {
-        this.friendsToInvite = this.friendsToInvite.reduce((flat, part) => flat.concat(part));
-    }
+    this.friendsToInvite = filter.doFiltering(getFriendsForInviting(friends, maxLevel)
+        .reduce((flat, part) => flat.concat(part)));
 }
 
 Iterator.prototype.done = function () {
