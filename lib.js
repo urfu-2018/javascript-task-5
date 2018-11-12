@@ -46,8 +46,13 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    this.friendsToInvite = filter.doFiltering(getFriendsForInviting(friends, maxLevel)
-        .reduce((flat, part) => flat.concat(part)));
+    if (friends === undefined) {
+        this.friendsToInvite = [];
+    } else {
+        this.friendsToInvite = filter.doFiltering(getFriendsForInviting(friends, maxLevel)
+            .reduce((flat, part) => flat.concat(part)), []);
+    }
+
 }
 
 Iterator.prototype.done = function () {
