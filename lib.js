@@ -41,7 +41,7 @@ function Iterator(friends, filter) {
     this.next = function () {
         this.index++;
 
-        return listOfAllFriends[this.index - 1] ? listOfAllFriends[this.index - 1] : null;
+        return !Iterator.done() ? listOfAllFriends[this.index - 1] : null;
     };
 
 }
@@ -69,7 +69,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     limitedIterator.next = function () {
         limitedIterator.index++;
 
-        return listOfAllFriends[limitedIterator.index - 1] && maxLevel !== 0
+        return !limitedIterator.done()
             ? listOfAllFriends[limitedIterator.index - 1] : null;
     };
 
