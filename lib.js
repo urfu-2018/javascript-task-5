@@ -28,23 +28,23 @@ class FemaleFilter extends Filter {
 
 function getGuests(friends, filter, maxLevel = Infinity) {
     let circle = friends.filter(friend => friend.best).sort((a, b) => a.name.localeCompare(b.name));
-    let guestList = [];
+    let guests = [];
     let level = 0;
     while (level < maxLevel && circle.length > 0) {
-        guestList.push(...circle);
-        circle = getNextCircle(circle, guestList, friends);
+        guests.push(...circle);
+        circle = getNextCircle(circle, guests, friends);
         level++;
     }
 
-    return guestList;
+    return guests;
 }
 
-function getNextCircle(circle, guestList, friends) {
+function getNextCircle(circle, guests, friends) {
     return [...new Set(circle
         .map(p => p.friends)
-        .reduce((result, f) => [...result, ...f], [])
+        .reduce((result, f) => result.concat(f), [])
         .map(name => friends.find(friend => friend.name === name))
-        .filter(friend => !guestList.includes(friend)))]
+        .filter(friend => !guests.includes(friend)))]
         .sort((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -56,7 +56,6 @@ class Iterator {
         }
         console.info(friends, filter);
 
-        /*
         let iteration = friends
             .filter(friend => friend.best)
             .sort((a, b) => a.name.localeCompare(b.name));
@@ -68,10 +67,11 @@ class Iterator {
                 .reduce((result, f) => result.concat(f), [])
                 .map(n => friends
                     .find(f => f.name === n))
-                .filter(friend => !guests.includes(friend)))];
-        }*/
+                .filter(friend => !guests.includes(friend)))]
+                .sort((a, b) => a.name.localeCompare(b.name));
+        }
 
-        const pickedFriends = getGuests(friends, filter, maxLevel).filter(filter.check);
+        const pickedFriends = guests;// getGuests(friends, filter, maxLevel).filter(filter.check);
         this.collection = pickedFriends.filter(e => filter.check(e));
         this.index = 0;
     }
