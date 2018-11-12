@@ -18,8 +18,8 @@ function getNextRound(friends, currentRound, invitedFriends) {
 
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = friends.filter(friend => friend.best).sort(sortByName);
-    let countCicle = 0;
     let invitedFriends = [];
+    let countCicle = 0;
     while (countCicle < maxLevel && currentRound.length > 0 && maxLevel > 0) {
         invitedFriends = invitedFriends.concat(currentRound);
         currentRound = getNextRound(friends, currentRound, invitedFriends);
@@ -41,13 +41,14 @@ function Iterator(friends, filter) {
     }
     this.invitedFriends = getInvitedFriends(friends, filter);
     this.count = 0;
-    this.next = () => {
-        return this.done() ? null : this.guests.shift();
-    };
-
     this.done = () => {
         return this.invitedFriends.length === 0;
     };
+
+    this.next = () => {
+        return this.done() ? null : this.invitedFriends.shift();
+    };
+
 }
 
 /**
