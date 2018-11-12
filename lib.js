@@ -91,6 +91,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
+    Filter.call(this);
     this.predicate = friend => friend.gender === 'male';
 }
 
@@ -102,6 +103,7 @@ MaleFilter.prototype = new Filter();
  * @constructor
  */
 function FemaleFilter() {
+    Filter.call(this);
     this.predicate = friend => friend.gender === 'female';
 }
 
