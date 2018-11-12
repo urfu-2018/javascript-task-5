@@ -46,11 +46,11 @@ function Iterator(friends, filter) {
         }
 
         return null;
-    }
+    };
 
     this.done = () => {
         return !(this.count < this.invitedFriends.length);
-    }
+    };
 }
 
 /**
