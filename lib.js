@@ -21,7 +21,7 @@ Object.assign(Iterator.prototype, {
 
         return this.done()
             ? null
-            : friendsWrapper.friends[friendsWrapper.current++].object;
+            : friendsWrapper.friends[friendsWrapper.current++];
     }
 });
 
@@ -77,66 +77,77 @@ function FemaleFilter() {
 
 FemaleFilter.prototype = Object.create(Filter.prototype);
 
+function nameCompare(a, b) {
+    return a.name < b.name ? -1 : 1;
+}
+
+function internal(currentLevel, sortedFriends, result, i) {
+
+    const currentFriend = sortedFriends[i].friend;
+    if (currentLevel === 1) {
+        if (currentFriend.best) {
+            return takeVisited(currentLevel, sortedFriends, result, i);
+        }
+    } else {
+        const q = result
+            .filter(r => r.level === currentLevel - 1)
+            .map(r => r.friend.friends);
+        const isFriend = q.reduce(flat, [])
+            .includes(currentFriend.name);
+        if (isFriend) {
+            return takeVisited(currentLevel, sortedFriends, result, i);
+        }
+    }
+
+    return 0;
+}
+
+function flat(accumulator, currentValue) {
+    return accumulator.concat(currentValue);
+}
+
+function takeVisited(currentLevel, sortedFriends, result, i) {
+    const el = sortedFriends.splice(i, 1)[0];
+    el.level = currentLevel;
+    result.push(el);
+
+    return -1;
+}
+
 function filterAndOrder(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    let temp = friends
-        .map(friend => {
+
+    let result = [];
+    const sortedFriends = friends
+        .sort(nameCompare)
+        .map(f => {
             return {
-                object: friend,
-                level: friend.best ? 1 : Infinity
+                friend: f,
+                level: Infinity
             };
         });
 
-    temp = bubbleSort(temp)
-        .filter(friend => filter.apply(friend.object))
-        .filter(friend => friend.level <= maxLevel &&
-            friend.level !== Infinity);
+    let currentLevel = 1;
+    while (currentLevel <= maxLevel) {
+        let iterationResult = result.slice();
+        for (let i = 0; i < sortedFriends.length; i++) {
+            i = i + internal(currentLevel, sortedFriends, iterationResult, i);
+        }
+        if (iterationResult.length === result.length) {
+            break;
+        }
+        result = iterationResult;
+        currentLevel++;
+    }
 
     return {
         current: 0,
-        friends: temp
+        friends: result
+            .map(f => f.friend)
+            .filter(f => filter.apply(f))
     };
-}
-
-function bubbleSort(friends) {
-    for (let i = 0; i < friends.length; i++) {
-        for (let j = i + 1; j < friends.length; j++) {
-            bubbleSortInternal(friends, i, j);
-        }
-    }
-
-    return friends;
-}
-
-function bubbleSortInternal(friends, i, j) {
-    const friendA = friends[i];
-    const friendB = friends[j];
-
-    if (friendA.level === friendB.level) {
-        if (friendA.object.name.toLowerCase() >= friendB.object.name.toLowerCase()) {
-            swap(friends, i, j);
-        }
-    } else if (friendA.level < friendB.level) {
-        correctLevel(friendA, friendB);
-    } else {
-        correctLevel(friendB, friendA);
-        swap(friends, i, j);
-    }
-
-}
-
-function correctLevel(lowLevelFriend, highLevelFriend) {
-    if (lowLevelFriend.object.friends.includes(highLevelFriend.object.name)) {
-        highLevelFriend.level = lowLevelFriend.level + 1;
-    }
-}
-
-function swap(friends, i, j) {
-    const temp = friends[i];
-    friends[i] = friends[j];
-    friends[j] = temp;
 }
 
 exports.Iterator = Iterator;
