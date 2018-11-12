@@ -65,14 +65,11 @@ function addPriorities(friends) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    // 1 лучшие друзья
-    // 2 друзья лучших друзей
     Object.setPrototypeOf(this, new Iterator(friends, filter));
     if (maxLevel === 0) {
         return this;
     }
     const bestFriendsIndexes = new Set(getBestFriendsIndexes(friends, maxLevel));
-    // this.friendsIndexes filtered male indexes
     this.friendsIndexes = filterIndexes(this.friendsIndexes, bestFriendsIndexes);
 
     return this;
@@ -195,7 +192,6 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    // var femaleFilter = {};
     Object.setPrototypeOf(this, new Filter());
     Object.defineProperty(this, 'isAvailable', {
         value: function (a) {
@@ -211,8 +207,11 @@ function friendsSortFunction(firstFriend, secondFriend) {
     if (isBest) {
         return isBest;
     }
+    if (firstFriend.hasOwnProperty('best')) {
+        return firstFriend.name.localeCompare(secondFriend.name, 'kn');
+    }
 
-    return firstFriend.name.localeCompare(secondFriend.name) &&
+    return firstFriend.name.localeCompare(secondFriend.name, 'kn') &&
         firstFriend.priority <= secondFriend.priority;
 }
 
