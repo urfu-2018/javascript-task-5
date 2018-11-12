@@ -33,7 +33,7 @@ function Iterator(friends, filter) {
                 y.circle.toString().padStart(3, '0') + y.name
             )
         )
-        .filter(filter.rule);
+        .filter(f => filter.rule(f) && f.circle);
     this.next = () => (this.done() ? null : this.friends.shift());
     this.done = () => !this.friends.length;
 }
@@ -48,7 +48,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    this.done = () => !this.friends.length || this.friends[0].circle > maxLevel || isNaN(maxLevel);
+    this.done = () => !this.friends.length || this.friends[0].circle > maxLevel;
 }
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
