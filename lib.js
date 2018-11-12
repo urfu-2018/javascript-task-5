@@ -133,9 +133,8 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.gender = '';
-    this.isCorrect = function (friend) {
-        return friend.gender === this.gender;
+    this.isCorrect = function () {
+        return true;
     };
 }
 
@@ -146,7 +145,9 @@ function Filter() {
  */
 function MaleFilter() {
     Filter.call(this);
-    this.gender = 'male';
+    this.isCorrect = function (friend) {
+        return friend.gender === 'male';
+    };
 }
 
 MaleFilter.prototype = Object.create(Filter.prototype);
@@ -158,7 +159,9 @@ MaleFilter.prototype = Object.create(Filter.prototype);
  */
 function FemaleFilter() {
     Filter.call(this);
-    this.gender = 'female';
+    this.isCorrect = function (friend) {
+        return friend.gender === 'female';
+    };
 }
 
 FemaleFilter.prototype = Object.create(Filter.prototype);
