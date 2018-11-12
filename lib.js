@@ -41,6 +41,10 @@ function getNextCircle(currentCircle, guests, friendsMap) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
+
     this.guests = getFriendsByCircles(friends, this.maxLevel)
         .filter(filter.predicate);
     this.index = 0;
