@@ -31,29 +31,6 @@ class FemaleFilter extends Filter {
     }
 }
 
-// class FilterCollection extends Filter {
-//     constructor(...filters) {
-//         super();
-//         this.filters = filters;
-//     }
-//
-//     isValid(person, iterator) {
-//         return this.filters
-//             .map(filter => filter.isValid(person, iterator))
-//             .every(value => value);
-//     }
-// }
-//
-// class LimitedFilter extends Filter {
-//     constructor(maxLevel) {
-//         super();
-//         this.maxLevel = maxLevel;
-//     }
-//
-//     isValid(person, iterator) {
-//         return iterator.friendLevel.get(person.name) <= this.maxLevel;
-//     }
-// }
 
 class Iterator {
 
@@ -66,19 +43,9 @@ class Iterator {
      */
     constructor(friends, filter, maxLevel = Infinity) {
         if (!(filter instanceof Filter)) {
-            throw new TypeError('isValid не является экземпляром Filter');
+            throw new TypeError('filter не является экземпляром Filter');
         }
-        this.friendLevel = getFriendLevel(friends, maxLevel);
-        this.friends = friends
-            .filter(friend => this.friendLevel.has(friend.name))
-            .filter(friend => filter.isValid(friend, this))
-            .sort((first, second) => {
-                if (this.friendLevel.get(first.name) === this.friendLevel.get(second.name)) {
-                    return first.name.localeCompare(second.name);
-                }
-
-                return this.friendLevel.get(first.name) - this.friendLevel.get(second.name);
-            });
+        this.friends = getInvitedFriends(friends, filter, maxLevel);
         this.index = 0;
     }
 
@@ -155,6 +122,21 @@ function getFriendLevel(friends, maxLevel) {
     }
 
     return friendLevel;
+}
+
+function getInvitedFriends(friends, filter, maxLevel) {
+    const friendLevel = getFriendLevel(friends, maxLevel);
+
+    return friends
+        .filter(friend => friendLevel.has(friend.name))
+        .filter(friend => filter.isValid(friend))
+        .sort((first, second) => {
+            if (friendLevel.get(first.name) === friendLevel.get(second.name)) {
+                return first.name.localeCompare(second.name);
+            }
+
+            return friendLevel.get(first.name) - friendLevel.get(second.name);
+        });
 }
 
 class LimitedIterator extends Iterator {
