@@ -28,12 +28,12 @@ function Iterator(friends, filter) {
         assignCirclesFromBestFriend(bestFriend, friends);
     }
     this.friends = friends
+        .filter(f => filter.rule(f) && f.circle)
         .sort((x, y) =>
             (x.circle.toString().padStart(3, '0') + x.name).localeCompare(
                 y.circle.toString().padStart(3, '0') + y.name
             )
-        )
-        .filter(f => filter.rule(f) && f.circle);
+        );
     this.next = () => (this.done() ? null : this.friends.shift());
     this.done = () => !this.friends.length;
 }
