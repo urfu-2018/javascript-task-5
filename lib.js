@@ -30,6 +30,9 @@ function getArrayOfObjectFriends(newNames, friends) {
 }
 
 function getResultFriends(friends, filter, maxLvl = Infinity) {
+    if (maxLvl < 1) {
+        return [];
+    }
     sortByName(friends);
     let bestFriends = getBestFriends(friends);
     let resultFriends = bestFriends;
