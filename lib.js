@@ -41,11 +41,11 @@ class Iterator {
      * @param {Filter} filter
      * @param {Number} maxLevel
      */
-    constructor(friends, filter) {
+    constructor(friends, filter, maxLevel = Infinity) {
         if (!(filter instanceof Filter)) {
             throw new TypeError('filter не является экземпляром Filter');
         }
-        this.friends = getInvitedFriends(friends, filter, Infinity);
+        this.friends = getInvitedFriends(friends, filter, maxLevel);
         this.index = 0;
     }
 
@@ -114,10 +114,8 @@ function getFriendLevel(friends, maxLevel) {
             .filter(friend => !friendLevel.has(friend))
             .forEach(friend => {
                 const level = friendLevel.get(currentFriend.name) + 1;
-                if (level <= maxLevel) {
-                    queue.enqueue(friendMap.get(friend));
-                    friendLevel.set(friend, level);
-                }
+                queue.enqueue(friendMap.get(friend));
+                friendLevel.set(friend, level);
             });
     }
 
@@ -150,8 +148,7 @@ class LimitedIterator extends Iterator {
      * @param {Number} maxLevel – максимальный круг друзей
      */
     constructor(friends, filter, maxLevel) {
-        super(friends, filter);
-        this.friends = getInvitedFriends(friends, filter, maxLevel);
+        super(friends, filter, maxLevel);
     }
 }
 
