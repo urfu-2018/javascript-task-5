@@ -7,6 +7,9 @@
  * @returns {[Object[]]}
  */
 function getFriendsForInviting(friends, maxLevel) {
+    if (friends === undefined) {
+        return [];
+    }
     const friendsToInvite = [friends.filter(friend => friend.best)];
     for (let i = 1; i < maxLevel; i++) {
         friends = friends.filter(friend => !friendsToInvite[i - 1].includes(friend));
@@ -27,10 +30,9 @@ function getFriendsForInviting(friends, maxLevel) {
  */
 function getNextLevelOfFriends(friendsToInvite, allFriends) {
     const nextLevel = [];
-    for (let prevLevelFriend of friendsToInvite) {
+    friendsToInvite.map(prevLevelFriend =>
         allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name))
-            .map(friend => nextLevel.push(friend));
-    }
+            .map(friend => nextLevel.push(friend)));
     nextLevel.sort((a, b) => a.name.localeCompare(b.name));
 
     return nextLevel;
