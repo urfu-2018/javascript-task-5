@@ -70,12 +70,23 @@ describe('Итераторы', () => {
             invitedFriends.push(femaleIterator.next());
         }
 
+        // while (!maleIterator.done()) {
+        //     invitedFriends.push(maleIterator.next());
+        // }
+
+        // assert.deepStrictEqual(invitedFriends, [ friend('Sam'), friend('Brad'), friend('Mat') ]);
+
         assert.deepStrictEqual(invitedFriends, [
             [friend('Sam'), friend('Sally')],
             [friend('Brad'), friend('Emily')],
             [friend('Mat'), friend('Sharon')],
             friend('Julia')
         ]);
+
+        // assert.deepStrictEqual(invitedFriends, [
+        //     friend('Sally'), friend('Emily'),
+        //     friend('Sharon'), friend('Julia')
+        // ]);
     });
 
     function friend(name) {
