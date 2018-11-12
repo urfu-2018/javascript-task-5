@@ -15,12 +15,14 @@ function Iterator(friends, filter) {
         .filter(filter.isValid);
 }
 
+const compareNames = (a, b) => a.name.localeCompare(b.name);
+
 Iterator.prototype = {
     constructor: Iterator,
     addFriendsOfFriends(friends, maxLevel = Infinity) {
         let currentFriends = friends
             .filter(friend => friend.best)
-            .sort((first, second) => first.name.localeCompare(second.name));
+            .sort(compareNames);
         const friendsOfFriends = [];
 
         while (currentFriends.length > 0 && maxLevel > 0) {
@@ -32,7 +34,7 @@ Iterator.prototype = {
 
             currentFriends = friends.filter(friend => !friendsOfFriends.includes(friend) &&
                 subFriendList.includes(friend.name))
-                .sort((first, second) => first.name.localeCompare(second.name));
+                .sort(compareNames);
 
             maxLevel -= 1;
         }
