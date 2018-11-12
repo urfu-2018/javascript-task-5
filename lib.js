@@ -50,7 +50,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
     this.done = () => !this.friends.length || this.friends[0].circle > maxLevel;
     if (typeof maxLevel !== 'number') {
-        this.done = () => false;
+        this.done = () => true;
     }
 }
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
