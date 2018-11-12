@@ -39,7 +39,7 @@ class Iterator {
         let guests = [];
         for (let i = 0; i < maxLevel && iteration.length > 0; i++) {
             guests.push(...iteration);
-            iteration = [...(iteration
+            iteration = [...new Set(iteration
                 .map(p => p.friends)
                 .reduce((result, f) => result.concat(f), [])
                 .map(n => friends
