@@ -27,9 +27,7 @@ function iterateOver(friends, filter, depth = Infinity) {
         currentDepth++;
     }
 
-    return answer
-        .filter(Boolean)
-        .filter(filter.predicate);
+    return answer.filter(filter.predicate);
 }
 
 /**
@@ -49,10 +47,9 @@ Iterator.prototype.done = function () {
 };
 
 Iterator.prototype.next = function () {
-    const index = this.index;
     this.index++;
 
-    return this.getContainment()[index];
+    return this.done() ? null : this.getContainment()[this.index - 1];
 };
 
 /**
@@ -70,6 +67,7 @@ function LimitedIterator(friends, filter, maxLevel) {
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
+LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
