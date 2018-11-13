@@ -69,7 +69,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.getContainment = () => this.containment;
 }
 
-LimitedIterator.prototype = new Iterator(null, null);
+LimitedIterator.prototype = Object.create(Iterator.prototype);
 
 /**
  * Фильтр друзей
