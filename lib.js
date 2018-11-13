@@ -34,7 +34,7 @@ function sortedListFriends(friends, filter, maxLevel) {
     let finalFriendsList = [];
     let cheackList = [];
     let newFriendsList = [];
-    while (maxLevel <= 0 && bestFriendsList.length) {
+    while (maxLevel !== 0 && bestFriendsList.length && maxLevel > 0) {
         let nowValue = bestFriendsList.pop();
         finalFriendsList = pushNewElement(filter, nowValue, cheackList, finalFriendsList);
         cheackList.push(nowValue);
