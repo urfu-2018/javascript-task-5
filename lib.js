@@ -51,6 +51,17 @@ function toMap(friends) {
     return map;
 }
 
+function sortFriend(a, b) {
+    if (a.power === b.power) {
+        return a.friend.name.localeCompare(b.friend.name);
+    }
+    if (a.power < b.power) {
+        return -1;
+    }
+
+    return 1;
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -65,34 +76,14 @@ function Iterator(friends, filter) {
         this.maxLevel = Infinity;
     }
     var copyFriend = Array.from(friends);
-    var current = 0;
-    var f = addPowerFriend(toMap(copyFriend), this.maxLevel);
-    this.selfFriends = f.sort((a, b) => {
-        if (a.power === b.power) {
-            return a.friend.name.localeCompare(b.friend.name);
-        }
-        if (a.power < b.power) {
-            return -1;
-        }
 
-        return 1;
+    this.selfFriends = addPowerFriend(toMap(copyFriend), this.maxLevel)
+        .sort(sortFriend)
+        .map(e => e.friend)
+        .filter(e => filter.isCorrect(e));
 
-    });
-    this.isCorrect = function (i) {
-        return (
-            i < this.selfFriends.length &&
-            !filter.isCorrect(this.selfFriends[i].friend)
-        );
-    };
     this.done = function () {
-        var i = current;
-        while (this.isCorrect(i)) {
-            i++;
-        }
-
-        return !(
-            i < this.selfFriends.length && filter.isCorrect(this.selfFriends[i].friend)
-        );
+        return !(this.selfFriends.length > 0);
     };
 
     this.next = function () {
@@ -100,12 +91,7 @@ function Iterator(friends, filter) {
             return null;
         }
 
-        while (this.isCorrect(current)) {
-            current++;
-        }
-        current++;
-
-        return this.selfFriends[current - 1].friend;
+        return this.selfFriends.shift();
     };
 }
 
@@ -120,15 +106,6 @@ function Iterator(friends, filter) {
 function LimitedIterator(friends, filter, maxLevel) {
     this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
-    this.isCorrect = function (i) {
-        return (
-            i < this.selfFriends.length &&
-            !(
-                filter.isCorrect(this.selfFriends[i].friend) &&
-                this.selfFriends[i].power <= this.maxLevel
-            )
-        );
-    };
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
