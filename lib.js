@@ -14,21 +14,33 @@ function compareFriends(friend1, friend2) {
 function getFriendsList(friends) {
     let bestFriends = [];
     let otherFriends = [];
-    for (let i = 0; i < friends.length; i++) {
+    friends.forEach(friend => {
+        if (friend.best) {
+            bestFriends.push(friend);
+        } else {
+            otherFriends.push(friend);
+        }
+    });
+
+    /* for (let i = 0; i < friends.length; i++) {
         if (friends[i].best) {
             bestFriends.push(friends[i]);
         } else {
             otherFriends.push(friends[i]);
         }
-    }
+    } */
     let result = [];
     result.push(bestFriends);
     while (otherFriends.length !== 0) {
         let length = otherFriends.length;
         let friendsFriend = [];
-        for (let i = 0; i < bestFriends.length; i++) {
+        bestFriends.forEach(friend => {
+            friendsFriend = friendsFriend.concat(friend.friends);
+        });
+
+        /* for (let i = 0; i < bestFriends.length; i++) {
             friendsFriend = friendsFriend.concat(bestFriends[i].friends);
-        }
+        }*/
         let halfResult = otherFriends.reduce(function (accum, elem) {
             if (friendsFriend.includes(elem.name)) {
                 accum[0].push(elem);
@@ -62,10 +74,15 @@ function Iterator(friends, filter) {
     }
     let newFriends = getFriendsList(friends);
     let result = [];
-    for (let i = 0; i < newFriends.length; i++) {
+    newFriends.forEach(friend => {
+        let halfResult = friend.filter(filter.filter).sort(compareFriends);
+        result = result.concat(halfResult);
+    });
+
+    /* for (let i = 0; i < newFriends.length; i++) {
         let halfResult = newFriends[i].filter(filter.filter).sort(compareFriends);
         result = result.concat(halfResult);
-    }
+    } */
     this.friends = result;
     this.place = 0;
 }
@@ -98,6 +115,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     if (maxLevel > newFriends.length) {
         newMaxLevel = newFriends.length;
     }
+
     for (let i = 0; i < newMaxLevel; i++) {
         let halfResult = newFriends[i].filter(filter.filter).sort(compareFriends);
         result = result.concat(halfResult);
