@@ -51,6 +51,7 @@ const friends = [
 ];
 
 describe('Итераторы', () => {
+
     it('должны обойти в правильном порядке друзей и составить пары', () => {
         const maleFilter = new lib.MaleFilter();
         const femaleFilter = new lib.FemaleFilter();
