@@ -18,7 +18,7 @@ function Iterator(friends, filter) {
     let pointer = 0;
 
     this.next = function () {
-        return this.friendsList[pointer++];
+        return this.done() ? null : this.friendsList[pointer++];
     };
     this.done = function () {
         return pointer >= this.friendsList.length;
@@ -40,8 +40,6 @@ function LimitedIterator(friends, filter, maxLevel) {
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
-// LimitedIterator.prototype = Object.create(Iterator.prototype);
-// LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
@@ -54,7 +52,6 @@ function Filter() {
     // };
 }
 
-// const filterProto = new Filter();
 
 /**
  * Фильтр друзей
@@ -62,11 +59,9 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    // super.setPredicate(person => person.gender === 'male');
     this.predicate = person => person.gender === 'male';
 }
 
-// MaleFilter.prototype = filterProto;
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
@@ -78,7 +73,6 @@ function FemaleFilter() {
     this.predicate = person => person.gender === 'female';
 }
 
-// FemaleFilter.prototype = filterProto;
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 function getFriendsList(friends, filter, maxLevel = Infinity) {

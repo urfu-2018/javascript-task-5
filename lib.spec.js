@@ -70,29 +70,22 @@ describe('Итераторы', () => {
             invitedFriends.push(femaleIterator.next());
         }
 
-        // while (!maleIterator.done()) {
-        //     invitedFriends.push(maleIterator.next());
-        // }
-
-        // assert.deepStrictEqual(invitedFriends, [ friend('Sam'), friend('Brad'), friend('Mat') ]);
-
         assert.deepStrictEqual(invitedFriends, [
             [friend('Sam'), friend('Sally')],
             [friend('Brad'), friend('Emily')],
             [friend('Mat'), friend('Sharon')],
             friend('Julia')
         ]);
-
-        // assert.deepStrictEqual(invitedFriends, [
-        //     friend('Sally'), friend('Emily'),
-        //     friend('Sharon'), friend('Julia')
-        // ]);
     });
     it('maleFilter и femaleFilter должны наледоваться от Filter', () => {
         const maleFilter = new lib.MaleFilter();
         const femaleFilter = new lib.FemaleFilter();
-        assert.equal((maleFilter instanceof lib.Filter), true);
-        assert.equal((femaleFilter instanceof lib.Filter), true);
+        assert.ok((maleFilter instanceof lib.Filter));
+        assert.ok((femaleFilter instanceof lib.Filter));
+    });
+    it('кидает ошибки при неверном фильтре', () => {
+        assert.throws(() => new lib.Iterator(friends, 'hello'), TypeError);
+        assert.throws(() => new lib.LimitedIterator(friends, 'hello', 2), TypeError);
     });
     it('все мальчики', () => {
         const maleFilter = new lib.MaleFilter();
@@ -108,6 +101,7 @@ describe('Итераторы', () => {
             friend('Sam'), friend('Brad'), friend('Mat'), friend('Itan')
         ]);
     });
+
     // it('', () => {});
 
     function friend(name) {
