@@ -5,7 +5,6 @@
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
- * @param {Number} maxLevel
  */
 function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
@@ -13,17 +12,18 @@ function Iterator(friends, filter) {
     }
     this.guests = getInvitedGuests(friends).filter(filter.checkGender);
 }
-Iterator.prototype.next = function () {
-    if (this.done()) {
-        return null;
-    }
 
-    return this.guests.shift();
+Iterator.prototype.next = function () {
+    return this.done() ? null : this.guests.shift();
 };
 
 Iterator.prototype.done = function () {
     return this.guests.length === 0;
 };
+
+function includeGuest(guests) {
+    return friend => !guests.includes(friend);
+}
 
 /**
  * @param {Array} friends - friend {Object}
@@ -36,19 +36,12 @@ function getInvitedGuests(friends, maxLevel = Infinity) {
         .filter(friend => friend.best)
         .sort((fr1, fr2) => fr1.name.localeCompare(fr2.name));
     while (curLevel.length > 0 && maxLevel > 0) {
-        guests.concat(guests, curLevel);
+        guests = guests.concat(curLevel);
         curLevel = curLevel
-            .reduce((newLevel, friend) => {
-                friend.friends.forEach(friendName => {
-                    const newFriend = friends.find(man => man.name === friendName);
-                    if (!guests.includes(newFriend) && !newLevel.includes(newFriend)) {
-                        newLevel.push(newFriend);
-                    }
-
-                });
-
-                return newLevel;
-            }, [])
+            .map(fr => fr.friends)
+            .reduce((a, b) => a.concat(b))
+            .map(name => friends.find(fr => fr.name === name))
+            .filter(includeGuest(guests))
             .sort((fr1, fr2) => fr1.name.localeCompare(fr2.name));
         maxLevel--;
     }
@@ -68,6 +61,8 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.guests = getInvitedGuests(friends, maxLevel).filter(filter.checkGender);
 }
 
+LimitedIterator.prototype = Object.create(Iterator.prototype);
+
 /**
  * Фильтр друзей
  * @constructor
@@ -85,6 +80,8 @@ function MaleFilter() {
     this.checkGender = friend => friend.gender === 'male';
 }
 
+MaleFilter.prototype = new Filter();
+
 /**
  * Фильтр друзей-девушек
  * @extends Filter
@@ -94,17 +91,7 @@ function FemaleFilter() {
     this.checkGender = friend => friend.gender === 'female';
 }
 
-LimitedIterator.prototype = Object.create(Iterator.prototype, {
-    constructor: { value: LimitedIterator }
-});
-
-MaleFilter.prototype = Object.create(Filter.prototype, {
-    constructor: { value: MaleFilter }
-});
-
-FemaleFilter.prototype = Object.create(Filter.prototype, {
-    constructor: { value: FemaleFilter }
-});
+FemaleFilter.prototype = new Filter();
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
