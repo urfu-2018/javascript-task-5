@@ -1,20 +1,5 @@
 'use strict';
 
-const sortByName = function (friend1, friend2) {
-    return friend1.name.localeCompare(friend2.name);
-};
-
-function removeDuplicatesAndSort(people) {
-    const set = [];
-    people.forEach(person => {
-        if (!set[person.name]) {
-            set[person.name] = person;
-        }
-    });
-
-    return Object.values(set).sort((a, b) => a.name.localeCompare(b.name));
-}
-
 /**
  * Итератор по друзьям
  * @constructor
@@ -33,32 +18,26 @@ function Iterator(friends, filter) {
 
 Iterator.prototype = {
     formatFriends(maxLevel = this.friends.length) {
-        if (maxLevel < 0) {
+        if (maxLevel < 0 || this.friends.length < 0) {
             return [];
         }
-        let previousFront = removeDuplicatesAndSort(this.friends
-            .filter(friend => friend.best).sort(sortByName));
-        let invited = (previousFront.map(friend => friend.name));
+        const sortByName = (friend1, friend2) => friend1.name.localeCompare(friend2.name);
+        let previousFront = this.friends.filter(friend => friend.best).sort(sortByName);
         let result = new Set(previousFront);
         let front = 0;
 
-        while (front < maxLevel && invited.length !== this.friends.length) {
+        while (front < maxLevel && previousFront.length > 0) {
             let currentFront = [];
             previousFront.forEach(friend => {
                 friend.friends.forEach(bro => {
                     const friendToInvite = this.friends.find(guy => guy.name === bro);
-                    if (friendToInvite && invited.indexOf(bro) === -1) {
-                        currentFront.push(friendToInvite);
-                        invited.push(bro);
-                    }
+                    currentFront.push(friendToInvite);
                 });
             });
 
             currentFront.sort(sortByName).forEach(friend => result.add(friend));
             if (currentFront.length === 0) {
-
-                result.add(this.friends.filter(friend =>
-                    invited.indexOf(friend.name) === -1).sort(sortByName));
+                this.friends.sort(sortByName).forEach(friend => result.add(friend));
             }
 
             previousFront = currentFront;
