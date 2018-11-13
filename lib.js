@@ -149,10 +149,6 @@ function FemaleFilter() {
 FemaleFilter.prototype = Object.create(Filter.prototype);
 FemaleFilter.prototype.constructor = FemaleFilter;
 
-
-const femaleFilter = new FemaleFilter();
-const maleFilter = new MaleFilter();
-
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
 
