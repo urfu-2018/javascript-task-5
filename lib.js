@@ -30,7 +30,7 @@ function getArrayOfObjectFriends(newNames, friends) {
 }
 
 function getResultFriends(friends, filter, maxLvl = Infinity) {
-    if (maxLvl < 1) {
+    if (!maxLvl || maxLvl < 1) {
         return [];
     }
     sortByName(friends);
@@ -89,6 +89,9 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (typeof maxLevel !== 'number' || maxLevel < 0) {
+        maxLevel = 0;
+    }
     this.resultFriends = getResultFriends(friends, filter, maxLevel);
 }
 
