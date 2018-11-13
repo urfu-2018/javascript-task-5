@@ -27,10 +27,6 @@ function getArrayOfObjectFriends(newNames, friends) {
     return newNames.map(name => friends.find(friend => friend.name === name));
 }
 
-function checkForUniqueObject(bestFriend, resultFriends) {
-    return bestFriend.filter(friend => !resultFriends.includes(friend));
-}
-
 function getResultFriends(friends, filter, maxLvl = Infinity) {
     if (!maxLvl || maxLvl < 1) {
         return [];
@@ -47,8 +43,7 @@ function getResultFriends(friends, filter, maxLvl = Infinity) {
             break;
         }
         bestFriends = getArrayOfObjectFriends(newNames, friends);
-        const checkedBestFriends = checkForUniqueObject(bestFriends, resultFriends);
-        resultFriends = resultFriends.concat(checkedBestFriends);
+        resultFriends = resultFriends.concat(bestFriends);
     }
 
     return filterFriends(resultFriends, filter);
