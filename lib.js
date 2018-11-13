@@ -3,7 +3,7 @@
 function getBestFriends(friends) {
     return friends
         .filter(friend => friend.best)
-        .sort((a, b) => a.name > b.name)
+        .sort((a, b) => a.name.localeCompare(b.name))
         .map(function (friend) {
             friend.priority = 0;
 
@@ -31,7 +31,7 @@ function* bfs(friends) {
     let currentPriority = 0;
     while (queue.length > 0) {
         if (currentPriority !== queue[0].priority) {
-            queue.sort((a, b) => a.name > b.name);
+            queue.sort((a, b) => a.name.localeCompare(b.name));
             ++currentPriority;
         }
         const current = queue.shift();
@@ -71,7 +71,6 @@ function Iterator(friends, filter) {
                 next = iter.next();
             }
             let value = next.done ? null : next.value;
-            delete value.priority;
             next = iter.next();
 
             return value;
