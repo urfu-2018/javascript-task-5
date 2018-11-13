@@ -49,7 +49,10 @@ function Iterator(friends, filter, maxLevel = Infinity) {
         return sortedInvitedFriends.length === 0;
     };
     this.next = () => {
-        return sortedInvitedFriends.shift();
+        var nextFriend = sortedInvitedFriends.shift();
+        delete nextFriend.level;
+
+        return nextFriend;
     };
 }
 
