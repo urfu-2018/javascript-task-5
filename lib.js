@@ -24,6 +24,7 @@ function Iterator(friends, filter) {
     }
 }
 
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -34,12 +35,10 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
     Iterator.call(this, friends, filter);
     this.listOfGuests = chooseFriends(friends, maxLevel)
         .filter(friend => filter.isAppropriate(friend));
 }
-
 function chooseFriends(friends, maxLevel = friends.length + 1) {
     var selection = [];
     var currentLevel = 1;
@@ -50,8 +49,8 @@ function chooseFriends(friends, maxLevel = friends.length + 1) {
         currentLevelFriends = currentLevelFriends
             .reduce((acc, friend) => acc.concat(friend.friends), [])
             .map(name => friends.find(friend => friend.name === name))
-            .filter(function (friend, index, arr) {
-                return !selection.includes(friend) && arr.indexOf(friend) === index;
+            .filter(function (friend) {
+                return !selection.includes(friend);
             });
         currentLevel++;
     }
@@ -87,11 +86,9 @@ function Filter() {
 function MaleFilter() {
 
     Object.setPrototypeOf(this, new Filter());
-    Object.defineProperty(this, 'isAppropriate', {
-        value: function (a) {
-            return a.gender === 'male';
-        }
-    });
+    this.isAppropriate = function (a) {
+        return a.gender === 'male';
+    };
 
 
     return this;
@@ -104,11 +101,9 @@ function MaleFilter() {
  */
 function FemaleFilter() {
     Object.setPrototypeOf(this, new Filter());
-    Object.defineProperty(this, 'isAppropriate', {
-        value: function (a) {
-            return a.gender === 'female';
-        }
-    });
+    this.isAppropriate = function (a) {
+        return a.gender === 'female';
+    };
 
     return this;
 }
