@@ -87,9 +87,9 @@ describe('Итераторы', () => {
         assert.throws(() => new lib.Iterator(friends, 'hello'), TypeError);
         assert.throws(() => new lib.LimitedIterator(friends, 'hello', 2), TypeError);
     });
-    it('все мальчики', () => {
+    it('не все мальчики', () => {
         const maleFilter = new lib.MaleFilter();
-        const maleIterator = new lib.Iterator(friends, maleFilter);
+        const maleIterator = new lib.LimitedIterator(friends, maleFilter, 2);
 
         const invitedFriends = [];
 
@@ -98,7 +98,21 @@ describe('Итераторы', () => {
         }
 
         assert.deepStrictEqual(invitedFriends, [
-            friend('Sam'), friend('Brad'), friend('Mat'), friend('Itan')
+            friend('Sam'), friend('Brad'), friend('Mat')
+        ]);
+    });
+    it('все девочки', () => {
+        const femaleFilter = new lib.FemaleFilter();
+        const femaleIterator = new lib.Iterator(friends, femaleFilter);
+
+        const invitedFriends = [];
+
+        while (!femaleIterator.done()) {
+            invitedFriends.push(femaleIterator.next());
+        }
+
+        assert.deepStrictEqual(invitedFriends, [
+            friend('Sally'), friend('Emily'), friend('Sharon'), friend('Julia')
         ]);
     });
 

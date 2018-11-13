@@ -11,17 +11,14 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    // this.maxLevel = Infinity;
-    // const friendsList = getFriendsList(friends, this.maxLevel);
-
-    this.friendsList = getFriendsList(friends, filter);
+    const friendsList = getFriendsList(friends, filter, this.maxLevel);
     let pointer = 0;
 
     this.next = function () {
-        return this.done() ? null : this.friendsList[pointer++];
+        return this.done() ? null : friendsList[pointer++];
     };
     this.done = function () {
-        return pointer >= this.friendsList.length;
+        return pointer >= friendsList.length;
     };
 }
 
@@ -34,9 +31,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
-    // this.maxLevel = maxLevel;
-    this.friendsList = getFriendsList(friends, filter, maxLevel);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
@@ -47,9 +43,6 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  */
 function Filter() {
     this.predicate = () => true;
-    // this.setPrecicate = function (predicate) {
-    //     this.predicate = predicate;
-    // };
 }
 
 
