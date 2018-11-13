@@ -55,9 +55,6 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError();
-    }
     friends = (friends.sort(compareForName)); // нужные в алфавитном порядке
     const basicIterator = new Iterator(friends, filter);
     const limitedIterator = Object.create(basicIterator);
@@ -67,7 +64,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     listOfAllFriends = getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel);
     listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr));
     limitedIterator.done = function () {
-        return limitedIterator.index >= listOfAllFriends.length || maxLevel === 0;
+        return limitedIterator.index >= listOfAllFriends.length || maxLevel <= 0;
     };
     limitedIterator.next = function () {
         if (limitedIterator.done()) {
@@ -75,7 +72,7 @@ function LimitedIterator(friends, filter, maxLevel) {
         }
         limitedIterator.index++;
 
-        return listOfAllFriends[limitedIterator.index - 1] && maxLevel !== 0
+        return (listOfAllFriends[limitedIterator.index - 1] && maxLevel > 0)
             ? listOfAllFriends[limitedIterator.index - 1] : null;
     };
 
