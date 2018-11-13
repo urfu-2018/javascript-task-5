@@ -3,7 +3,7 @@
 
 const byNames = (friend1, friend2) => friend1.name.localeCompare(friend2.name);
 
-function getSortedFriends(friends, maxLevel) {
+function getSortedFriends(friends, maxLevel = Infinity) {
     let sortedFriends = [];
     let currentFriends = friends.filter(friend => friend.best).sort(byNames);
     let currentLevel = 0;
@@ -33,13 +33,12 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
     this.friends = friends;
+    this.currentIndex = 0;
     this.sortedFriends = getSortedFriends(this.friends, this.maxLevel)
         .filter(filter.filterFriends);
 }
 
 Iterator.prototype = {
-    maxLevel: Infinity,
-    currentIndex: 0,
     next() {
         return this.done() ? null : this.sortedFriends[this.currentIndex++];
     },
