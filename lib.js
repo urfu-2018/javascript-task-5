@@ -10,18 +10,17 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
+    this.generator = bfsWithFilter(friends, filter, this.maxLevel);
+    let i = 0;
 
-    this.generator = bfsWithFilter(friends, filter, Infinity);
-    this.i = 0;
     this.next = function () {
-        return this.generator[this.i++];
+        return this.done() ? null : this.generator[i++];
     };
 
     this.done = function () {
-        return this.i >= this.generator.length;
+        return i >= this.generator.length;
     };
 }
-
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -32,10 +31,12 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
-    this.generator = bfsWithFilter(friends, filter, maxLevel);
-    this.i = 0;
 }
+
+LimitedIterator.prototype = Object.create(Iterator.prototype);
+LimitedIterator.prototype.constructor = LimitedIterator;
 
 class InitializeBFSCarcass {
     constructor(friends) {
@@ -81,7 +82,7 @@ function sortFriend(friends) {
     });
 }
 
-function bfsWithFilter(friends, filter, maxLevel) {
+function bfsWithFilter(friends, filter, maxLevel = Infinity) {
     let bfs = new InitializeBFSCarcass(friends);
     let level = 0;
     let nextLevel = [];
@@ -124,9 +125,6 @@ function bfsWithFilter(friends, filter, maxLevel) {
 function Filter() {
     this.it = () => true;
 }
-
-LimitedIterator.prototype = Object.create(Iterator.prototype);
-LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
