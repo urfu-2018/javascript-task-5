@@ -14,18 +14,13 @@ function Iterator(friends, filter) {
     this.current = 0;
     this.data = [];
 
-    console.info('-------------SIMPLE ITERATOR--------------');
     while (this.data.length !== friends.length) {
-        console.info('--------------START ITERATION--------------');
-        console.info('INVITED IS ', this.data);
         const nextCircle = getNextUniqueCircle(friends, this.data);
-        console.info('GOT: ', nextCircle);
         if (!nextCircle.length) {
             break;
         }
 
         this.data = this.data.concat(nextCircle);
-        console.info('--------------------END ITERATION--------------------');
     }
 
     this.data = this.data
@@ -61,14 +56,9 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.current = 0;
     this.data = [];
 
-    console.info('-------------LIMITED ITERATOR-----------------');
     for (let i = 0; i < maxLevel; i++) {
-        console.info('-------START ITERATION-----------');
-        console.info('SEND ', this.data.map(f => f.name), 'AS INVITED');
         const nextCircle = getNextUniqueCircle(friends, this.data);
-        console.info(nextCircle);
         this.data = this.data.concat(nextCircle);
-        console.info('--------------END ITERATION-----------------');
     }
 
     this.data = this.data.filter(item => filter.exec(item));
@@ -86,18 +76,10 @@ function getNextUniqueCircle(friends, invitations) {
         .reduce((acc, frSet) => acc.concat(frSet), [])
         .map(frName => friends.find(item => item.name === frName));
 
-    console.info('friends of invited', friendsOfInvitedFriends.map(f => f.name));
+    const uniqueFriends = dedupe(friendsOfInvitedFriends)
+        .filter(friend => invitations.indexOf(friend) === -1);
 
-    const uniqueFriends = dedupe(friendsOfInvitedFriends);
-
-    console.info('unique', uniqueFriends.map(f => f.name));
-    console.info('overall', invitations.map(f => f.name));
-
-    const notInvited = uniqueFriends.filter(friend => invitations.indexOf(friend) === -1);
-
-    console.info('not invited', notInvited.map(f => f.name));
-
-    return sortByName(notInvited);
+    return sortByName(uniqueFriends);
 }
 
 function getRestFriends(friends, invitations) {

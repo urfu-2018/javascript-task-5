@@ -52,6 +52,21 @@ const friends = [
         name: 'Melisa',
         friends: [],
         gender: 'female'
+    },
+    {
+        name: 'Bill',
+        friends: ['John', 'Ellison'],
+        gender: 'male'
+    },
+    {
+        name: 'John',
+        friends: ['Bill'],
+        gender: 'male'
+    },
+    {
+        name: 'Ellison',
+        friends: ['Bill'],
+        gender: 'female'
     }
 ];
 
@@ -63,30 +78,30 @@ describe('Итераторы', () => {
         const femaleIterator = new lib.Iterator(friends, femaleFilter);
 
         console.info(
-            'TEST ITSELF, CREATED ITERATORS: ',
+            'finally created iterators',
             maleIterator.data.map(f => f.name), femaleIterator.data.map(f => f.name));
 
         const invitedFriends = [];
 
         while (!maleIterator.done() && !femaleIterator.done()) {
             invitedFriends.push([
-                maleIterator.next().name,
-                femaleIterator.next().name
+                maleIterator.next(),
+                femaleIterator.next()
             ]);
         }
 
         while (!femaleIterator.done()) {
-            invitedFriends.push(femaleIterator.next().name);
+            invitedFriends.push(femaleIterator.next());
         }
 
-        const toName = fr => fr.name;
 
         assert.deepStrictEqual(invitedFriends, [
-            [friend('Sam'), friend('Sally')].map(toName),
-            [friend('Brad'), friend('Emily')].map(toName),
-            [friend('Mat'), friend('Sharon')].map(toName),
-            toName(friend('Julia')),
-            toName(friend('Melisa'))
+            [friend('Sam'), friend('Sally')],
+            [friend('Brad'), friend('Emily')],
+            [friend('Mat'), friend('Sharon')],
+            friend('Julia'),
+            friend('Ellison'),
+            friend('Melisa')
         ]);
     });
 
