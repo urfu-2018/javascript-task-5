@@ -26,6 +26,7 @@ function getFriendsToInvite(friends, maxLevel) {
             break; // если всех добавили, или очередной уровень пуст.
         }
     }
+    toInvite[maxLevel] = friends;
 
     return toInvite;
 }
