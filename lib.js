@@ -1,6 +1,26 @@
 'use strict';
 
 /**
+ * Формирует список друзей, отсортированный по уровням и потом алфавиту.
+ * @param {Object[]} friends
+ * @param {Number} maxLevel
+ * @returns {[Object[]]}
+ */
+function getFriendsToInvite(friends, maxLevel) {
+    const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
+    for (let i = 0; i < maxLevel - 1; i++) {
+        friends = friends.filter(friend => !toInvite[i].includes(friend));
+        toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
+        if (!friends.length || !toInvite[i + 1].length) {
+            break; // если всех добавили, или все оставшиеся не связаны.
+        }
+    }
+
+    return toInvite;
+}
+
+
+/**
  * Формирует очередной уровень друзей по предыдущему
  * @param {Object[]} previousLevel
  * @param {Object[]} allFriends
@@ -32,15 +52,12 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
-    for (let i = 0; i < maxLevel - 1; i++) {
-        friends = friends.filter(friend => !toInvite[i].includes(friend));
-        toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
-        if (!friends.length || !toInvite[i + 1].length) {
-            break; // если всех добавили, или все оставшиеся не связаны.
-        }
+    if (!friends.length || maxLevel < 1) {
+        this.previousLevel = [];
+    } else {
+        this.previousLevel = filter.filter(
+            getFriendsToInvite(friends, maxLevel).reduce((flat, part) => flat.concat(part), []));
     }
-    this.previousLevel = filter.filter(toInvite.reduce((flat, part) => flat.concat(part), []));
 }
 Iterator.prototype.done = function () {
     return !this.previousLevel.length;
