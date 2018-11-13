@@ -47,15 +47,18 @@ function Iterator(friends, filter) {
         this.containment = iterateOver(friends, filter);
     }
     this.getContainment = () => this.containment;
+    this.index = 0;
 }
 
 Iterator.prototype.done = function () {
-    return this.getContainment().length === 0;
+    return this.getContainment().length <= this.index;
 };
 
 Iterator.prototype.next = function () {
-    return this.getContainment()
-        .shift();
+    const index = this.index;
+    this.index++;
+
+    return this.getContainment()[index - 1];
 };
 
 /**
