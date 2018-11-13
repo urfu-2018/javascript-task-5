@@ -1,44 +1,88 @@
+/* eslint-env mocha */
 'use strict';
 
-/**
- * Фильтр друзей
- * @constructor
- */
-function Filter() {
-    this.it = () => true;
-}
+const assert = require('assert');
 
-/**
- * Фильтр друзей
- * @extends Filter
- * @constructor
- */
-function MaleFilter() {
-    this.it = friend => friend.gender === 'male';
-}
+const lib = require('./lib');
 
-MaleFilter.prototype = Object.create(Filter.prototype);
-MaleFilter.prototype.constructor = MaleFilter;
+const friends = [
+    {
+        name: 'Sam',
+        friends: ['Mat', 'Sharon'],
+        gender: 'male',
+        best: true
+    },
+    {
+        name: 'Sally',
+        friends: ['Brad', 'Emily'],
+        gender: 'female',
+        best: true
+    },
+    {
+        name: 'Mat',
+        friends: ['Sam', 'Sharon'],
+        gender: 'male'
+    },
+    {
+        name: 'Sharon',
+        friends: ['Sam', 'Itan', 'Mat'],
+        gender: 'female'
+    },
+    {
+        name: 'Brad',
+        friends: ['Sally', 'Emily', 'Julia'],
+        gender: 'male'
+    },
+    {
+        name: 'Emily',
+        friends: ['Sally', 'Brad'],
+        gender: 'female'
+    },
+    {
+        name: 'Itan',
+        friends: ['Sharon', 'Julia'],
+        gender: 'male'
+    },
+    {
+        name: 'Julia',
+        friends: ['Brad', 'Itan'],
+        gender: 'female'
+    }
+];
 
-/**
- * Фильтр друзей-девушек
- * @extends Filter
- * @constructor
- */
-function FemaleFilter() {
-    this.it = friend => friend.gender === 'female';
-}
+describe('Итераторы', () => {
+    it('должны обойти в правильном порядке друзей и составить пары', () => {
+        const maleFilter = new lib.MaleFilter();
+        const femaleFilter = new lib.FemaleFilter();
+        const maleIterator = new lib.LimitedIterator(friends, maleFilter, 2);
+        const femaleIterator = new lib.Iterator(friends, femaleFilter);
 
-FemaleFilter.prototype = Object.create(Filter.prototype);
-FemaleFilter.prototype.constructor = FemaleFilter;
+        const invitedFriends = [];
 
-const femaleFilter = new FemaleFilter();
+        while (!maleIterator.done() && !femaleIterator.done()) {
+            invitedFriends.push([
+                maleIterator.next()
+            ]);
+        }
 
-let t = femaleFilter.it({
-    name: 'Sally',
-    friends: ['Emily', 'Brad'],
-    gender: 'female',
-    best: true
+        while (!femaleIterator.done()) {
+            invitedFriends.push(femaleIterator.next());
+        }
+
+        assert.deepStrictEqual(invitedFriends, [
+            [friend('Sam')],
+            [friend('Brad')],
+            [friend('Mat')]
+        ]);
+    });
+
+    function friend(name) {
+        let len = friends.length;
+
+        while (len--) {
+            if (friends[len].name === name) {
+                return friends[len];
+            }
+        }
+    }
 });
-
-console.info(t);

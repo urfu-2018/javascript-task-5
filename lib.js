@@ -111,6 +111,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     Iterator.call(this, friends, filter);
     this.generator = generateSequence(friends, filter, maxLevel);
+    this.actual = this.generator.next();
 }
 
 /**

@@ -162,8 +162,6 @@ const maleFilter = new MaleFilter();
 
 var generator = generateSequence(friendss, maleFilter, 2);
 
-console.info(new InitializeBFSCarcass(friendss));
-
 console.info(generator.next());
 console.info(generator.next());
 console.info(generator.next());
