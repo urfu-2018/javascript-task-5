@@ -26,7 +26,7 @@ function getFriendsToInvite(friends, maxLevel) {
         }
     }
 
-    return toInvite;
+    return Array.from(new Set(toInvite));
 }
 
 /**
