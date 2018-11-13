@@ -35,7 +35,7 @@ function sortAndFilterFriends(friends, filter, level = Infinity) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    if (!(filter instanceof Filter)) {
+    if (!Filter.prototype.isPrototypeOf(filter)) {
         throw new TypeError();
     }
 
@@ -48,7 +48,7 @@ Iterator.prototype.next = function () {
 };
 
 Iterator.prototype.done = function () {
-    return this.filteredFriends.length <= this.index;
+    return this.index >= this.filteredFriends.length;
 };
 
 /**
