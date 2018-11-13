@@ -1,5 +1,37 @@
 'use strict';
 
+const assert = require('assert');
+
+function localCompareFriends(first, second) {
+    const names = [first, second].map(friend => friend.name);
+
+    return names[0].localeCompare(names[1]);
+}
+
+function iterateOver(friends, filter, depth = Infinity) {
+    let currentFriends = friends.filter(friend => friend.best);
+
+    const answer = [];
+    const passed = [];
+    let currentDepth = 1;
+
+    while (currentDepth <= depth && currentFriends.length > 0) {
+        currentFriends.forEach(someone => passed.push(someone));
+        const satisfied = currentFriends.sort(localCompareFriends);
+        satisfied.filter(filter.predicate)
+            .forEach(someone => answer.push(someone));
+        currentFriends = satisfied
+            .map(someone => someone.friends)
+            .reduce((array, friendsOfFriends) => array.concat(friendsOfFriends), [])
+            .map(friendName => friends.find(someone => someone.name === friendName))
+            .filter(Boolean)
+            .filter(someone => !passed.includes(someone));
+        currentDepth++;
+    }
+
+    return answer;
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -7,8 +39,21 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    this.containment = [];
+    if (friends && filter) {
+        assert(Filter.prototype.isPrototypeOf(filter));
+        this.containment = iterateOver(friends, filter);
+    }
+    this.getContainment = () => this.containment;
 }
+
+Iterator.prototype.done = function () {
+    return this.getContainment().length === 0;
+};
+
+Iterator.prototype.next = function () {
+    return this.getContainment().shift();
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -19,15 +64,18 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
+    assert(Filter.prototype.isPrototypeOf(filter));
+    this.containment = iterateOver(friends, filter, maxLevel);
+    this.getContainment = () => this.containment;
 }
+LimitedIterator.prototype = new Iterator(null, null);
 
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    console.info('Filter');
+    this.predicate = () => true;
 }
 
 /**
@@ -36,7 +84,9 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    console.info('MaleFilter');
+    Object.setPrototypeOf(this, new Filter());
+
+    this.predicate = someone => someone.gender === 'male';
 }
 
 /**
@@ -45,7 +95,9 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    console.info('FemaleFilter');
+    Object.setPrototypeOf(this, new Filter());
+
+    this.predicate = someone => someone.gender === 'female';
 }
 
 exports.Iterator = Iterator;
