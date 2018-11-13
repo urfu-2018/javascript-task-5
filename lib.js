@@ -36,9 +36,12 @@ function Iterator(friends, filter) {
     listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr)); // фильтр по полу
     this.index = 0;
     this.done = function () {
-        return this.index >= listOfAllFriends.length;
+        return this.index >= listOfAllFriends.length || listOfAllFriends.length === 0;
     };
     this.next = function () {
+        if (this.done()) {
+            return false;
+        }
         this.index++;
 
         return listOfAllFriends[this.index - 1] ? listOfAllFriends[this.index - 1] : null;
@@ -64,7 +67,8 @@ function LimitedIterator(friends, filter, maxLevel) {
     listOfAllFriends = getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel);
     listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr));
     limitedIterator.done = function () {
-        return limitedIterator.index >= listOfAllFriends.length || maxLevel === 0;
+        return limitedIterator.index >= listOfAllFriends.length || maxLevel === 0 ||
+            listOfAllFriends.length === 0;
     };
     limitedIterator.next = function () {
         if (limitedIterator.done()) {
@@ -84,7 +88,7 @@ function getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel = 
         currentFriendList = getCircle(currentFriendList);
         currentFriendList = getVertex(friends, currentFriendList);
         let currentlistOfAllFriends = getFriendsList(currentFriendList, listOfAllFriends);
-        if (!currentlistOfAllFriends) {
+        if (currentlistOfAllFriends === null) {
             break;
         }
         listOfAllFriends = currentlistOfAllFriends;
@@ -96,7 +100,7 @@ function getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel = 
 function getFriendsList(currentFriendList, listOfAllFriends) {
     let flag = false;
     for (let person of currentFriendList) {
-        if (!listOfAllFriends.includes(person)) {
+        if (!listOfAllFriends.includes(person) && person) { // ну мало ли что с персон
             listOfAllFriends.push(person);
             flag = true;
         }
@@ -151,6 +155,11 @@ function MaleFilter() {
 
     return genderFilter;
 }
+
+let friends = [];
+const maleFilter = new MaleFilter();
+const maleIterator = new LimitedIterator(friends, maleFilter, 2);
+console.info(maleIterator instanceof Iterator);
 
 /**
  * Фильтр друзей-девушек
