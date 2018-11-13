@@ -1,5 +1,20 @@
 'use strict';
 
+Iterator.prototype = {
+    weddingGuests: [],
+    index: 0,
+    done() {
+        return this.index >= this.weddingGuests.length;
+    },
+    next() {
+        if (this.done()) {
+            return null;
+        }
+
+        return this.weddingGuests[this.index++];
+    }
+};
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -7,27 +22,17 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    if (!filter instanceof Filter) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.weddingGuests = getInvitedFriends(friends, filter);
+    this.weddingGuests = getInvitedFriends(friends, filter)
+        .filter(friend => filter.isSuitable(friend));
     this.index = 0;
-    this.done = () => {
-        return index >= this.weddingGuests.length; 
-    };
-    this.next = () => {
-        if (this.done) {
-            return null;
-        } else {
-            return this.weddingGuests[this.index++];
-        }
-    };
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
-Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
-
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -46,7 +51,7 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    return this.isSuitable = () => true;
+    this.isSuitable = () => true;
 }
 
 /**
@@ -55,7 +60,9 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.isSuitable = (friend) => friend.gender === 'male';
+    this.isSuitable = function (friend) {
+        return friend.gender === 'male';
+    };
 }
 
 /**
@@ -64,38 +71,44 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    this.isSuitable = (friend) => friend.gender === 'female';
+    this.isSuitable = function (friend) {
+        return friend.gender === 'female';
+    };
 }
 
 /**
  * Получение списка друзей, которые будут приглашены на свадьбу
- * @param {Object[]} AllFriends - список всех друзей
+ * @param {Object[]} friends - список всех друзей
  * @param {Filter} filter
  * @param {Number} maxLevel - максимальный круг друзей
  * @returns {Object[]} - отсортированный массив,
  * кого Аркадий пригласит на свадьбу
  */
 function getInvitedFriends(friends, filter, maxLevel = Infinity) {
-    let  invited = [];
+    let invited = [];
     let currentLevelList = friends.filter(friend => friend.best)
-        .sort((a,b) => a.name.localeCompare(b.name));
+        .sort((a, b) => a.name.localeCompare(b.name));
+    invited = invited.concat(currentLevelList);
     while (maxLevel > 0 && currentLevelList.length > 0) {
-        invited = invited.concat(currentLevelList);
         currentLevelList = getNextLefelFriends(currentLevelList, invited, friends);
+        if (currentLevelList.length === 0) {
+            break;
+        }
         maxLevel--;
+        invited = invited.concat(currentLevelList);
     }
 
-    return invited.filter(filter);
+    return invited;
 }
 
-function getNextLefelFriends(currentLevelList, invited, friends)
-{
+function getNextLefelFriends(currentLevelList, invited, friends) {
     let nextLevelFriends = [];
     let invitedFriendsNames = invited.map(friend => friend.name);
-    nextLevelFriends.concat(currentLevelList.forEach(friend => {
-        friend.friends.filter(candidat =>
-            invitedFriendsNames.indexOf(candidat) === -1)
-    }));
+    nextLevelFriends = nextLevelFriends.concat(currentLevelList
+        .forEach(friend => {
+            friend.friends.filter(candidat =>
+                invitedFriendsNames.indexOf(candidat) === -1);
+        }));
 
     return friends.filter(friend => nextLevelFriends.includes(friend.name));
 }
