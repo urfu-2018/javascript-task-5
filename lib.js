@@ -7,7 +7,6 @@ function nameSort(fr1, fr2) {
 function sortAndFilterFriends(friends, filter, level = Infinity) {
     let bestFriends = friends.filter(a => a.best).sort(nameSort);
     let friendsForInvite = [];
-    friendsForInvite = friendsForInvite.concat(bestFriends);
     let newCircle = bestFriends;
 
     function checkOnRepeat(friend, index, arr) {
@@ -15,14 +14,15 @@ function sortAndFilterFriends(friends, filter, level = Infinity) {
             arr.findIndex(person => person.name === friend.name) === index;
     }
 
-    while (level > 1 && newCircle.length > 0) {
+    while (level > 0 && newCircle.length > 0) {
+        friendsForInvite = friendsForInvite.concat(newCircle);
+
         newCircle = newCircle
             .reduce((list, friend) => list.concat(friend.friends), [])
             .map(name => friends.find(friend => friend.name === name))
             .filter(checkOnRepeat)
             .sort(nameSort);
 
-        friendsForInvite = friendsForInvite.concat(newCircle);
         level--;
     }
 
@@ -42,15 +42,15 @@ function Iterator(friends, filter) {
 
     this.filteredFriends = sortAndFilterFriends(friends, filter);
     this.index = 0;
-
-    this.next = function () {
-        return this.done() ? null : this.filteredFriends[this.index++];
-    };
-
-    this.done = function () {
-        return this.index >= this.filteredFriends.length;
-    };
 }
+
+Iterator.prototype.next = function () {
+    return this.done() ? null : this.filteredFriends[this.index++];
+};
+
+Iterator.prototype.done = function () {
+    return this.index >= this.filteredFriends.length;
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
