@@ -47,6 +47,11 @@ const friends = [
         name: 'Julia',
         friends: ['Brad', 'Itan'],
         gender: 'female'
+    },
+    {
+        name: 'Melisa',
+        friends: [],
+        gender: 'female'
     }
 ];
 
@@ -80,7 +85,8 @@ describe('Итераторы', () => {
             [friend('Sam'), friend('Sally')].map(toName),
             [friend('Brad'), friend('Emily')].map(toName),
             [friend('Mat'), friend('Sharon')].map(toName),
-            toName(friend('Julia'))
+            toName(friend('Julia')),
+            toName(friend('Melisa'))
         ]);
     });
 

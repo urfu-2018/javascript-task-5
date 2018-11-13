@@ -28,7 +28,9 @@ function Iterator(friends, filter) {
         console.info('--------------------END ITERATION--------------------');
     }
 
-    this.data = this.data.filter((item) => filter.exec(item));
+    this.data = this.data
+        .concat(getRestFriends(friends, this.data))
+        .filter((item) => filter.exec(item));
 }
 
 Iterator.prototype.done = function () {
@@ -36,6 +38,10 @@ Iterator.prototype.done = function () {
 };
 
 Iterator.prototype.next = function () {
+    if (this.done()) {
+        return null;
+    }
+
     return this.data[this.current++];
 };
 
@@ -72,7 +78,7 @@ LimitedIterator.prototype = Iterator.prototype;
 
 function getNextUniqueCicle(friends, invitations) {
     if (invitations.length === 0) {
-        return sortByName(filterBest(friends));
+        return sortByName(dedupe(filterBest(friends)));
     }
 
     const friendsOfInvitedFriends = invitations
@@ -92,6 +98,10 @@ function getNextUniqueCicle(friends, invitations) {
     console.info('not invited', notInvited.map(f => f.name));
 
     return sortByName(notInvited);
+}
+
+function getRestFriends(friends, invitations) {
+    return friends.filter(fr => invitations.indexOf(fr) === -1);
 }
 
 function dedupe(arr) {
