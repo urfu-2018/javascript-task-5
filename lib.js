@@ -1,52 +1,35 @@
 'use strict';
 
-function sortByName(friends) {
-    friends.sort((friend1, friend2) => friend1.name > friend2.name ? 1 : -1);
+function sortByName(friend1, friend2) {
+    return friend1.name.localeCompare(friend2.name);
 }
 
-function getBestFriends(friends) {
-    return friends.filter(friend => friend.best);
-}
 
-function filterFriends(friends, filter) {
-    return friends.filter(friend => filter.check(friend));
-}
-
-function checkForUniqueName(friendsObject, resultFriends) {
-    return friendsObject.filter(name => resultFriends
-        .every(resultFriend => resultFriend.name !== name));
-}
-
-function getNewNames(bestFriends, resultFriends) {
-    return bestFriends.map(friend => checkForUniqueName(friend.friends, resultFriends))
-        .reduce((resultArray, someArray) => resultArray.concat(someArray));
+function getNewNames(bestFriends) {
+    return bestFriends.map(friend => friend.friends)
+        .reduce((a, b) => a.concat(b));
 
 }
 
-function getArrayOfObjectFriends(newNames, friends) {
-    return newNames.map(name => friends.find(friend => friend.name === name));
+function checkFriends(resultFriends) {
+    return friend => !resultFriends.includes(friend);
 }
 
 function getResultFriends(friends, filter, maxLvl = Infinity) {
     if (!maxLvl || maxLvl < 1) {
         return [];
     }
-    let bestFriends = getBestFriends(friends);
-    sortByName(bestFriends);
-    if (bestFriends.length === 0) {
-        return [];
-    }
-    let resultFriends = bestFriends;
-    for (; maxLvl > 1; maxLvl--) {
-        const newNames = getNewNames(bestFriends, resultFriends);
-        if (newNames.length === 0) {
-            break;
-        }
-        bestFriends = getArrayOfObjectFriends(newNames, friends);
+    let bestFriends = friends.filter(friend => friend.best).sort(sortByName);
+    let resultFriends = [];
+    for (; maxLvl > 0 && bestFriends.length > 0; maxLvl--) {
         resultFriends = resultFriends.concat(bestFriends);
+        bestFriends = getNewNames(bestFriends)
+            .map(name => friends.find(human => human.name === name))
+            .filter(checkFriends(resultFriends));
+        bestFriends = Array.from(new Set(bestFriends)).sort(sortByName);
     }
 
-    return filterFriends(resultFriends, filter);
+    return resultFriends.filter(friend => filter.check(friend));
 }
 
 /**
