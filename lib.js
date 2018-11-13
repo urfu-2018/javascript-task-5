@@ -78,7 +78,7 @@ LimitedIterator.prototype = Iterator.prototype;
 
 function getNextUniqueCircle(friends, invitations) {
     if (invitations.length === 0) {
-        return sortByName(dedupe(filterBest(friends)));
+        return sortByName(filterBest(friends));
     }
 
     const friendsOfInvitedFriends = invitations
