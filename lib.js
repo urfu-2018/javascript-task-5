@@ -18,7 +18,7 @@ function Iterator(friends, filter) {
     while (this.data.length !== friends.length) {
         console.info('--------------START ITERATION--------------');
         console.info('INVITED IS ', this.data);
-        const nextCircle = getNextUniqueCicle(friends, this.data);
+        const nextCircle = getNextUniqueCircle(friends, this.data);
         console.info('GOT: ', nextCircle);
         if (!nextCircle.length) {
             break;
@@ -29,7 +29,7 @@ function Iterator(friends, filter) {
     }
 
     this.data = this.data
-        .concat(getRestFriends(friends, this.data))
+        .concat(sortByName(getRestFriends(friends, this.data)))
         .filter((item) => filter.exec(item));
 }
 
@@ -65,7 +65,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     for (let i = 0; i < maxLevel; i++) {
         console.info('-------START ITERATION-----------');
         console.info('SEND ', this.data.map(f => f.name), 'AS INVITED');
-        const nextCircle = getNextUniqueCicle(friends, this.data);
+        const nextCircle = getNextUniqueCircle(friends, this.data);
         console.info(nextCircle);
         this.data = this.data.concat(nextCircle);
         console.info('--------------END ITERATION-----------------');
@@ -76,7 +76,7 @@ function LimitedIterator(friends, filter, maxLevel) {
 
 LimitedIterator.prototype = Iterator.prototype;
 
-function getNextUniqueCicle(friends, invitations) {
+function getNextUniqueCircle(friends, invitations) {
     if (invitations.length === 0) {
         return sortByName(dedupe(filterBest(friends)));
     }
