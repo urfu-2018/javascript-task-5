@@ -11,18 +11,30 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    this.generator = generateSequence(friends, filter, Infinity);
-    this.actual = this.generator.next();
+    this.generator = bfsWithFilter(friends, filter, Infinity);
+    this.i = 0;
     this.next = function () {
-        let result = this.actual.value;
-        this.actual = this.generator.next();
-
-        return result;
+        return this.generator[this.i++];
     };
 
     this.done = function () {
-        return this.actual.done;
+        return this.i >= this.generator.length;
     };
+}
+
+
+/**
+ * Итератор по друзям с ограничением по кругу
+ * @extends Iterator
+ * @constructor
+ * @param {Object[]} friends
+ * @param {Filter} filter
+ * @param {Number} maxLevel – максимальный круг друзей
+ */
+function LimitedIterator(friends, filter, maxLevel) {
+    Iterator.call(this, friends, filter);
+    this.generator = bfsWithFilter(friends, filter, maxLevel);
+    this.i = 0;
 }
 
 class InitializeBFSCarcass {
@@ -69,10 +81,19 @@ function sortFriend(friends) {
     });
 }
 
-function* generateSequence(friends, filter, maxLevel) {
+function* generateSequence(array) {
+    for (let i = 0; i < array.length; ++i) {
+        yield array[i];
+    }
+
+    return;
+}
+function bfsWithFilter(friends, filter, maxLevel) {
     let bfs = new InitializeBFSCarcass(friends);
     let level = 0;
     let nextLevel = [];
+    let result = [];
+
     function pushFriends(toFriend) {
         let friendId = bfs.namesDict[toFriend];
         if (!bfs.used[friendId]) {
@@ -81,37 +102,26 @@ function* generateSequence(friends, filter, maxLevel) {
         }
     }
 
-    while (bfs.queue.length > 0 && level < maxLevel) {
-        nextLevel = [];
-        for (let i = 0; i < bfs.queue.length; ++i) {
-            bfs.queue[i].friends.forEach(pushFriends);
-        }
+    function runBfs() {
+        while (bfs.queue.length > 0 && level < maxLevel) {
+            nextLevel = [];
+            console.info(bfs.queue);
+            for (let i = 0; i < bfs.queue.length; ++i) {
+                bfs.queue[i].friends.forEach(pushFriends);
+            }
 
-        let filteringFriends = bfs.queue.filter(f => filter.it(f));
-        for (let i = 0; i < filteringFriends.length; ++i) {
-            yield filteringFriends[i];
+            let filteringFriends = bfs.queue.filter(f => filter.it(f));
+            bfs.queue = nextLevel.sort((a, b) => a.name.localeCompare(b.name));
+            ++level;
+            for (let i = 0; i < filteringFriends.length; ++i) {
+                result.push(filteringFriends[i]);
+            }
         }
-
-        bfs.queue = nextLevel.sort((a, b) => a.name.localeCompare(b.name));
-        ++level;
     }
 
-    return;
-}
+    runBfs();
 
-/**
- * Итератор по друзям с ограничением по кругу
- * @extends Iterator
- * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
- * @param {Number} maxLevel – максимальный круг друзей
- */
-function LimitedIterator(friends, filter, maxLevel) {
-    console.info(friends, filter, maxLevel);
-    Iterator.call(this, friends, filter);
-    this.generator = generateSequence(friends, filter, maxLevel);
-    this.actual = this.generator.next();
+    return result;
 }
 
 /**
