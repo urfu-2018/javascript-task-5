@@ -81,13 +81,6 @@ function sortFriend(friends) {
     });
 }
 
-function* generateSequence(array) {
-    for (let i = 0; i < array.length; ++i) {
-        yield array[i];
-    }
-
-    return;
-}
 function bfsWithFilter(friends, filter, maxLevel) {
     let bfs = new InitializeBFSCarcass(friends);
     let level = 0;
