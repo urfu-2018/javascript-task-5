@@ -9,27 +9,29 @@ function localCompareFriends(first, second) {
 }
 
 function iterateOver(friends, filter, depth = Infinity) {
-    let currentFriends = friends.filter(friend => friend.best);
+    let currentFriends = friends
+        .filter(friend => friend.best)
+        .sort(localCompareFriends);
 
     const answer = [];
-    const passed = [];
     let currentDepth = 1;
 
     while (currentDepth <= depth && currentFriends.length > 0) {
-        currentFriends.forEach(someone => passed.push(someone));
-        const satisfied = currentFriends.sort(localCompareFriends);
-        satisfied.filter(filter.predicate)
-            .forEach(someone => answer.push(someone));
-        currentFriends = satisfied
-            .map(someone => someone.friends)
+        currentFriends.forEach(someone => answer.push(someone));
+        currentFriends = currentFriends
+            .map(friend => friend.friends)
             .reduce((array, friendsOfFriends) => array.concat(friendsOfFriends), [])
-            .map(friendName => friends.find(someone => someone.name === friendName))
-            .filter(Boolean)
-            .filter(someone => !passed.includes(someone));
+            .map(friendOfFriendName => friends.find(object => object.name === friendOfFriendName))
+            // distinct
+            .filter((someone, index, array) => array.indexOf(someone) === index)
+            .filter(someone => answer.indexOf(someone) === -1)
+            .sort(localCompareFriends);
         currentDepth++;
     }
 
-    return answer;
+    return answer
+        .filter(Boolean)
+        .filter(filter.predicate);
 }
 
 /**
@@ -52,7 +54,8 @@ Iterator.prototype.done = function () {
 };
 
 Iterator.prototype.next = function () {
-    return this.getContainment().shift();
+    return this.getContainment()
+        .shift();
 };
 
 /**
@@ -69,6 +72,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.containment = iterateOver(friends, filter, maxLevel);
     this.getContainment = () => this.containment;
 }
+
 LimitedIterator.prototype = new Iterator(null, null);
 
 /**
