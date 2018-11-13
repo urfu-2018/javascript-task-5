@@ -10,7 +10,7 @@ const getBestFriends = (friends) => friends
 const getFriendsOf = (selected, all) => selected
     .reduce((acc, friend) => acc.concat(friend.friends), [])
     .map(name => all.find(friend => friend.name === name))
-    .filter((friend, i, arr) => !all.includes(friend) && arr.indexOf(friend) === i)
+    .filter((friend, i, arr) => !selected.includes(friend) && arr.indexOf(friend) === i)
     .sort(ascNames);
 
 function getLevels(invited, friends, maxLevel) {
@@ -104,3 +104,66 @@ exports.LimitedIterator = LimitedIterator;
 exports.Filter = Filter;
 exports.MaleFilter = MaleFilter;
 exports.FemaleFilter = FemaleFilter;
+
+const friends = [
+    {
+        name: 'Sam',
+        friends: ['Mat', 'Sharon'],
+        gender: 'male',
+        best: true
+    },
+    {
+        name: 'Sally',
+        friends: ['Brad', 'Emily'],
+        gender: 'female',
+        best: true
+    },
+    {
+        name: 'Mat',
+        friends: ['Sam', 'Sharon'],
+        gender: 'male'
+    },
+    {
+        name: 'Sharon',
+        friends: ['Sam', 'Itan', 'Mat'],
+        gender: 'female'
+    },
+    {
+        name: 'Brad',
+        friends: ['Sally', 'Emily', 'Julia'],
+        gender: 'male'
+    },
+    {
+        name: 'Emily',
+        friends: ['Sally', 'Brad'],
+        gender: 'female'
+    },
+    {
+        name: 'Itan',
+        friends: ['Sharon', 'Julia'],
+        gender: 'male'
+    },
+    {
+        name: 'Julia',
+        friends: ['Brad', 'Itan'],
+        gender: 'female'
+    }
+];
+
+const maleFilter = new MaleFilter();
+const femaleFilter = new FemaleFilter();
+const maleIterator = new LimitedIterator(friends, maleFilter, 2);
+const femaleIterator = new Iterator(friends, femaleFilter);
+
+const invitedFriends = [];
+
+while (!maleIterator.done() && !femaleIterator.done()) {
+    invitedFriends.push([
+        maleIterator.next(),
+        femaleIterator.next()
+    ]);
+}
+
+while (!femaleIterator.done()) {
+    invitedFriends.push(femaleIterator.next());
+}
