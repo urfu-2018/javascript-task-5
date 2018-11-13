@@ -39,10 +39,7 @@ function iterateOver(friends, filter, depth = Infinity) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    this.containment = [];
-    if (friends && filter) {
-        this.containment = iterateOver(friends, filter);
-    }
+    this.containment = iterateOver(friends, filter);
     this.getContainment = () => this.containment;
     this.index = 0;
 }
