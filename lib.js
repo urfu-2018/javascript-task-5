@@ -12,10 +12,10 @@ function sortAndUniq(array) {
 }
 
 /**
- * Формирует список друзей, отсортированный по уровням и потом алфавиту.
+ * Формирует список друзей, отсортированный по уровням и внутри уровня по алфавиту.
  * @param {Object[]} friends
  * @param {Number} maxLevel
- * @returns {[Object[]]}
+ * @returns {Object[]}
  */
 function getFriendsToInvite(friends, maxLevel) {
     const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
@@ -47,15 +47,16 @@ function getNextLevelOfFriends(previousLevel, allFriends) {
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
+ * @param {Number} maxLevel
  */
-function Iterator(friends, filter) {
+function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    if (!friends || !friends.length) {
+    if (!friends || !friends.length || maxLevel < 1) {
         this.friendsToInvite = [];
     } else {
-        this.friendsToInvite = filter.filter(getFriendsToInvite(friends, Infinity));
+        this.friendsToInvite = filter.filter(getFriendsToInvite(friends, maxLevel));
     }
 }
 Iterator.prototype.done = function () {
@@ -74,14 +75,7 @@ Iterator.prototype.next = function () {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError('filter should be an instance of Filter');
-    }
-    if (!friends || !friends.length || maxLevel < 1) {
-        this.friendsToInvite = [];
-    } else {
-        this.friendsToInvite = filter.filter(getFriendsToInvite(friends, maxLevel));
-    }
+    Iterator.call(this, friends, filter, maxLevel);
 }
 LimitedIterator.prototype = Object.create(Iterator.prototype);
 
