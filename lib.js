@@ -68,6 +68,9 @@ Iterator.prototype.next = function () {
  */
 
 function LimitedIterator(friends, filter, maxLevel) {
+    if (filter.constructor !== Filter) {
+        throw new TypeError();
+    }
     Object.setPrototypeOf(this, Iterator.prototype);
     this.invitedFriends = bypassWide(friends, filter, maxLevel);
 }
