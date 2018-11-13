@@ -1,26 +1,40 @@
 'use strict';
 
+/**
+ * Получить всех приглашенных друзей
+ * @constructor
+ * @param {Object[]} friends
+ * @param {Number} maxLevel
+ * @returns {Object[]}
+ */
 function getGuests(friends, maxLevel) {
+    const guests = [];
     let temporaryListOfFriends = friends
         .filter(friend => friend.best)
-        .sort((person1, person2) => person1.name > person2.name);
-    const guests = maxLevel > 0 ? [...temporaryListOfFriends] : [];
+        .sort((person1, person2) => person1.name.localeCompare(person2.name));
 
-    while (--maxLevel > 0 && temporaryListOfFriends.length > 0) {
-        temporaryListOfFriends = getNotInvitedFriends(
+    while (maxLevel-- > 0 && temporaryListOfFriends.length > 0) {
+        guests.push(...temporaryListOfFriends);
+
+        temporaryListOfFriends = getUninvitedFriends(
             temporaryListOfFriends.map(friend => friend.friends),
             guests
         )
-            .sort((personName1, personName2) => personName1 > personName2)
+            .sort((personName1, personName2) => personName1.localeCompare(personName2))
             .map(friendName => friends.find(person => person.name === friendName));
-
-        guests.push(...temporaryListOfFriends);
     }
 
     return guests;
 }
 
-function getNotInvitedFriends(currentLevelFriends, guests) {
+/**
+ * Получить ещё не приглашенных друзей
+ * @constructor
+ * @param {Object[]} currentLevelFriends
+ * @param {Object[]} guests
+ * @returns {Object[]}
+ */
+function getUninvitedFriends(currentLevelFriends, guests) {
     const result = [];
     for (const listOfFriends of currentLevelFriends) {
         result.push(...listOfFriends);
@@ -43,13 +57,9 @@ function Iterator(friends, filter) {
 
     this.guests = getGuests(friends, Infinity).filter(filter.fitsTheCondition);
 
-    this.next = function () {
-        return this.done() ? null : this.guests.shift();
-    };
+    this.next = () => this.done() ? null : this.guests.shift();
 
-    this.done = function () {
-        return this.guests.length === 0;
-    };
+    this.done = () => this.guests.length === 0;
 }
 
 /**
@@ -72,9 +82,7 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.fitsTheCondition = function () {
-        return true;
-    };
+    this.fitsTheCondition = () => true;
 }
 
 /**
@@ -83,9 +91,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.fitsTheCondition = function (person) {
-        return person.gender === 'male';
-    };
+    this.fitsTheCondition = person => person.gender === 'male';
 }
 
 MaleFilter.prototype = Object.create(Filter.prototype);
@@ -96,9 +102,7 @@ MaleFilter.prototype = Object.create(Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    this.fitsTheCondition = function (person) {
-        return person.gender === 'female';
-    };
+    this.fitsTheCondition = person => person.gender === 'female';
 }
 
 FemaleFilter.prototype = Object.create(Filter.prototype);
