@@ -20,13 +20,14 @@ function sortAndUniq(array) {
 function getFriendsToInvite(friends, maxLevel) {
     const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
     for (let i = 0; i < maxLevel - 1; i++) {
+        friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать уже добавленных
         toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
         if (!friends.length || !toInvite[i + 1].length) {
             break; // если всех добавили, или очередной уровень пуст.
         }
     }
 
-    return Array.from(new Set(toInvite));
+    return toInvite;
 }
 
 /**
@@ -55,8 +56,9 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!friends.length || maxLevel < 1) {
         this.friendsToInvite = [];
     } else {
+        this.friendsToInvite = Array.from(new Set(getFriendsToInvite(friends, maxLevel)));
         this.friendsToInvite = filter.filter(
-            getFriendsToInvite(friends, maxLevel).reduce((flat, part) => flat.concat(part), []));
+            this.friendsToInvite.reduce((flat, part) => flat.concat(part), []));
     }
 }
 Iterator.prototype.done = function () {
