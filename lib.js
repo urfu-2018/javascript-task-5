@@ -3,6 +3,9 @@
 function addPowerFor(friends, names, level, maxLevel) {
     var newNames = [];
     var buildFriends = [];
+    if (level > maxLevel) {
+        return [];
+    }
     for (var name of names) {
         if (friends.has(name)) {
             var friend = friends.get(name);
@@ -22,12 +25,14 @@ function addPowerFor(friends, names, level, maxLevel) {
 function addPowerFriend(friends, maxLevel) {
     var newFriends = [];
     var names = [];
-    for (var friend of friends.values()) {
-        if (friend.best) {
-            names = names.concat(friend.friends);
-            newFriends.push({ friend, power: 1 });
-            friends.delete(friend.name);
-        }
+    for (var friend of Array.from(friends.values()).filter(f => f.best)) {
+        names = names.concat(friend.friends);
+        newFriends.push({ friend, power: 1 });
+        friends.delete(friend.name);
+    }
+
+    if (newFriends.length === 0 || maxLevel <= 0) {
+        return [];
     }
 
     newFriends = newFriends
