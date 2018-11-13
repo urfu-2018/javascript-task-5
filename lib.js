@@ -56,8 +56,9 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!friends.length || maxLevel < 1) {
         this.friendsToInvite = [];
     } else {
+        this.friendsToInvite = Array.from(new Set(getFriendsToInvite(friends, maxLevel)));
         this.friendsToInvite = filter.filter(
-            getFriendsToInvite(friends, maxLevel).reduce((flat, part) => flat.concat(part), []));
+            this.friendsToInvite.reduce((flat, part) => flat.concat(part), []));
     }
 }
 Iterator.prototype.done = function () {
