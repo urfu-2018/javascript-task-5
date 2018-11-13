@@ -24,17 +24,15 @@ function getNewNames(bestFriends, resultFriends) {
 }
 
 function getArrayOfObjectFriends(newNames, friends) {
-    return newNames.map(name => friends
-        .filter(obj => obj.name === name))
-        .reduce((resultArray, someArray) => resultArray.concat(someArray));
+    return newNames.map(name => friends.find(friend => friend.name === name));
 }
 
 function getResultFriends(friends, filter, maxLvl = Infinity) {
     if (!maxLvl || maxLvl < 1) {
         return [];
     }
-    sortByName(friends);
     let bestFriends = getBestFriends(friends);
+    sortByName(bestFriends);
     if (bestFriends.length === 0) {
         return [];
     }
@@ -89,6 +87,9 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     if (typeof maxLevel !== 'number' || maxLevel < 0) {
         maxLevel = 0;
     }
