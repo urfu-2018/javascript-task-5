@@ -9,11 +9,13 @@ function addPowerFor(friends, names, level, maxLevel) {
     for (var name of names) {
         if (friends.has(name)) {
             var friend = friends.get(name);
-            buildFriends.push({ friend, power: level });
+            buildFriends.push(friend);
             friends.delete(name);
             newNames = newNames.concat(friend.friends);
         }
     }
+
+    buildFriends = buildFriends.sort(sortFriend);
 
     if (newNames.length > 0 && level + 1 <= maxLevel) {
         return buildFriends.concat(addPowerFor(friends, newNames, level + 1, maxLevel));
@@ -23,11 +25,11 @@ function addPowerFor(friends, names, level, maxLevel) {
 }
 
 function addPowerFriend(friends, maxLevel) {
-    var newFriends = [];
+    var newFriends = Array.from(friends.values()).filter(f => f.best)
+        .sort(sortFriend);
     var names = [];
-    for (var friend of Array.from(friends.values()).filter(f => f.best)) {
+    for (var friend of newFriends) {
         names = names.concat(friend.friends);
-        newFriends.push({ friend, power: 1 });
         friends.delete(friend.name);
     }
 
@@ -39,9 +41,7 @@ function addPowerFriend(friends, maxLevel) {
         .concat(addPowerFor(friends, names, 2, maxLevel));
 
     if (friends.size > 0 && !isFinite(maxLevel)) {
-        newFriends = newFriends.concat(Array.from(friends.values()).map(f => {
-            return { friend: f, power: Infinity };
-        }));
+        newFriends = newFriends.concat(Array.from(friends.values()).sort(sortFriend));
     }
 
     return newFriends;
@@ -57,14 +57,8 @@ function toMap(friends) {
 }
 
 function sortFriend(a, b) {
-    if (a.power === b.power) {
-        return a.friend.name.localeCompare(b.friend.name);
-    }
-    if (a.power < b.power) {
-        return -1;
-    }
+    return a.name.localeCompare(b.name);
 
-    return 1;
 }
 
 /**
@@ -83,8 +77,6 @@ function Iterator(friends, filter) {
     var copyFriend = Array.from(friends);
 
     this.selfFriends = addPowerFriend(toMap(copyFriend), this.maxLevel)
-        .sort(sortFriend)
-        .map(e => e.friend)
         .filter(e => filter.isCorrect(e));
 
     this.done = function () {
