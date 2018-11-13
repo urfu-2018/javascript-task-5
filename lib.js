@@ -10,7 +10,7 @@ function findFriends(bestFriends, friends, invitedFriends) {
     bestFriends.forEach(friend => {
         listFriends = listFriends.concat(friends.filter(friendData =>
             friend.friends.indexOf(friendData.name) !== -1 &&
-            invitedFriends.indexOf(friendData) === -1));
+            invitedFriends.indexOf(friendData) === -1).sort(sortName));
     });
 
     return listFriends;
@@ -21,7 +21,7 @@ function bypassWide(friends, filter, maxLevel = Infinity) {
     let invitedFriends = bestFriends;
     let i = 1;
     while (bestFriends.length !== 0 && i < maxLevel) {
-        bestFriends = findFriends(bestFriends, friends, invitedFriends).sort(sortName);
+        bestFriends = findFriends(bestFriends, friends, invitedFriends);
         invitedFriends = invitedFriends.concat(bestFriends);
         i++;
     }
