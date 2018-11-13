@@ -36,7 +36,7 @@ function Iterator(friends, filter) {
     listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr)); // фильтр по полу
     this.index = 0;
     this.done = function () {
-        return this.index >= listOfAllFriends.length || listOfAllFriends.length === 0;
+        return this.index >= listOfAllFriends.length;
     };
     this.next = function () {
         if (this.done()) {
