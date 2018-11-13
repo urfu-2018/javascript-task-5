@@ -39,9 +39,6 @@ function Iterator(friends, filter) {
         return this.index >= listOfAllFriends.length;
     };
     this.next = function () {
-        if (this.done()) {
-            return false;
-        }
         this.index++;
 
         return listOfAllFriends[this.index - 1] ? listOfAllFriends[this.index - 1] : null;
@@ -99,7 +96,7 @@ function getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel = 
 function getFriendsList(currentFriendList, listOfAllFriends) {
     let flag = false;
     for (let person of currentFriendList) {
-        if (!listOfAllFriends.includes(person)) { // ну мало ли что с персон
+        if (!listOfAllFriends.includes(person)) {
             listOfAllFriends.push(person);
             flag = true;
         }
@@ -154,11 +151,6 @@ function MaleFilter() {
 
     return genderFilter;
 }
-
-let friends = [];
-const maleFilter = new MaleFilter();
-const maleIterator = new LimitedIterator(friends, maleFilter, 2);
-console.info(maleIterator instanceof Iterator);
 
 /**
  * Фильтр друзей-девушек
