@@ -65,6 +65,7 @@ Iterator.prototype.next = function () {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     assert(Filter.prototype.isPrototypeOf(filter));
+    Iterator.apply(this, [friends, filter]);
     this.containment = iterateOver(friends, filter, maxLevel);
     this.getContainment = () => this.containment;
 }
