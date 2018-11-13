@@ -9,8 +9,8 @@ const getBestFriends = (friends) => friends
 
 const getFriendsOf = (selected, all) => selected
     .reduce((acc, friend) => acc.concat(friend.friends), [])
-    .filter(name => !selected.some(friend => friend.name === name))
     .map(name => all.find(friend => friend.name === name))
+    .filter((friend, i, arr) => !all.includes(friend) && arr.indexOf(friend) === i)
     .sort(ascNames);
 
 function getLevels(invited, friends, maxLevel) {
