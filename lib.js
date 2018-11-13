@@ -58,7 +58,7 @@ Iterator.prototype.next = function () {
     const index = this.index;
     this.index++;
 
-    return this.getContainment()[index - 1];
+    return this.getContainment()[index];
 };
 
 /**
