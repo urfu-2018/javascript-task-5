@@ -1,7 +1,5 @@
 'use strict';
 
-const assert = require('assert');
-
 function localCompareFriends(first, second) {
     const names = [first, second].map(friend => friend.name);
 
@@ -43,7 +41,6 @@ function iterateOver(friends, filter, depth = Infinity) {
 function Iterator(friends, filter) {
     this.containment = [];
     if (friends && filter) {
-        assert(Filter.prototype.isPrototypeOf(filter));
         this.containment = iterateOver(friends, filter);
     }
     this.getContainment = () => this.containment;
@@ -70,7 +67,6 @@ Iterator.prototype.next = function () {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    assert(Filter.prototype.isPrototypeOf(filter));
     Iterator.apply(this, [friends, filter]);
     this.containment = iterateOver(friends, filter, maxLevel);
     this.getContainment = () => this.containment;
