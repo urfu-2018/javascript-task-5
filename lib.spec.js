@@ -57,24 +57,30 @@ describe('Итераторы', () => {
         const maleIterator = new lib.LimitedIterator(friends, maleFilter, 2);
         const femaleIterator = new lib.Iterator(friends, femaleFilter);
 
+        console.info(
+            'TEST ITSELF, CREATED ITERATORS: ',
+            maleIterator.data.map(f => f.name), femaleIterator.data.map(f => f.name));
+
         const invitedFriends = [];
 
         while (!maleIterator.done() && !femaleIterator.done()) {
             invitedFriends.push([
-                maleIterator.next(),
-                femaleIterator.next()
+                maleIterator.next().name,
+                femaleIterator.next().name
             ]);
         }
 
         while (!femaleIterator.done()) {
-            invitedFriends.push(femaleIterator.next());
+            invitedFriends.push(femaleIterator.next().name);
         }
 
+        const toName = fr => fr.name;
+
         assert.deepStrictEqual(invitedFriends, [
-            [friend('Sam'), friend('Sally')],
-            [friend('Brad'), friend('Emily')],
-            [friend('Mat'), friend('Sharon')],
-            friend('Julia')
+            [friend('Sam'), friend('Sally')].map(toName),
+            [friend('Brad'), friend('Emily')].map(toName),
+            [friend('Mat'), friend('Sharon')].map(toName),
+            toName(friend('Julia'))
         ]);
     });
 
@@ -87,4 +93,33 @@ describe('Итераторы', () => {
             }
         }
     }
+});
+
+describe('Filters', () => {
+    it('simple filter should not filter', () => {
+        const filter = new lib.Filter();
+
+        assert.deepStrictEqual(filter.exec({}), true);
+        assert.deepStrictEqual(filter.exec({ gender: 'female' }), true);
+    });
+
+    it('male filter should filter out females', () => {
+        const filter = new lib.MaleFilter();
+
+        assert.deepStrictEqual(filter instanceof lib.Filter, true);
+
+        assert.deepStrictEqual(filter.exec({}), false);
+        assert.deepStrictEqual(filter.exec({ gender: 'male' }), true);
+        assert.deepStrictEqual(filter.exec({ gender: 'female' }), false);
+    });
+
+    it('female filter should filter out males', () => {
+        const filter = new lib.FemaleFilter();
+
+        assert.deepStrictEqual(filter instanceof lib.Filter, true);
+
+        assert.deepStrictEqual(filter.exec({}), false);
+        assert.deepStrictEqual(filter.exec({ gender: 'male' }), false);
+        assert.deepStrictEqual(filter.exec({ gender: 'female' }), true);
+    });
 });
