@@ -27,6 +27,10 @@ function getArrayOfObjectFriends(newNames, friends) {
     return newNames.map(name => friends.find(friend => friend.name === name));
 }
 
+function checkForUniqueObject(bestFriend, resultFriends) {
+    return bestFriend.filter(friend => !resultFriends.includes(friend));
+}
+
 function getResultFriends(friends, filter, maxLvl = Infinity) {
     if (!maxLvl || maxLvl < 1) {
         return [];
@@ -43,7 +47,8 @@ function getResultFriends(friends, filter, maxLvl = Infinity) {
             break;
         }
         bestFriends = getArrayOfObjectFriends(newNames, friends);
-        resultFriends = resultFriends.concat(bestFriends);
+        const checkedBestFriends = checkForUniqueObject(bestFriends, resultFriends);
+        resultFriends = resultFriends.concat(checkedBestFriends);
     }
 
     return filterFriends(resultFriends, filter);
@@ -87,8 +92,9 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
-
+    if (typeof maxLevel !== 'number' || maxLevel < 0) {
+        maxLevel = 0;
+    }
     this.resultFriends = getResultFriends(friends, filter, maxLevel);
 }
 
