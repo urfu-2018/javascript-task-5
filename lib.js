@@ -11,7 +11,8 @@ function sortAndFilterFriends(friends, filter, level = Infinity) {
     let newCircle = bestFriends;
 
     function checkOnRepeat(friend, index, arr) {
-        return !friendsForInvite.includes(friend) && arr.indexOf(friend) === index;
+        return !friendsForInvite.find(person => person.name === friend.name) &&
+            arr.findIndex(person => person.name === friend.name) === index;
     }
 
     while (level > 1 && newCircle.length > 0) {
