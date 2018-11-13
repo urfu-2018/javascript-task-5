@@ -10,8 +10,7 @@ function sortAndFilterFriends(friends, filter, level = Infinity) {
     let newCircle = bestFriends;
 
     function checkOnRepeat(friend, index, arr) {
-        return !friendsForInvite.find(person => person.name === friend.name) &&
-            arr.findIndex(person => person.name === friend.name) === index;
+        return !friendsForInvite.includes(friend) && arr.indexOf(friend) === index;
     }
 
     while (level > 0 && newCircle.length > 0) {
@@ -36,7 +35,7 @@ function sortAndFilterFriends(friends, filter, level = Infinity) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    if (!Filter.prototype.isPrototypeOf(filter)) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
 
