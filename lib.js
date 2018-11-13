@@ -55,6 +55,9 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     friends = (friends.sort(compareForName)); // нужные в алфавитном порядке
     const basicIterator = new Iterator(friends, filter);
     const limitedIterator = Object.create(basicIterator);
