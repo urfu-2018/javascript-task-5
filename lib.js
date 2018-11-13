@@ -49,7 +49,7 @@ function* bfs(friends) {
  */
 function Iterator(friends, filter) {
     console.info(friends, filter);
-    if (filter.prototype.name !== 'Filter') {
+    if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
     const iter = bfs(friends);
@@ -88,11 +88,10 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
+    const limitedFilter = new Filter();
+    limitedFilter.filter = fr => filter.filter(fr) && fr.priority < maxLevel;
 
-    return new Iterator(friends, {
-        filter: fr => filter.filter(fr) && fr.priority < maxLevel,
-        prototype: Filter
-    });
+    return new Iterator(friends, limitedFilter);
 }
 
 /**
@@ -111,9 +110,11 @@ function Filter() {
  */
 function MaleFilter() {
     console.info('MaleFilter');
-    this.prototype = Filter;
+    // this.prototype = Filter;
     this.filter = friend => friend.gender === 'male';
 }
+MaleFilter.prototype = Object.create(Filter.prototype);
+MaleFilter.prototype.constructor = MaleFilter;
 
 /**
  * Фильтр друзей-девушек
@@ -122,9 +123,11 @@ function MaleFilter() {
  */
 function FemaleFilter() {
     console.info('FemaleFilter');
-    this.prototype = Filter;
+    // this.prototype = Filter;
     this.filter = friend => friend.gender === 'female';
 }
+FemaleFilter.prototype = Object.create(Filter.prototype);
+FemaleFilter.prototype.constructor = FemaleFilter;
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
