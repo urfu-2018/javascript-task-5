@@ -1,6 +1,5 @@
 'use strict';
 
-/* eslint-disable max-statements*/
 function compareFriends(friend1, friend2) {
     if (friend1.name > friend2.name) {
         return 1;
@@ -12,36 +11,28 @@ function compareFriends(friend1, friend2) {
 }
 
 function getFriendsList(friends) {
-    let bestFriends = [];
-    let otherFriends = [];
+    let objectFriends = {
+        bestFriends: [],
+        otherFriends: []
+    };
     friends.forEach(friend => {
         if (friend.best) {
-            bestFriends.push(friend);
+            objectFriends.bestFriends.push(friend);
         } else {
-            otherFriends.push(friend);
+            objectFriends.otherFriends.push(friend);
         }
     });
 
-    /* for (let i = 0; i < friends.length; i++) {
-        if (friends[i].best) {
-            bestFriends.push(friends[i]);
-        } else {
-            otherFriends.push(friends[i]);
-        }
-    } */
     let result = [];
-    result.push(bestFriends);
-    while (otherFriends.length !== 0) {
-        let length = otherFriends.length;
+    result.push(objectFriends.bestFriends);
+    while (objectFriends.otherFriends.length !== 0) {
+        let length = objectFriends.otherFriends.length;
         let friendsFriend = [];
-        bestFriends.forEach(friend => {
+        objectFriends.bestFriends.forEach(friend => {
             friendsFriend = friendsFriend.concat(friend.friends);
         });
 
-        /* for (let i = 0; i < bestFriends.length; i++) {
-            friendsFriend = friendsFriend.concat(bestFriends[i].friends);
-        }*/
-        let halfResult = otherFriends.reduce(function (accum, elem) {
+        let halfResult = objectFriends.otherFriends.reduce(function (accum, elem) {
             if (friendsFriend.includes(elem.name)) {
                 accum[0].push(elem);
             } else {
@@ -50,12 +41,12 @@ function getFriendsList(friends) {
 
             return accum;
         }, [[], []]);
-        bestFriends = halfResult[0];
-        otherFriends = halfResult[1];
-        if (length === otherFriends.length) {
+        objectFriends.bestFriends = halfResult[0];
+        objectFriends.otherFriends = halfResult[1];
+        if (length === objectFriends.otherFriends.length) {
             return result;
         }
-        result.push(bestFriends);
+        result.push(objectFriends.bestFriends);
     }
 
     return result;
@@ -79,10 +70,6 @@ function Iterator(friends, filter) {
         result = result.concat(halfResult);
     });
 
-    /* for (let i = 0; i < newFriends.length; i++) {
-        let halfResult = newFriends[i].filter(filter.filter).sort(compareFriends);
-        result = result.concat(halfResult);
-    } */
     this.friends = result;
     this.place = 0;
 }
