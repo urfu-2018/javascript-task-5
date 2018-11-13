@@ -114,7 +114,7 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    this.isAcceptableFriend = (friend) => true;
+    this.isAcceptableFriend = () => true;
 }
 
 /**
