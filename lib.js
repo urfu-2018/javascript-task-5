@@ -87,12 +87,8 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError();
-    }
-    if (typeof maxLevel !== 'number' || maxLevel < 0) {
-        maxLevel = 0;
-    }
+    Iterator.call(this, friends, filter);
+
     this.resultFriends = getResultFriends(friends, filter, maxLevel);
 }
 
