@@ -52,7 +52,7 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('filter should be an instance of Filter');
     }
-    if (!friends.length || !maxLevel || maxLevel < 1) {
+    if (!friends.length || maxLevel < 1) {
         this.previousLevel = [];
     } else {
         this.previousLevel = filter.filter(
