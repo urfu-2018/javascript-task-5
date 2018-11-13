@@ -40,10 +40,6 @@ function addPowerFriend(friends, maxLevel) {
     newFriends = newFriends
         .concat(addPowerFor(friends, names, 2, maxLevel));
 
-    if (friends.size > 0 && !isFinite(maxLevel)) {
-        newFriends = newFriends.concat(Array.from(friends.values()).sort(sortFriend));
-    }
-
     return newFriends;
 }
 
