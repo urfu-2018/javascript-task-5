@@ -14,7 +14,7 @@ function getSortedFriends(friends, maxLevel = Infinity) {
         nextFriendLevel = nextFriendLevel
             .map(name => friends.find(friend => friend.name === name))
             .filter(friend => !sortedFriends.includes(friend));
-        currentFriends = [...nextFriendLevel].sort(byNames);
+        currentFriends = [...new Set(nextFriendLevel)].sort(byNames);
         currentLevel++;
     }
 
