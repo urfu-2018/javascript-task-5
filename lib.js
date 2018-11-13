@@ -53,17 +53,17 @@ function Iterator(friends, filter, maxLevel = Infinity) {
         throw new TypeError('filter should be an instance of Filter');
     }
     if (!friends.length || maxLevel < 1) {
-        this.previousLevel = [];
+        this.friendsToInvite = [];
     } else {
-        this.previousLevel = filter.filter(
+        this.friendsToInvite = filter.filter(
             getFriendsToInvite(friends, maxLevel).reduce((flat, part) => flat.concat(part), []));
     }
 }
 Iterator.prototype.done = function () {
-    return !this.previousLevel.length;
+    return !this.friendsToInvite.length;
 };
 Iterator.prototype.next = function () {
-    return this.done() ? null : this.previousLevel.shift();
+    return this.done() ? null : this.friendsToInvite.shift();
 };
 
 /**
