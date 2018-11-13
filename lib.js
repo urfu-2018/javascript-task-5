@@ -26,7 +26,7 @@ function getFriends(friends, filter, levels = Number.MAX_SAFE_INTEGER) {
         const NEXT_LEVEL_INVITED = levelFriends.filter(friend => {
             return filter.isAcceptableFriend(friend);
         }).sort(friendsNamesCompare);
-        // если на втором круге приглашенных - выходим из цикла (на 3 круге и т.д. аналогично)
+        // если на втором круге нет приглашенных - выходим из цикла (на 3 круге и т.д. аналогично)
         if (!NEXT_LEVEL_INVITED.length) {
             break;
         }
@@ -67,10 +67,10 @@ function getNextLevelNames(levelFriends) {
 
 /**
  * Возвращает список друзей на следующем круге на основе списка имен друзей следующего
- * круга (друзья друзей) и списка уже приглашенных друзей
+ * круга (друзья друзей) и списка уже приглашенных
  * @param {Object[]} friends - список всех друзей
  * @param {String[]} names - список имен друзей на следующем круге (друзья друзей)
- * @param {Object[]} invited - список приглашенных друзей
+ * @param {Object[]} invited - список уже приглашенных друзей
  * @returns {Object[]}
  */
 function getLevelFriends(friends, names, invited) {
@@ -114,7 +114,7 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    this.acceptableGender = null;
+    this.isAcceptableFriend = (friend) => true;
 }
 
 /**
@@ -123,7 +123,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.acceptableGender = 'male';
+    this.isAcceptableFriend = (friend) => friend.gender === 'male';
 }
 
 /**
@@ -132,16 +132,8 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    this.acceptableGender = 'female';
+    this.isAcceptableFriend = (friend) => friend.gender === 'female';
 }
-
-Filter.prototype.isAcceptableFriend = function (friend) {
-    if (!this.acceptableGender) {
-        return true;
-    }
-
-    return this.acceptableGender === friend.gender;
-};
 
 /**
  * Проверяет, закончена ли работа итератора
