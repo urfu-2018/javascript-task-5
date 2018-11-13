@@ -1,6 +1,17 @@
 'use strict';
 
 /**
+ * Возвращает отсортированый по .name массив без повторений
+ * @param {Object[]} array
+ * @returns {Object[]}
+ */
+function sortAndUniq(array) {
+    array.sort((a, b) => a.name.localeCompare(b.name)); // sort - единственная в мире in-place func.
+
+    return Array.from(new Set(array)); // Set не содержит повторений
+}
+
+/**
  * Формирует список друзей, отсортированный по уровням и потом алфавиту.
  * @param {Object[]} friends
  * @param {Number} maxLevel
@@ -9,16 +20,15 @@
 function getFriendsToInvite(friends, maxLevel) {
     const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
     for (let i = 0; i < maxLevel - 1; i++) {
-        friends = friends.filter(friend => !toInvite[i].includes(friend));
+        friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать уже добавленных
         toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
         if (!friends.length || !toInvite[i + 1].length) {
-            break; // если всех добавили, или все оставшиеся не связаны.
+            break; // если всех добавили, или очередной уровень пуст.
         }
     }
 
     return toInvite;
 }
-
 
 /**
  * Формирует очередной уровень друзей по предыдущему
@@ -27,18 +37,9 @@ function getFriendsToInvite(friends, maxLevel) {
  * @returns {Object[]}
  */
 function getNextLevelOfFriends(previousLevel, allFriends) {
-    return previousLevel.map(prevLevelFriend =>
-        allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name)))
-        .reduce((flat, part) => flat.concat(part), []);
-}
-
-/**
- * Возвращает отсортированый по .name массив без повторений
- * @param {Object[]} array
- * @returns {Object[]}
- */
-function sortAndUniq(array) {
-    return Array.from(new Set(array.sort((a, b) => a.name.localeCompare(b.name))));
+    return previousLevel.map(prevLevelFriend => // для каждого из предыдущего уровня
+        allFriends.filter(friend => friend.friends.includes(prevLevelFriend.name))) // найти друзей
+        .reduce((flat, part) => flat.concat(part), []); // обьеденить все в один массив
 }
 
 /**
