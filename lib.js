@@ -4,7 +4,7 @@ function getGuests(friends, maxLevel) {
     let temporaryListOfFriends = friends
         .filter(friend => friend.best)
         .sort((person1, person2) => person1.name > person2.name);
-    const guests = [...temporaryListOfFriends];
+    const guests = maxLevel > 0 ? [...temporaryListOfFriends] : [];
 
     while (--maxLevel > 0 && temporaryListOfFriends.length > 0) {
         temporaryListOfFriends = getNotInvitedFriends(
@@ -26,7 +26,8 @@ function getNotInvitedFriends(currentLevelFriends, guests) {
         result.push(...listOfFriends);
     }
 
-    return result.filter(friendName => guests.every(friend => friendName !== friend.name));
+    return [...new Set(result.filter(friendName =>
+        guests.every(friend => friendName !== friend.name)))];
 }
 
 /**
