@@ -33,6 +33,9 @@ function Iterator(friends, filter) {
 
 Iterator.prototype = {
     formatFriends(maxLevel = this.friends.length) {
+        if (maxLevel < 0) {
+            return [];
+        }
         let previousFront = removeDuplicatesAndSort(this.friends
             .filter(friend => friend.best).sort(sortByName));
         let invited = (previousFront.map(friend => friend.name));
