@@ -5,7 +5,7 @@ function getGuests(friends, maxLevel = Infinity) {
     let currLevel = 0;
     let currLevelFriends = friends
         .filter(friend => friend.best)
-        .sort((a, b) => a.name > b.name);
+        .sort((a, b) => a.name.localeCompare(b.name));
 
     let guests = [];
     while (currLevel < maxLevel && currLevelFriends.length !== 0) {
@@ -18,15 +18,17 @@ function getGuests(friends, maxLevel = Infinity) {
 }
 
 function getNextLevelFriends(currLevelFriends, guests, friendsMap) {
-    let nextLevelGuests = [];
+    let nextLevelGuests = new Set();
     for (let currFriend of currLevelFriends) {
-        nextLevelGuests.push(...currFriend.friends
+        let nextFriends = currFriend.friends
             .map(name => friendsMap.get(name))
-            .filter((friend, friendIndex, allFriends) =>
-                !guests.includes(friend) && allFriends.indexOf(friend) === friendIndex));
+            .filter(friend => !guests.includes(friend));
+        for (let friend of nextFriends) {
+            nextLevelGuests.add(friend);
+        }
     }
 
-    return nextLevelGuests.sort((a, b) => a.name > b.name);
+    return [...nextLevelGuests].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**
