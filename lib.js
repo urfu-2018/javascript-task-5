@@ -21,7 +21,9 @@ function getFriendsToInvite(friends, maxLevel) {
     const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
     for (let i = 0; i < maxLevel - 1; i++) {
         friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать уже добавленных
-        toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
+        toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends))
+            .filter(friend => toInvite.map(level =>
+                level.map(levelFriend => friend !== levelFriend)));
         if (!friends.length || !toInvite[i + 1].length) {
             break; // если всех добавили, или очередной уровень пуст.
         }
