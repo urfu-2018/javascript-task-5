@@ -9,18 +9,6 @@ function sortFriends(friends) {
     });
 }
 
-function filterFriends(friends, filter) {
-    const filteredFriends = [];
-    const arrayLength = friends.length;
-    for (let i = 0; i < arrayLength; i++) {
-        if (filter.isSuitable(friends[i])) {
-            filteredFriends.push(friends[i]);
-        }
-    }
-
-    return filteredFriends;
-}
-
 function tryGetNext(thisObject, filter) {
     for (let i = thisObject.pointer; i < thisObject.currentFriendCycle.length; i++) {
         if (filter.isSuitable(thisObject.currentFriendCycle[i])) {
@@ -55,7 +43,7 @@ function getNextCycle(thisObject, friendsStorage) {
 function Iterator(friends, filter) {
     friends = sortFriends(friends);
 
-    if (filter.constructor !== Filter) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError('filter must be a type of Filter');
     }
 
@@ -65,7 +53,7 @@ function Iterator(friends, filter) {
         }
     };
     Object.setPrototypeOf(bestFriendFilter, new Filter());
-    this.currentFriendCycle = filterFriends(friends, bestFriendFilter);
+    this.currentFriendCycle = friends.filter(bestFriendFilter.isSuitable);
     this.invited = new Set(this.currentFriendCycle.map(friend => friend.name));
     this.maxLevel = Infinity;
     this.pointer = 0;
