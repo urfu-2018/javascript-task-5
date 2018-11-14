@@ -6,32 +6,37 @@ function getInvitedFriends(friends, filter, maxLevel) {
         new Map());
 
     let level = 1;
-    let currentLevel = friends
-        .filter(friend => friend.best);
-    const resultNames = new Set();
+    const invitedFriendNames = new Set();
+    let currentLevel = friends.filter(friend => friend.best);
 
     while (currentLevel.length !== 0 && level <= maxLevel) {
-        currentLevel
-            .sort((f1, f2) => f1.name.localeCompare(f2.name))
-            .forEach(friend => resultNames.add(friend.name));
-
-        currentLevel = [...currentLevel
-            .reduce(
-                (set, friend) => {
-                    friend.friends.forEach(name => set.add(name));
-
-                    return set;
-                },
-                new Set())]
-            .filter(name => !resultNames.has(name))
-            .map(name => allFriends.get(name));
-
+        inviteFriends(currentLevel, invitedFriendNames);
+        currentLevel = getNewLevelFriends(currentLevel, invitedFriendNames, allFriends);
         level++;
     }
 
-    return [...resultNames]
+    return [...invitedFriendNames]
         .map(name => allFriends.get(name))
         .filter(filter.predicate);
+}
+
+function inviteFriends(currentLevel, invitedFriendNames) {
+    currentLevel
+        .sort((f1, f2) => f1.name.localeCompare(f2.name))
+        .forEach(friend => invitedFriendNames.add(friend.name));
+}
+
+function getNewLevelFriends(currentLevel, invitedFriendNames, allFriends) {
+    return [...currentLevel
+        .reduce(
+            (set, friend) => {
+                friend.friends.forEach(name => set.add(name));
+
+                return set;
+            },
+            new Set())]
+        .filter(name => !invitedFriendNames.has(name))
+        .map(name => allFriends.get(name));
 }
 
 /**
