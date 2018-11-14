@@ -48,6 +48,7 @@ function getInvitedGuests(friends, maxLevel = Infinity) {
     let curLevel = friends
         .filter(friend => friend.best)
         .sort(compareNames);
+
     while (curLevel.length > 0 && maxLevel > 0) {
         guests = guests.concat(curLevel);
         curLevel = curLevel
