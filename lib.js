@@ -30,6 +30,15 @@ function includeGuest(guests) {
 }
 
 /**
+ * @param {Object} fr1
+ * @param {Object} fr2
+ * @returns {number}
+ */
+function compareNames(fr1, fr2) {
+    return fr1.name.localeCompare(fr2.name);
+}
+
+/**
  * @param {Array} friends - friend {Object}
  * @param {Number} maxLevel
  * @returns {Array}
@@ -38,15 +47,16 @@ function getInvitedGuests(friends, maxLevel = Infinity) {
     let guests = [];
     let curLevel = friends
         .filter(friend => friend.best)
-        .sort((fr1, fr2) => fr1.name.localeCompare(fr2.name));
+        .sort(compareNames);
     while (curLevel.length > 0 && maxLevel > 0) {
         guests = guests.concat(curLevel);
         curLevel = curLevel
             .map(fr => fr.friends)
             .reduce((a, b) => a.concat(b))
             .map(name => friends.find(fr => fr.name === name))
-            .filter(includeGuest(guests))
-            .sort((fr1, fr2) => fr1.name.localeCompare(fr2.name));
+            .filter(includeGuest(guests));
+        curLevel = Array.from(new Set(curLevel))
+            .sort(compareNames);
         maxLevel--;
     }
 
