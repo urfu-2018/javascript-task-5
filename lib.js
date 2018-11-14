@@ -8,9 +8,9 @@ function sortName(a, b) {
 function findFriends(bestFriends, friends, invitedFriends) {
     let listFriends = [];
     bestFriends.forEach(friend => {
-        listFriends = listFriends.concat(friends.filter(friendData =>
+        listFriends.push(...friends.filter(friendData =>
             friend.friends.indexOf(friendData.name) !== -1 &&
-            invitedFriends.indexOf(friendData) === -1).sort(sortName));
+            invitedFriends.indexOf(friendData) === -1));
     });
 
     return listFriends;
@@ -18,12 +18,11 @@ function findFriends(bestFriends, friends, invitedFriends) {
 
 function bypassWide(friends, filter, maxLevel = Infinity) {
     let bestFriends = friends.filter(friend => friend.best).sort(sortName);
-    let invitedFriends = bestFriends;
-    let i = 1;
-    while (bestFriends.length !== 0 && i < maxLevel) {
-        bestFriends = findFriends(bestFriends, friends, invitedFriends);
-        invitedFriends = invitedFriends.concat(bestFriends);
-        i++;
+    let invitedFriends = [];
+    while (bestFriends.length !== 0 && maxLevel > 0) {
+        invitedFriends.push(...bestFriends);
+        bestFriends = findFriends(bestFriends, friends, invitedFriends).sort(sortName);
+        maxLevel--;
     }
     invitedFriends = invitedFriends.filter(filter.check).reverse();
 
@@ -45,17 +44,11 @@ function Iterator(friends, filter) {
 }
 
 Iterator.prototype.done = function () {
-
     return !this.invitedFriends.length;
 };
 
 Iterator.prototype.next = function () {
-    if (this.done()) {
-
-        return null;
-    }
-
-    return this.invitedFriends.pop();
+    return this.done() ? null : this.invitedFriends.pop();
 };
 
 /**
@@ -80,9 +73,7 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    this.check = function (friend) {
-        return friend;
-    };
+    this.check = () => true;
 }
 
 /**
@@ -92,9 +83,7 @@ function Filter() {
  */
 function MaleFilter() {
     const malerFilter = Object.create(new Filter());
-    malerFilter.check = function (friend) {
-        return friend.gender === 'male';
-    };
+    malerFilter.check = friend => friend.gender === 'male';
 
     return malerFilter;
 }
@@ -106,9 +95,7 @@ function MaleFilter() {
  */
 function FemaleFilter() {
     const femaleFilter = Object.create(new Filter());
-    femaleFilter.check = function (friend) {
-        return friend.gender === 'female';
-    };
+    femaleFilter.check = friend => friend.gender === 'female';
 
     return femaleFilter;
 }
