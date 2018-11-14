@@ -15,6 +15,10 @@ Iterator.prototype = {
     }
 };
 
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -25,14 +29,10 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.weddingGuests = getInvitedFriends(friends, filter)
+    this.weddingGuests = getInvitedFriends(friends)
         .filter(friend => filter.isSuitable(friend));
     this.index = 0;
 }
-
-Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
-Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
-Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -43,7 +43,9 @@ Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    this.weddingGuests = getInvitedFriends(friends, filter, maxLevel);
+    Iterator.apply(this, [friends, filter]);
+    this.weddingGuests = getInvitedFriends(friends, maxLevel)
+        .filter(friend => filter.isSuitable(friend));
 }
 
 /**
@@ -79,17 +81,19 @@ function FemaleFilter() {
 /**
  * Получение списка друзей, которые будут приглашены на свадьбу
  * @param {Object[]} friends - список всех друзей
- * @param {Filter} filter
  * @param {Number} maxLevel - максимальный круг друзей
  * @returns {Object[]} - отсортированный массив,
  * кого Аркадий пригласит на свадьбу
  */
-function getInvitedFriends(friends, filter, maxLevel = Infinity) {
+function getInvitedFriends(friends, maxLevel = Infinity) {
     let invited = [];
     let currentLevelList = friends.filter(friend => friend.best)
         .sort((a, b) => a.name.localeCompare(b.name));
+    if (currentLevelList.length === 0 || maxLevel < 1) {
+        return invited;
+    }
     invited = invited.concat(currentLevelList);
-    while (maxLevel > 0 && currentLevelList.length > 0) {
+    while (maxLevel > 1 && currentLevelList.length > 0) {
         currentLevelList = getNextLefelFriends(currentLevelList, invited, friends);
         if (currentLevelList.length === 0) {
             break;
@@ -103,14 +107,19 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
 
 function getNextLefelFriends(currentLevelList, invited, friends) {
     let nextLevelFriends = [];
-    let invitedFriendsNames = invited.map(friend => friend.name);
-    nextLevelFriends = nextLevelFriends.concat(currentLevelList
-        .forEach(friend => {
-            friend.friends.filter(candidat =>
-                invitedFriendsNames.indexOf(candidat) === -1);
-        }));
+    let FriendsNames = currentLevelList.reduce((prev, friend) => {
+        return prev.concat(friend.friends);
+    }, []);
+    const notAllFriends = FriendsNames.map(name => {
+        return friends.find(friend => name === friend.name);
+    });
+    let index = 0;
+    nextLevelFriends = notAllFriends.filter(candidat =>
+        !invited.includes(candidat));
+    nextLevelFriends = nextLevelFriends.filter(candidat =>
+        nextLevelFriends.indexOf(candidat) === index++);
 
-    return friends.filter(friend => nextLevelFriends.includes(friend.name));
+    return nextLevelFriends.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 exports.Iterator = Iterator;
