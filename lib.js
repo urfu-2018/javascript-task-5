@@ -47,47 +47,15 @@ function Iterator(friends, filter) {
         throw new TypeError('filter must be a type of Filter');
     }
 
-    const bestFriendFilter = {
-        isSuitable(friend) {
-            return friend.best;
-        }
-    };
-    Object.setPrototypeOf(bestFriendFilter, new Filter());
-    this.currentFriendCycle = friends.filter(bestFriendFilter.isSuitable);
+    this.currentFriendCycle = friends.filter((friend) => friend.best);
     this.invited = new Set(this.currentFriendCycle.map(friend => friend.name));
     this.maxLevel = Infinity;
     this.pointer = 0;
+    this.currentLevel = 1;
+    this.friendsStorage = new Map();
+    this.filter = filter;
 
-    let currentLevel = 1;
-    const friendsStorage = new Map();
-    friends.forEach(friend => friendsStorage.set(friend.name, friend));
-
-    this.done = function () {
-        if (tryGetNext(this, filter) !== -1 && currentLevel <= this.maxLevel) {
-            return false;
-        }
-        const nextCycle = getNextCycle(this, friendsStorage);
-        if (currentLevel++ < this.maxLevel && nextCycle.length !== 0) {
-            this.currentFriendCycle = nextCycle;
-            this.pointer = 0;
-
-            return this.done();
-        }
-
-        return true;
-    };
-
-    this.next = function () {
-        if (!this.done()) {
-            const friendIndex = tryGetNext(this, filter);
-            this.pointer = friendIndex + 1;
-
-            return this.currentFriendCycle[friendIndex];
-        }
-
-        return null;
-    };
-
+    friends.forEach(friend => this.friendsStorage.set(friend.name, friend));
 }
 
 /**
@@ -99,10 +67,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    const limitedIterator = Object.create(new Iterator(friends, filter));
-    limitedIterator.maxLevel = maxLevel;
-
-    return limitedIterator;
+    Iterator.call(this, friends, filter);
+    this.maxLevel = maxLevel;
 }
 
 /**
@@ -121,14 +87,9 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    const filter = new Filter();
-
-    const maleFilter = Object.create(filter);
-    maleFilter.isSuitable = function (friend) {
+    this.isSuitable = function (friend) {
         return friend.gender === MALE;
     };
-
-    return maleFilter;
 }
 
 /**
@@ -137,15 +98,45 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    const filter = new Filter();
-
-    const femaleFilter = Object.create(filter);
-    femaleFilter.isSuitable = function (friend) {
+    this.isSuitable = function (friend) {
         return friend.gender === FEMALE;
     };
-
-    return femaleFilter;
 }
+
+Iterator.prototype.done = function () {
+    if (tryGetNext(this, this.filter) !== -1 && this.currentLevel <= this.maxLevel) {
+        return false;
+    }
+    const nextCycle = getNextCycle(this, this.friendsStorage);
+    if (this.currentLevel++ < this.maxLevel && nextCycle.length !== 0) {
+        this.currentFriendCycle = nextCycle;
+        this.pointer = 0;
+
+        return this.done();
+    }
+
+    return true;
+};
+
+Iterator.prototype.next = function () {
+    if (!this.done()) {
+        const friendIndex = tryGetNext(this, this.filter);
+        this.pointer = friendIndex + 1;
+
+        return this.currentFriendCycle[friendIndex];
+    }
+
+    return null;
+};
+
+LimitedIterator.prototype = Object.create(Iterator.prototype);
+LimitedIterator.prototype.constructor = LimitedIterator;
+
+FemaleFilter.prototype = Object.create(Filter.prototype);
+FemaleFilter.prototype.constructor = FemaleFilter;
+
+MaleFilter.prototype = Object.create(Filter.prototype);
+MaleFilter.prototype.constructor = MaleFilter;
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
