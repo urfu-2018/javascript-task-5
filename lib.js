@@ -3,52 +3,59 @@
 
 /**
  * Фильтр друзей
+ * @constructor
  */
 
-class Filter {
-    isValid() {
+function Filter() {
+    this.isValid = function () {
         return true;
-    }
+    };
 }
 
 /**
  * Фильтр друзей
+ * @constructor
  * @extends Filter
  */
-class MaleFilter extends Filter {
-    isValid(person) {
+
+function MaleFilter() {
+    this.isValid = function (person) {
         return person.gender === 'male';
-    }
+    };
 }
+
+MaleFilter.prototype = Filter.prototype;
 
 /**
  * Фильтр друзей-девушек
+ * @constructor
  * @extends Filter
  */
-class FemaleFilter extends Filter {
-    isValid(person) {
+
+function FemaleFilter() {
+    this.isValid = function (person) {
         return person.gender === 'female';
-    }
+    };
 }
 
+FemaleFilter.prototype = Filter.prototype;
 
-class Iterator {
-
-    /**
-     * Итератор по друзьям
-     * @constructor
-     * @param {Object[]} friends
-     * @param {Filter} filter
-     * @param {Number} maxLevel
-     */
-    constructor(friends, filter, maxLevel = Infinity) {
-        if (!(filter instanceof Filter)) {
-            throw new TypeError('filter не является экземпляром Filter');
-        }
-        this.friends = getInvitedFriends(friends, filter, maxLevel);
-        this.index = 0;
+/**
+ * Итератор по друзьям
+ * @constructor
+ * @param {Object[]} friends
+ * @param {Filter} filter
+ * @param {Number} maxLevel
+ */
+function Iterator(friends, filter, maxLevel = Infinity) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('filter не является экземпляром Filter');
     }
+    this.friends = getInvitedFriends(friends, filter, maxLevel);
+    this.index = 0;
+}
 
+Iterator.prototype = {
     next() {
         if (!this.done()) {
             const friend = this.friends[this.index];
@@ -58,12 +65,12 @@ class Iterator {
         }
 
         return null;
-    }
+    },
 
     done() {
         return this.index >= this.friends.length;
     }
-}
+};
 
 class Queue {
     constructor(iterable) {
@@ -136,20 +143,20 @@ function getInvitedFriends(friends, filter, maxLevel) {
         });
 }
 
-class LimitedIterator extends Iterator {
-
-    /**
-     * Итератор по друзям с ограничением по кругу
-     * @extends Iterator
-     * @constructor
-     * @param {Object[]} friends
-     * @param {Filter} filter
-     * @param {Number} maxLevel – максимальный круг друзей
-     */
-    constructor(friends, filter, maxLevel) {
-        super(friends, filter, maxLevel);
-    }
+/**
+ * Итератор по друзям с ограничением по кругу
+ * @extends Iterator
+ * @constructor
+ * @param {Object[]} friends
+ * @param {Filter} filter
+ * @param {Number} maxLevel – максимальный круг друзей
+ */
+function LimitedIterator(friends, filter, maxLevel) {
+    Iterator.call(this, friends, filter, maxLevel);
 }
+
+LimitedIterator.prototype = Iterator.prototype;
+
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
