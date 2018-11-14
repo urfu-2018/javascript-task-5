@@ -10,7 +10,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('Invalid type of filter!');
     }
-    this.guests = getInvitedGuests(friends).filter(filter.checkGender);
+    this.guests = inviteGuestsByGender(friends, filter);
 }
 
 Iterator.prototype.next = function () {
@@ -21,6 +21,10 @@ Iterator.prototype.done = function () {
     return this.guests.length === 0;
 };
 
+/**
+ * @param {Array} guests
+ * @returns {function(*=): boolean}
+ */
 function includeGuest(guests) {
     return friend => !guests.includes(friend);
 }
@@ -50,6 +54,18 @@ function getInvitedGuests(friends, maxLevel = Infinity) {
 }
 
 /**
+ * @param {Array} friends - friend {Object}
+ * @param {Filter} filter
+ * @param {Number} maxLevel
+ * @returns {Array}
+ */
+function inviteGuestsByGender(friends, filter, maxLevel = Infinity) {
+    const guests = getInvitedGuests(friends, maxLevel);
+
+    return guests.filter(friend => filter.checkGender(friend));
+}
+
+/**
  * Итератор по друзям с ограничением по кругу
  * @extends Iterator
  * @constructor
@@ -58,7 +74,7 @@ function getInvitedGuests(friends, maxLevel = Infinity) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    this.guests = getInvitedGuests(friends, maxLevel).filter(filter.checkGender);
+    this.guests = inviteGuestsByGender(friends, filter, maxLevel);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
