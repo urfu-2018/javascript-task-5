@@ -1,47 +1,30 @@
 'use strict';
 
-function sort(friend, anotherFriend) {
-    if (friend.name < anotherFriend.name) {
-        return -1;
-    }
-
-    if (friend.name > anotherFriend.name) {
-        return 1;
-    }
-
-    return 0;
+function sortFriends(friend, anotherFriend) {
+    return friend.name.localeCompare(anotherFriend.name);
 }
 
-function getFriend(friends) {
-    const res = [];
-
-    for (const friend of friends) {
-        if (friend) {
-            res.push(friend.friends);
-        }
-    }
-
-    return [].concat(...res);
+function getFriendsName(friends) {
+    return [].concat(...friends.map(friend => friend.friends));
 }
 
 function filterGuest(friends, filter, maxLevel) {
     const guests = [];
-    let levelFriends = friends.filter(friend => friend.best).sort(sort);
-
+    let levelFriends = friends.filter(friend => friend.best).sort(sortFriends);
 
     while (levelFriends.length > 0 && maxLevel > 0) {
         guests.push(...levelFriends);
 
-        levelFriends = getFriend(levelFriends)
+        levelFriends = getFriendsName(levelFriends)
             .map(name => friends.find(friend => name === friend.name))
             .filter((friend, i, allFriends) => !guests.includes(friend) &&
                 allFriends.indexOf(friend) === i)
-            .sort(sort);
+            .sort(sortFriends);
 
         maxLevel--;
     }
 
-    return guests.filter(filter.__filter);
+    return guests.filter(filter._filter);
 }
 
 /**
@@ -90,10 +73,10 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    this.__filter = () => true;
+    this._filter = () => true;
 }
 
-MaleFilter.prototype = Object.create(Filter.prototype);
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей
@@ -101,10 +84,10 @@ MaleFilter.prototype = Object.create(Filter.prototype);
  * @constructor
  */
 function MaleFilter() {
-    this.__filter = friend => friend.gender === 'male';
+    this._filter = friend => friend.gender === 'male';
 }
 
-FemaleFilter.prototype = Object.create(Filter.prototype);
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -112,7 +95,7 @@ FemaleFilter.prototype = Object.create(Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    this.__filter = friend => friend.gender === 'female';
+    this._filter = friend => friend.gender === 'female';
 }
 
 exports.Iterator = Iterator;
