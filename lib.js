@@ -1,24 +1,38 @@
 'use strict';
 
 
+/**
+ * Сравнение двух имен друзей лексикографически
+ * @param {Object} friend1 - Первый друг с параметром name
+ * @param {Object} friend2 - Второй друг с параметром name
+ * @returns {Function} - Функция сравнения
+ */
+function nameLocalCompare(friend1, friend2) {
+    return friend1.name.localeCompare(friend2.name);
+}
+
+/**
+ * Получает список гостей для приглашения на свадьбу
+ * @param {Object[]} friends - Массив друзей Аркандия
+ * @param {Number} maxLevel - Максимальный круг друзей
+ * @returns {Object[]} - Массив друзей для приглашение
+ */
 function getListOfGuests(friends, maxLevel = Infinity) {
     let currentLevelList = friends.filter(friend => friend.best)
-        .sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
+        .sort(nameLocalCompare);
 
     const guestsList = [];
 
     while (currentLevelList.length > 0 && maxLevel > 0) {
         guestsList.push(...currentLevelList);
         currentLevelList = currentLevelList.reduce((acc, friend) => {
-            friend.friends.forEach(friendName => {
-                const newFriend = friends.find(man => man.name === friendName);
-                if (!guestsList.includes(newFriend) && !acc.includes(newFriend)) {
-                    acc.push(newFriend);
-                }
-            });
+            friend.friends.map(friendName => friends.find(man => man.name === friendName))
+                .filter(friendObject => !guestsList.includes(friendObject) &&
+                !acc.includes(friendObject))
+                .forEach(guest => acc.push(guest));
 
             return acc;
-        }, []).sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
+        }, []).sort(nameLocalCompare);
         maxLevel--;
     }
 
@@ -57,6 +71,10 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError('Passed filter is not instance of Filter');
+    }
+
     this.guests = getListOfGuests(friends, maxLevel).filter(filter.isFriendSuit);
 }
 
