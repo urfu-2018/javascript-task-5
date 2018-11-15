@@ -7,13 +7,12 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    // console.info(friends, filter);
 
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
 
-    this.friends = getFriends(friends).filter((arg) => filter.filter(arg));
+    this.friends = getFriendsToInvite(friends).filter((arg) => filter.isSuitable(arg));
     this.position = 0;
 }
 
@@ -22,22 +21,18 @@ Iterator.prototype.done = function () {
 };
 
 Iterator.prototype.next = function () {
-    if (this.done()) {
-        return null;
-    }
-
-    return this.friends[this.position++];
+    return this.done() ? null : this.friends[this.position++];
 };
 
-function compareFriends(friend1, friend2) {
-    return friend1.name.localeCompare(friend2.name);
+function compareFriends(a, b) {
+    return a.name.localeCompare(b.name);
 }
 
 function getBestFriends(friends) {
     return friends.filter(friend => friend.best).sort(compareFriends);
 }
 
-function getFriends(friends, maxLevel = Infinity) {
+function getFriendsToInvite(friends, maxLevel = Infinity) {
     let invitations = [];
     if (maxLevel < 1) {
         return invitations;
@@ -83,14 +78,13 @@ function removeDuplicates(arr) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    // console.info(friends, filter, maxLevel);
 
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
 
     Object.setPrototypeOf(this, Iterator.prototype);
-    this.friends = getFriends(friends, maxLevel).filter((arg) => filter.filter(arg));
+    this.friends = getFriendsToInvite(friends, maxLevel).filter((arg) => filter.isSuitable(arg));
 
     this.position = 0;
 }
@@ -100,16 +94,12 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    // console.info('Filter');
-    this.gender = '';
+    this.filters = {};
 }
 
-Filter.prototype.filter = function (friend) {
-    if (this.gender === '' || friend.gender === this.gender) {
-        return true;
-    }
-
-    return false;
+Filter.prototype.isSuitable = function (friend) {
+    return Object.keys(this.filters)
+        .every(property => friend[property] === this.filters[property]);
 };
 
 /**
@@ -118,9 +108,10 @@ Filter.prototype.filter = function (friend) {
  * @constructor
  */
 function MaleFilter() {
-    // console.info('MaleFilter');
     Object.setPrototypeOf(this, Filter.prototype);
-    this.gender = 'male';
+    this.filters = {
+        gender: 'male'
+    };
 }
 
 /**
@@ -129,9 +120,10 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    // console.info('FemaleFilter');
     Object.setPrototypeOf(this, Filter.prototype);
-    this.gender = 'female';
+    this.filters = {
+        gender: 'female'
+    };
 }
 
 exports.Iterator = Iterator;
