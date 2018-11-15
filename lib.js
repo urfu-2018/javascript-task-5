@@ -45,7 +45,7 @@ function chooseFriends(friends, maxLevel = friends.length + 1) {
     var currentLevelFriends = friends.filter(friend => friend.best);
 
     while (currentLevelFriends.length > 0 && currentLevel <= maxLevel) {
-        selection.push(...currentLevelFriends.sort(nameComparator));
+        selection.push(...currentLevelFriends.slice().sort(nameComparator));
         currentLevelFriends = currentLevelFriends
             .reduce((acc, friend) => acc.concat(friend.friends), [])
             .map(name => friends.find(friend => friend.name === name))
