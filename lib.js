@@ -4,15 +4,9 @@ function compareByName(first, second) {
     return first.name.localeCompare(second.name);
 }
 
-function getFriendByName(friends, name) {
-    const friend = friends.filter(f => f.name === name);
-
-    return friend[0];
-}
-
-function getFriends(Arcadyfriends, filter, maxLevel = Infinity) {
+function getFriends(arcadyFriends, filter, maxLevel = Infinity) {
     let currentLevel = 1;
-    let currentLevelFriends = Arcadyfriends.filter(friend => friend.best).sort(compareByName);
+    let currentLevelFriends = arcadyFriends.filter(friend => friend.best).sort(compareByName);
 
     const friends = [];
 
@@ -20,7 +14,7 @@ function getFriends(Arcadyfriends, filter, maxLevel = Infinity) {
         friends.push(...currentLevelFriends);
         currentLevelFriends = currentLevelFriends
             .reduce((prev, curr) => [...prev, ...curr.friends], [])
-            .map(friendName => getFriendByName(Arcadyfriends, friendName))
+            .map(friendName => arcadyFriends.find(friend => friend.name === friendName))
             .filter((item, pos, self) => !friends.includes(item) && self.indexOf(item) === pos)
             .sort(compareByName);
         currentLevel++;
