@@ -8,19 +8,23 @@
  */
 function Iterator(friends, filter) {
     this.sortedFriends = getSortedFriends(friends, filter);
-    let i = 0;
-    this.next = () => this.done() ? null : this.sortedFriends[i++].friend;
-    this.done = () => i >= this.sortedFriends.length;
 }
 
-function levelFilt(currentLevelFriends, visitedFriends) {
+Iterator.prototype = {
+    i: 0,
+    done: function () {
+        return this.i >= this.sortedFriends.length;
+    },
+    next: function () {
+        return this.done() ? null : this.sortedFriends[this.i++].friend;
+    }
+};
+
+function getCurrentLevel(currentLevelFriends, visitedFriends) {
     return currentLevelFriends
-        .filter(friend => {
-            return !visitedFriends.has(friend.name);
-        })
-        .sort((f1, f2) => {
-            return f1.name.localeCompare(f2.name);
-        });
+        .filter(friend => !visitedFriends.has(friend.name))
+        .sort((f1, f2) => f1.name.localeCompare(f2.name));
+
 }
 
 function addFriendToArr(allSortedFriend, currentLevel, currentLevelNum) {
@@ -44,16 +48,14 @@ function getSortedFriends(friends, filter) {
     let allFriends = new Map(friends.map(x => [x.name, x]));
     let allSortedFriends = [];
     let i = 1;
-    let currentLevel = levelFilt(friends.filter(x => x.best), visitedFriends);
+    let currentLevel = getCurrentLevel(friends.filter(x => x.best), visitedFriends);
     while (currentLevel.length !== 0) {
-        currentLevel.forEach(x => {
-            visitedFriends.add(x.name);
-        });
+        currentLevel.forEach(x => visitedFriends.add(x.name));
         addFriendToArr(allSortedFriends, currentLevel, i);
         let curLevelFriends = currentLevel
             .map(x => x.name)
             .reduce((list, name) => friendsReducer(list, name, allFriends), []);
-        currentLevel = levelFilt(curLevelFriends, visitedFriends);
+        currentLevel = getCurrentLevel(curLevelFriends, visitedFriends);
         i += 1;
     }
 
