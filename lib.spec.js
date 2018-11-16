@@ -440,3 +440,40 @@ describe('Есть кто-то идентифицирующийся как бо�
         }
     });
 });
+
+
+const friends8 = [
+    {
+        name: 'X',
+        friends: [],
+        gender: 'male',
+        best: false
+    }
+];
+
+describe('Один не лучший друг без фильтров', () => {
+    it('Должен быть приглашен.', () => {
+        const maleFilter = new lib.MaleFilter();
+        const maleIterator = new lib.Iterator(friends8, maleFilter);
+
+        const invitedFriends = [];
+
+        while (!maleIterator.done()) {
+            invitedFriends.push(maleIterator.next());
+        }
+
+        assert.deepStrictEqual(invitedFriends, [
+            friend('X')
+        ]);
+
+        function friend(name) {
+            let len = friends8.length;
+
+            while (len--) {
+                if (friends8[len].name === name) {
+                    return friends8[len];
+                }
+            }
+        }
+    });
+});

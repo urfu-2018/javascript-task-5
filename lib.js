@@ -19,7 +19,7 @@ function sortAndUniq(array) {
  */
 function getFriendsToInvite(friends, maxLevel) {
     const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
-    if (toInvite.length === 0) { // if no best friends
+    if (toInvite[0].length === 0) { // if no best friends
         return sortAndUniq(friends);
     }
     for (let i = 0; i < maxLevel - 1; i++) {
