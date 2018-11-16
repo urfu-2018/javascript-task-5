@@ -193,75 +193,75 @@ describe('Никто', () => {
 
         assert.deepStrictEqual(invitedFriends, []);
     });
-})
-
-const friends5 = [
-    {
-        name: 'Sam',
-        friends: ['Mat', 'Sharon'],
-        gender: 'male',
-    },
-    {
-        name: 'Sally',
-        friends: ['Brad', 'Emily'],
-        gender: 'female',
-    },
-    {
-        name: 'Mat',
-        friends: ['Sam', 'Sharon'],
-        gender: 'male'
-    },
-    {
-        name: 'Sharon',
-        friends: ['Sam', 'Itan', 'Mat'],
-        gender: 'female'
-    },
-    {
-        name: 'Brad',
-        friends: ['Sally', 'Emily', 'Julia'],
-        gender: 'male'
-    },
-    {
-        name: 'Emily',
-        friends: ['Sally', 'Brad'],
-        gender: 'female'
-    },
-    {
-        name: 'Itan',
-        friends: ['Sharon', 'Julia'],
-        gender: 'male'
-    },
-    {
-        name: 'Julia',
-        friends: ['Brad', 'Itan'],
-        gender: 'female'
-    }
-];
-
-describe('Нет лучших друзей', () => {
-    it('никто не прийдет', () => {
-        const maleFilter = new lib.MaleFilter();
-        const femaleFilter = new lib.FemaleFilter();
-        const maleIterator = new lib.LimitedIterator(friends5, maleFilter, 2);
-        const femaleIterator = new lib.Iterator(friends5, femaleFilter);
-
-        const invitedFriends = [];
-
-        while (!maleIterator.done() && !femaleIterator.done()) {
-            invitedFriends.push([
-                maleIterator.next(),
-                femaleIterator.next()
-            ]);
-        }
-
-        while (!femaleIterator.done()) {
-            invitedFriends.push(femaleIterator.next());
-        }
-
-        assert.deepStrictEqual(invitedFriends, [
-        ]);
-    });
 });
+
+// const friends5 = [
+//     {
+//         name: 'Sam',
+//         friends: ['Mat', 'Sharon'],
+//         gender: 'male',
+//     },
+//     {
+//         name: 'Sally',
+//         friends: ['Brad', 'Emily'],
+//         gender: 'female',
+//     },
+//     {
+//         name: 'Mat',
+//         friends: ['Sam', 'Sharon'],
+//         gender: 'male'
+//     },
+//     {
+//         name: 'Sharon',
+//         friends: ['Sam', 'Itan', 'Mat'],
+//         gender: 'female'
+//     },
+//     {
+//         name: 'Brad',
+//         friends: ['Sally', 'Emily', 'Julia'],
+//         gender: 'male'
+//     },
+//     {
+//         name: 'Emily',
+//         friends: ['Sally', 'Brad'],
+//         gender: 'female'
+//     },
+//     {
+//         name: 'Itan',
+//         friends: ['Sharon', 'Julia'],
+//         gender: 'male'
+//     },
+//     {
+//         name: 'Julia',
+//         friends: ['Brad', 'Itan'],
+//         gender: 'female'
+//     }
+// ];
+//
+// describe('Нет лучших друзей', () => {
+//     it('никто не прийдет', () => {
+//         const maleFilter = new lib.MaleFilter();
+//         const femaleFilter = new lib.FemaleFilter();
+//         const maleIterator = new lib.LimitedIterator(friends5, maleFilter, 2);
+//         const femaleIterator = new lib.Iterator(friends5, femaleFilter);
+//
+//         const invitedFriends = [];
+//
+//         while (!maleIterator.done() && !femaleIterator.done()) {
+//             invitedFriends.push([
+//                 maleIterator.next(),
+//                 femaleIterator.next()
+//             ]);
+//         }
+//
+//         while (!femaleIterator.done()) {
+//             invitedFriends.push(femaleIterator.next());
+//         }
+//
+//         assert.deepStrictEqual(invitedFriends, [
+//         ]);
+//     });
+// });
 
 const friends6 = [
     {
