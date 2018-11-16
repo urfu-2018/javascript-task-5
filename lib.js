@@ -40,8 +40,9 @@ function Iterator(friends, filter) {
     }
 
     this.filteredFriends = sortAndFilterFriends(friends, filter);
-    this.index = 0;
 }
+
+Iterator.prototype.index = 0;
 
 Iterator.prototype.next = function () {
     return this.done() ? null : this.filteredFriends[this.index++];
@@ -60,7 +61,6 @@ Iterator.prototype.done = function () {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
     this.filteredFriends = sortAndFilterFriends(friends, filter, maxLevel);
 }
 LimitedIterator.prototype = Object.create(Iterator.prototype);
@@ -71,8 +71,12 @@ LimitedIterator.prototype.constructor = LimitedIterator;
  * @constructor
  */
 function Filter() {
-    this.genderFilter = () => true;
+    // empty constructor
 }
+
+Filter.prototype.genderFilter = function () {
+    return true;
+};
 
 /**
  * Фильтр друзей
@@ -80,10 +84,13 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.genderFilter = (friend) => friend.gender === 'male';
+    // empty constructor
 }
 MaleFilter.prototype = Object.create(Filter.prototype);
 MaleFilter.prototype.constructor = MaleFilter;
+MaleFilter.prototype.genderFilter = function (friend) {
+    return friend.gender === 'male';
+};
 
 /**
  * Фильтр друзей-девушек
@@ -91,10 +98,13 @@ MaleFilter.prototype.constructor = MaleFilter;
  * @constructor
  */
 function FemaleFilter() {
-    this.genderFilter = (friend) => friend.gender === 'female';
+    // empty constructor
 }
 FemaleFilter.prototype = Object.create(Filter.prototype);
 FemaleFilter.prototype.constructor = FemaleFilter;
+FemaleFilter.prototype.genderFilter = function (friend) {
+    return friend.gender === 'female';
+};
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
