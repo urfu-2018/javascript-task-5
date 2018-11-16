@@ -19,9 +19,12 @@ function sortAndUniq(array) {
  */
 function getFriendsToInvite(friends, maxLevel) {
     const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
+    if (toInvite.length === 0) { // if no best friends
+        return sortAndUniq(friends);
+    }
     for (let i = 0; i < maxLevel - 1; i++) {
         friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать уже добавленных
-        toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends))
+        toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
         if (!friends.length || !toInvite[i + 1].length) {
             break; // если всех добавили, или очередной уровень пуст.
         }
