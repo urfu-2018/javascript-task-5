@@ -37,22 +37,18 @@ function getNextCircle(currentCircle, guests, friendsMap) {
 /**
  * Итератор по друзьям
  * @constructor
- * @param {Object[]} friends
- * @param {Filter} filter
+ * @param {Object[]} collection
  */
-function Iterator(friends, filter) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError();
-    }
+function Iterator(collection) {
     this.index = 0;
-    this.guests = friends.filter(filter.predicate);
+    this.collection = collection;
 
     this.next = function () {
-        return this.done() ? null : this.guests[this.index++];
+        return this.done() ? null : this.collection[this.index++];
     };
 
     this.done = function () {
-        return !(this.index < this.guests.length);
+        return !(this.index < this.collection.length);
     };
 }
 
@@ -65,11 +61,12 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     Iterator.call(this, friends, filter);
-    this.guests = getFriendsByCircles(friends, maxLevel)
+    this.collection = getFriendsByCircles(friends, maxLevel)
         .filter(filter.predicate);
-
-    return this;
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
@@ -82,8 +79,6 @@ function Filter() {
     this.predicate = () => true;
 }
 
-const filter = new Filter();
-
 /**
  * Фильтр друзей
  * @extends Filter
@@ -91,11 +86,9 @@ const filter = new Filter();
  */
 function MaleFilter() {
     this.predicate = friend => friend.gender === 'male';
-
-    return this;
 }
 
-MaleFilter.prototype = filter;
+MaleFilter.prototype = Object.create(Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -104,11 +97,9 @@ MaleFilter.prototype = filter;
  */
 function FemaleFilter() {
     this.predicate = friend => friend.gender === 'female';
-
-    return this;
 }
 
-FemaleFilter.prototype = filter;
+FemaleFilter.prototype = Object.create(Filter.prototype);
 
 exports.Iterator = LimitedIterator;
 exports.LimitedIterator = LimitedIterator;
