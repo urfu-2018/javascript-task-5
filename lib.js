@@ -19,15 +19,15 @@ function sortAndUniq(array) {
  */
 function getFriendsToInvite(friends, maxLevel) {
     const toInvite = [sortAndUniq(friends.filter(friend => friend.best))];
-    if (toInvite[0].length === 0) { // if no best friends
-        return sortAndUniq(friends);
-    }
     for (let i = 0; i < maxLevel - 1; i++) {
         friends = friends.filter(friend => !toInvite[i].includes(friend)); // убрать уже добавленных
         toInvite[i + 1] = sortAndUniq(getNextLevelOfFriends(toInvite[i], friends));
-        if (!friends.length || !toInvite[i + 1].length) {
+        if (!toInvite[i + 1].length) {
             break; // если всех добавили, или очередной уровень пуст.
         }
+    }
+    if (friends.length !== 0 && maxLevel === Infinity && toInvite[0].length > 0) {
+        toInvite.push(sortAndUniq(friends.filter(friend => friend.friends.length > 0)));
     }
 
     return toInvite.reduce((flat, part) => flat.concat(part), []);
