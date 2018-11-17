@@ -9,7 +9,7 @@ function findFriends(bestFriends, friends, invitedFriends) {
     let listFriends = [];
     bestFriends.forEach(friend => {
         listFriends.push(...friends.filter(friendData =>
-            friend.friends.includes(friendData.name) &&
+            friend.friends && friend.friends.includes(friendData.name) &&
             !invitedFriends.includes(friendData)));
     });
 
