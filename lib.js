@@ -7,7 +7,7 @@
  * @param {Number} maxLevel
  * @returns {Object[]}
  */
-function getGuests(friends, maxLevel) {
+function getGuests(friends, maxLevel = Infinity) {
     const guests = [];
     let temporaryListOfFriends = friends
         .filter(friend => friend.best)
@@ -55,12 +55,17 @@ function Iterator(friends, filter) {
         throw new TypeError('Filter does not have type "Filter"');
     }
 
-    this.guests = getGuests(friends, Infinity).filter(filter.fitsTheCondition);
-
-    this.next = () => this.done() ? null : this.guests.shift();
-
-    this.done = () => this.guests.length === 0;
+    this.guests = getGuests(friends).filter(filter.fitsTheCondition);
 }
+
+Iterator.prototype = {
+    done() {
+        return this.guests.length === 0;
+    },
+    next() {
+        return this.done() ? null : this.guests.shift();
+    }
+};
 
 /**
  * Итератор по друзьям с ограничением по кругу
@@ -71,7 +76,6 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
     this.guests = getGuests(friends, maxLevel).filter(filter.fitsTheCondition);
 }
 
