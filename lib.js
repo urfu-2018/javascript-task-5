@@ -1,9 +1,18 @@
 'use strict';
 
-const sortByName = (first, second) => first.name > second.name;
+function sortByName(first, second) {
+    if (first.name > second.name) {
+        return 1;
+    }
+    if (first.name < second.name) {
+        return -1;
+    }
+
+    return 0;
+}
 
 function getOrderedFriends(friends, maxLevel = Infinity) {
-    const friendsMap = createNameToFriendMap(friends);
+    const friendsMap = new Map(friends.map(friend => [friend.name, friend]));
     let result = [];
     let currentLevel = 0;
     let currentLevelFriends = friends
@@ -24,15 +33,6 @@ function getOrderedFriends(friends, maxLevel = Infinity) {
     return result;
 }
 
-function createNameToFriendMap(friends) {
-    let result = new Map();
-    friends.forEach(friend => {
-        result.set(friend.name, friend);
-    });
-
-    return result;
-}
-
 /**
  * Итератор по друзьям
  * @constructor
@@ -44,18 +44,29 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
     this.friends = getOrderedFriends(friends).filter(filter.isFit);
-
-    let current = 0;
-    this.next = () => {
-        if (current < this.friends.length) {
-            return this.friends[current++];
-        }
-
-        return null;
-    };
-
-    this.done = () => current === this.friends.length;
 }
+
+Object.defineProperties(Iterator.prototype, {
+    'current': {
+        value: 0,
+        writable: true
+    },
+    'next': {
+        value: function () {
+            if (!this.done()) {
+                return this.friends[this.current++];
+            }
+
+            return null;
+        }
+    },
+    'done': {
+        value: function () {
+            return this.current === this.friends.length;
+        },
+        enumerable: true
+    }
+});
 
 /**
  * Итератор по друзям с ограничением по кругу
