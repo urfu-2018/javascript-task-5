@@ -38,10 +38,14 @@ function getNextCircle(currentCircle, guests, friendsMap) {
  * Итератор по друзьям
  * @constructor
  * @param {Object[]} collection
+ *  @param {Filter} filter
  */
-function Iterator(collection) {
+function Iterator(collection, filter) {
+    if (!(filter instanceof Filter)) {
+        throw new TypeError();
+    }
     this.index = 0;
-    this.collection = collection;
+    this.collection = collection.filter(filter.predicate);
 
     this.next = function () {
         return this.done() ? null : this.collection[this.index++];
@@ -61,12 +65,7 @@ function Iterator(collection) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError();
-    }
-    Iterator.call(this, friends, filter);
-    this.collection = getFriendsByCircles(friends, maxLevel)
-        .filter(filter.predicate);
+    Iterator.call(this, getFriendsByCircles(friends, maxLevel), filter);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
