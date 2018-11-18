@@ -60,10 +60,7 @@ describe('Итераторы', () => {
         const invitedFriends = [];
 
         while (!maleIterator.done() && !femaleIterator.done()) {
-            invitedFriends.push([
-                maleIterator.next(),
-                femaleIterator.next()
-            ]);
+            invitedFriends.push([maleIterator.next(), femaleIterator.next()]);
         }
 
         while (!femaleIterator.done()) {

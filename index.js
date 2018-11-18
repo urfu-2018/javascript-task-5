@@ -61,10 +61,7 @@ const invitedFriends = [];
 
 // Собираем пары «парень + девушка»
 while (!maleIterator.done() && !femaleIterator.done()) {
-    invitedFriends.push([
-        maleIterator.next(),
-        femaleIterator.next()
-    ]);
+    invitedFriends.push([maleIterator.next(), femaleIterator.next()]);
 }
 
 // Если остались девушки, то приглашаем остальных

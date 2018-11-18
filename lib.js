@@ -1,8 +1,8 @@
 'use strict';
 
 function getChosenFriendsList(friends, circlesCount = Infinity) {
-    friends = friends.sort((x, y) => x.name.localeCompare(y.name));
-    let currentCircle = friends.filter(f => f.best);
+    const friendsOrdered = friends.sort((x, y) => x.name.localeCompare(y.name));
+    let currentCircle = friendsOrdered.filter(f => f.best);
     let result = [];
 
     for (let i = 0; i < circlesCount && currentCircle.length; i++) {
@@ -29,7 +29,7 @@ function Iterator(friends, filter) {
         throw new TypeError('filter should be an instanse of Filter');
     }
 
-    this.orderedFriends = getChosenFriendsList(friends).filter(filter.isSutable);
+    this.orderedFriends = getChosenFriendsList(friends, this.maxLevel).filter(filter.isSutable);
     this.next = () => (this.done() ? null : this.orderedFriends.shift());
     this.done = () => !this.orderedFriends.length;
 }
@@ -43,8 +43,8 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
+    this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
-    this.orderedFriends = getChosenFriendsList(friends, maxLevel).filter(filter.isSutable);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
@@ -54,7 +54,7 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.isSutable = () => Boolean;
+    this.isSutable = Boolean;
 }
 
 /**
