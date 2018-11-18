@@ -31,6 +31,7 @@ function getOrderedFriends(friends, maxLevel = Infinity) {
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
+    this.current = 0;
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
@@ -38,7 +39,6 @@ function Iterator(friends, filter) {
 }
 
 Iterator.prototype = {
-    current: 0,
     next() {
         if (!this.done()) {
             return this.friends[this.current++];
@@ -71,8 +71,14 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.isFit = () => true;
+    // do nothing.
 }
+
+Filter.prototype = {
+    isFit() {
+        return true;
+    }
+};
 
 /**
  * Фильтр друзей
