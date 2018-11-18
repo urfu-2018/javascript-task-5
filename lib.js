@@ -1,15 +1,6 @@
 'use strict';
 
-function sortByName(first, second) {
-    if (first.name > second.name) {
-        return 1;
-    }
-    if (first.name < second.name) {
-        return -1;
-    }
-
-    return 0;
-}
+const sortByName = (first, second) => first.name.localeCompare(second.name);
 
 function getOrderedFriends(friends, maxLevel = Infinity) {
     const friendsMap = new Map(friends.map(friend => [friend.name, friend]));
@@ -46,27 +37,19 @@ function Iterator(friends, filter) {
     this.friends = getOrderedFriends(friends).filter(filter.isFit);
 }
 
-Object.defineProperties(Iterator.prototype, {
-    'current': {
-        value: 0,
-        writable: true
-    },
-    'next': {
-        value: function () {
-            if (!this.done()) {
-                return this.friends[this.current++];
-            }
-
-            return null;
+Iterator.prototype = {
+    current: 0,
+    next() {
+        if (!this.done()) {
+            return this.friends[this.current++];
         }
+
+        return null;
     },
-    'done': {
-        value: function () {
-            return this.current === this.friends.length;
-        },
-        enumerable: true
+    done() {
+        return this.current === this.friends.length;
     }
-});
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -77,9 +60,6 @@ Object.defineProperties(Iterator.prototype, {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError();
-    }
     Iterator.call(this, friends, filter);
     this.friends = getOrderedFriends(friends, maxLevel).filter(filter.isFit);
 }
