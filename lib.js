@@ -70,8 +70,13 @@ class FriendPicker {
         let prevPickedFriendsLength = 0;
         let currentStepFriends = new Set(this._getBestFriends());
         for (let i = 0; i < depth && friends.length > 0; i++) {
-            currentStepFriends = FriendPicker._performFriendPickStep(friends,
-                currentStepFriends, pickedFriends);
+            const removed = FriendPicker._removeFriendsWithNames(friends, currentStepFriends);
+
+            currentStepFriends = new Set();
+            for (const friend of removed) {
+                pickedFriends.push(friend);
+                addAll(currentStepFriends, friend.friends.filter(f => !pickedFriends.includes(f)));
+            }
 
             if (prevPickedFriendsLength === pickedFriends.length) {
                 break;
@@ -82,18 +87,17 @@ class FriendPicker {
         return pickedFriends;
     }
 
-    static _performFriendPickStep(friends, currentStepFriends, pickedFriends) {
-        const nextStepFriends = new Set();
+    static _removeFriendsWithNames(friends, names) {
+        const removed = [];
         for (let j = 0; j < friends.length; j++) {
             const friend = friends[j];
-            if (currentStepFriends.has(friend.name)) {
-                pickedFriends.push(friend);
+            if (names.has(friend.name)) {
                 friends.splice(j--, 1);
-                addAll(nextStepFriends, friend.friends.filter(f => !pickedFriends.includes(f)));
+                removed.push(friend);
             }
         }
 
-        return nextStepFriends;
+        return removed;
     }
 
     _getBestFriends() {
@@ -103,16 +107,11 @@ class FriendPicker {
 
 }
 
-function checkFilter(filter) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError('Expected filter to be a Filter');
-    }
-}
-
 class Iterator extends ArrayIterator {
     constructor(friends, filter, maxLevel = Number.MAX_SAFE_INTEGER) {
-        checkFilter(filter);
-        console.info(friends, filter);
+        if (!(filter instanceof Filter)) {
+            throw new TypeError('Expected filter to be a Filter');
+        }
         const pickedFriends = new FriendPicker(friends).getFriends(maxLevel);
 
         super(filter.filterAll(pickedFriends));
