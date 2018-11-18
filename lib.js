@@ -12,7 +12,7 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    this.friends = getFriendsToInvite(friends).filter((arg) => filter.isSuitable(arg));
+    this.friends = getFriendsToInvite(friends).filter(filter.isSuitable);
     this.position = 0;
 }
 
