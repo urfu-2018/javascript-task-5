@@ -7,10 +7,14 @@
  */
 
 function Filter() {
-    this.isValid = function () {
-        return true;
-    };
+    return this;
 }
+
+Object.assign(Filter.prototype, {
+    isValid() {
+        return true;
+    }
+});
 
 /**
  * Фильтр друзей
@@ -19,12 +23,16 @@ function Filter() {
  */
 
 function MaleFilter() {
-    this.isValid = function (person) {
-        return person.gender === 'male';
-    };
+    return this;
 }
 
-MaleFilter.prototype = Filter.prototype;
+Object.assign(MaleFilter.prototype, {
+    isValid(person) {
+        return person.gender === 'male';
+    }
+});
+
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -33,12 +41,16 @@ MaleFilter.prototype = Filter.prototype;
  */
 
 function FemaleFilter() {
-    this.isValid = function (person) {
-        return person.gender === 'female';
-    };
+    return this;
 }
 
-FemaleFilter.prototype = Filter.prototype;
+Object.assign(FemaleFilter.prototype, {
+    isValid(person) {
+        return person.gender === 'female';
+    }
+});
+
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 /**
  * Итератор по друзьям
@@ -55,7 +67,7 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     this.index = 0;
 }
 
-Iterator.prototype = {
+Object.assign(Iterator.prototype, {
     next() {
         if (!this.done()) {
             const friend = this.friends[this.index];
@@ -70,7 +82,7 @@ Iterator.prototype = {
     done() {
         return this.index >= this.friends.length;
     }
-};
+});
 
 class Queue {
     constructor(iterable) {
@@ -129,7 +141,7 @@ function getFriendLevel(friends) {
 }
 
 function getInvitedFriends(friends, filter, maxLevel) {
-    const friendLevel = getFriendLevel(friends, maxLevel);
+    const friendLevel = getFriendLevel(friends);
 
     return friends
         .filter(friend => friendLevel.has(friend.name) && friendLevel.get(friend.name) <= maxLevel)
@@ -155,7 +167,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter, maxLevel);
 }
 
-LimitedIterator.prototype = Iterator.prototype;
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 
 exports.Iterator = Iterator;
