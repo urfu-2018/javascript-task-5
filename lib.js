@@ -33,7 +33,7 @@ function newCircle(previousCircle, friendsMap, listOfGuest) {
     return Array.from(currentCircle).sort(sortNamesLexicographic);
 }
 
-function getFilteredInvitedFriends(friends, filter, maxLevel) {
+function getFilteredInvitedFriends(friends, filter, maxLevel = Infinity) {
     const friendsMap = friendsToMap(friends);
     let friendsArray = firstCircle(friends);
     const notFilteredInvitedFriends = [];
@@ -63,9 +63,8 @@ function friendsToMap(friends) {
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
- * @param {number} maxLevel
  */
-function Iterator(friends, filter, maxLevel = Infinity) {
+function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
@@ -84,7 +83,7 @@ function Iterator(friends, filter, maxLevel = Infinity) {
         return result;
     };
 
-    this._collection = getFilteredInvitedFriends(friends, filter, maxLevel);
+    this._collection = getFilteredInvitedFriends(friends, filter);
     this._counter = 0;
 }
 
@@ -97,7 +96,9 @@ function Iterator(friends, filter, maxLevel = Infinity) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter, maxLevel);
+    Iterator.call(this, friends, filter);
+
+    this._collection = getFilteredInvitedFriends(friends, filter, maxLevel);
 }
 
 /**
