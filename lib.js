@@ -7,11 +7,9 @@ function sortName(a, b) {
 
 function findFriends(bestFriends, friends, invitedFriends) {
     let listFriends = [];
-    bestFriends.forEach(friend => {
-        listFriends.push(...friends.filter(friendData =>
-            friend.friends && friend.friends.includes(friendData.name) &&
-            !invitedFriends.includes(friendData)));
-    });
+    bestFriends.forEach(friend => listFriends.push(...friend.friends));
+    listFriends = listFriends.map(friendName => friends.find(friend => friend.name === friendName))
+        .filter(friend => !invitedFriends.includes(friend));
 
     return listFriends;
 }
