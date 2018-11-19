@@ -2,26 +2,22 @@
 
 /**
  * Получить всех приглашенных друзей
- * @constructor
  * @param {Object[]} friends
  * @param {Number} maxLevel
  * @returns {Object[]}
  */
 function getGuests(friends, maxLevel = Infinity) {
     const guests = [];
-    let temporaryListOfFriends = friends
-        .filter(friend => friend.best)
-        .sort((person1, person2) => person1.name.localeCompare(person2.name));
+    let temporaryListOfFriends = sortByName(friends.filter(friend => friend.best));
 
     while (maxLevel-- > 0 && temporaryListOfFriends.length > 0) {
         guests.push(...temporaryListOfFriends);
 
         temporaryListOfFriends = getUninvitedFriends(
             temporaryListOfFriends.map(friend => friend.friends),
-            guests
-        )
-            .sort((personName1, personName2) => personName1.localeCompare(personName2))
-            .map(friendName => friends.find(person => person.name === friendName));
+            new Set(guests.map(guest => guest.name))
+        ).map(friendName => friends.find(person => person.name === friendName));
+        temporaryListOfFriends = sortByName(temporaryListOfFriends);
     }
 
     return guests;
@@ -29,19 +25,33 @@ function getGuests(friends, maxLevel = Infinity) {
 
 /**
  * Получить ещё не приглашенных друзей
- * @constructor
  * @param {Object[]} currentLevelFriends
  * @param {Object[]} guests
  * @returns {Object[]}
  */
 function getUninvitedFriends(currentLevelFriends, guests) {
-    const result = [];
-    for (const listOfFriends of currentLevelFriends) {
-        result.push(...listOfFriends);
-    }
+    const result = new Set();
+    currentLevelFriends.map(friends => addUniqueFriends(result, friends));
 
-    return [...new Set(result.filter(friendName =>
-        guests.every(friend => friendName !== friend.name)))];
+    return [...result].filter(friendName => !guests.has(friendName));
+}
+
+/**
+ * Добавляет уникальных друзей
+ * @param {Set<Object>} uniqueFriends
+ * @param {Object[]} friends
+ */
+function addUniqueFriends(uniqueFriends, friends) {
+    friends.map(friend => uniqueFriends.add(friend));
+}
+
+/**
+ * Сортирует список друзей по имени
+ * @param {Object[]} friends
+ * @returns {Object[]}
+ */
+function sortByName(friends) {
+    return friends.sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
 }
 
 /**
