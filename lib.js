@@ -7,36 +7,57 @@ class FriendData {
     }
 }
 
-
+/**
+ * Добавляет в массив, содержащий друзей в указанном в задаче порядке, друзей уровня num
+ * @param {FriendData[]} allSortedFriend
+ * @param {Object[]} crLvl
+ * @param {Number} num
+ */
 Iterator.prototype.fillSortedFriends = function (allSortedFriend, crLvl, num) {
     crLvl = this.removeDuplicates(crLvl);
     crLvl.forEach(x => allSortedFriend.push(new FriendData(x, num)));
 };
 
-
-Iterator.prototype.filterLevel = function (currLevel, visitedFriends) {
+/**
+ * Фильтрует переданный уровень друзей по вхождению
+ * в итоговый список, а затем лексикографическси сортирует
+ * @param {Object[]} currLevel
+ * @param {Set} visitedFriends
+ * @returns {Object[]}
+ */
+Iterator.prototype.filterAndSortLevel = function (currLevel, visitedFriends) {
     return currLevel.filter(x => !visitedFriends.has(x.name))
         .sort((x, y) => x.name.localeCompare(y.name));
 };
 
-
+/**
+ * Удаляет дубли из массива
+ * @param {Object[]} arr
+ * @returns {Object[]}
+ */
 Iterator.prototype.removeDuplicates = function (arr) {
     const names = new Set();
 
     return arr.filter(item => !names.has(item.name) ? names.add(item.name) : false);
 };
 
+/**
+ * Преобразует исходные данные о друзьях в массив FriendData, применяя указанный фильтр
+ * @param {Object[]} friends
+ * @param {Filter} filter
+ * @returns {FriendData[]}
+ */
 Iterator.prototype.getAllSortedFriends = function (friends, filter) {
     const allFriends = new Map(friends.map(friend => [friend.name, friend]));
     const visitedFriends = new Set();
-    let currentLevel = this.filterLevel(friends.filter(x => x.best), visitedFriends);
+    let currentLevel = this.filterAndSortLevel(friends.filter(x => x.best), visitedFriends);
     let allSortedFriends = [];
     let currentLevelNum = 1;
 
     while (currentLevel.length !== 0) {
         currentLevel.forEach(friend => visitedFriends.add(friend.name));
         this.fillSortedFriends(allSortedFriends, currentLevel, currentLevelNum);
-        currentLevel = this.filterLevel(currentLevel
+        currentLevel = this.filterAndSortLevel(currentLevel
             .map(x => x.name)
             .reduce((list, name) => {
                 allFriends.get(name).friends.forEach(friend => list.push(allFriends.get(friend)));
@@ -50,10 +71,18 @@ Iterator.prototype.getAllSortedFriends = function (friends, filter) {
     return allSortedFriends.filter(x => filter.isCorrect(x.friend));
 };
 
+/**
+ * Возвращает очередной элемент итератора
+ * @returns {Object}
+ */
 Iterator.prototype.next = function () {
     return this.done() ? null : this.allSortedFriends[this.pointer++].friend;
 };
 
+/**
+ * Возвращает true, если перечисление завершено и false в противном случае
+ * @returns {Boolean}
+ */
 Iterator.prototype.done = function () {
     return this.pointer >= this.allSortedFriends.length;
 };
