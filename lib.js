@@ -5,14 +5,23 @@ Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 Object.setPrototypeOf(BestFriendsFilter.prototype, Filter.prototype);
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
-function sortNamesLexicographic(one, another) {
-    return one.name.localeCompare(another.name);
+function sortNamesLexicographic(friends) {
+    const friendsMap = friendsToMap(friends);
+    let circleToSort = firstCircle(friends);
+    const result = [];
+
+    while (circleToSort.length > 0) {
+        result.push(...circleToSort.sort((l, r) => l.name.localeCompare(r.name)));
+        circleToSort = newCircle(circleToSort, friendsMap, result);
+    }
+
+    return result;
 }
 
 function firstCircle(friends) {
     const bestFriendFilter = new BestFriendsFilter();
     const friendSet = new Set();
-    bestFriendFilter.filter(friends).sort(sortNamesLexicographic)
+    bestFriendFilter.filter(friends)
         .forEach(e => {
             friendSet.add(e);
         });
@@ -24,29 +33,28 @@ function newCircle(previousCircle, friendsMap, listOfGuest) {
     const currentCircle = new Set();
     previousCircle.forEach(friend => {
         friend.friends.forEach(name => {
-            if (!listOfGuest.includes(friendsMap.get(name))) {
+            if (typeof friendsMap.get(name) !== 'undefined' &&
+                !listOfGuest.includes(friendsMap.get(name))) {
                 currentCircle.add(friendsMap.get(name));
             }
         });
     });
 
-    return Array.from(currentCircle).sort(sortNamesLexicographic);
+    return Array.from(currentCircle);
 }
 
-function getFilteredInvitedFriends(friends, filter, maxLevel = Infinity) {
+function getFriendsBelowMaxLevel(friends, maxLevel) {
     const friendsMap = friendsToMap(friends);
     let friendsArray = firstCircle(friends);
     const notFilteredInvitedFriends = [];
 
-    while (friendsArray.length > 0 && friendsArray.length > 0 && maxLevel > 0) {
-        Array.from(friendsArray).forEach(friend =>
-            notFilteredInvitedFriends.push(friend)
-        );
+    while (friendsArray.length > 0 && maxLevel > 0) {
+        notFilteredInvitedFriends.push(...friendsArray);
         friendsArray = newCircle(friendsArray, friendsMap, notFilteredInvitedFriends);
         maxLevel--;
     }
 
-    return filter.filter(notFilteredInvitedFriends);
+    return notFilteredInvitedFriends;
 }
 
 function friendsToMap(friends) {
@@ -83,7 +91,7 @@ function Iterator(friends, filter) {
         return result;
     };
 
-    this._collection = getFilteredInvitedFriends(friends, filter);
+    this._collection = filter.filter(sortNamesLexicographic(friends));
     this._counter = 0;
 }
 
@@ -96,9 +104,7 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
-
-    this._collection = getFilteredInvitedFriends(friends, filter, maxLevel);
+    Iterator.call(this, getFriendsBelowMaxLevel(friends, maxLevel), filter);
 }
 
 /**
