@@ -51,7 +51,7 @@ Iterator.prototype.next = function () {
 };
 
 Iterator.prototype.done = function () {
-    return !(this.count < this.invitedFriends.length);
+    return this.count === this.invitedFriends.length;
 };
 
 /**
