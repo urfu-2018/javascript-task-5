@@ -6,7 +6,11 @@ function getInvatedFriends(friends, maxLevel = Infinity) {
     currentPriorityFriends = friends.filter(friend => friend.best)
         .sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
     while (maxLevel > 0 && currentPriorityFriends.length !== 0) {
-        invatedFriends.push(...currentPriorityFriends);
+        currentPriorityFriends.forEach(guest => {
+            if (!invatedFriends.includes(guest)) {
+                invatedFriends.push(guest);
+            }
+        });
         currentPriorityFriends = currentPriorityFriends
             .reduce((acc, person) => [...acc, ...person.friends], [])
             .map(name => friends.find(friend => friend.name === name))
