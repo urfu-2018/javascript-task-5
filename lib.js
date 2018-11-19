@@ -7,46 +7,56 @@ class FriendData {
     }
 }
 
-function getAllSortedFriends(friends, filter) {
+
+Iterator.prototype.fillSortedFriends = function (allSortedFriend, crLvl, num) {
+    crLvl = this.removeDuplicates(crLvl);
+    crLvl.forEach(x => allSortedFriend.push(new FriendData(x, num)));
+};
+
+
+Iterator.prototype.filterLevel = function (currLevel, visitedFriends) {
+    return currLevel.filter(x => !visitedFriends.has(x.name))
+        .sort((x, y) => x.name.localeCompare(y.name));
+};
+
+
+Iterator.prototype.removeDuplicates = function (arr) {
+    const names = new Set();
+
+    return arr.filter(item => !names.has(item.name) ? names.add(item.name) : false);
+};
+
+Iterator.prototype.getAllSortedFriends = function (friends, filter) {
     const allFriends = new Map(friends.map(friend => [friend.name, friend]));
     const visitedFriends = new Set();
-    let currentLevel = filterLevel(friends.filter(x => x.best));
+    let currentLevel = this.filterLevel(friends.filter(x => x.best), visitedFriends);
     let allSortedFriends = [];
     let currentLevelNum = 1;
 
     while (currentLevel.length !== 0) {
         currentLevel.forEach(friend => visitedFriends.add(friend.name));
-        fillSortedFriends(allSortedFriends, currentLevel, currentLevelNum);
-        currentLevel = filterLevel(currentLevel
+        this.fillSortedFriends(allSortedFriends, currentLevel, currentLevelNum);
+        currentLevel = this.filterLevel(currentLevel
             .map(x => x.name)
             .reduce((list, name) => {
                 allFriends.get(name).friends.forEach(friend => list.push(allFriends.get(friend)));
 
                 return list;
             }, []
-            ));
+            ), visitedFriends);
         currentLevelNum += 1;
     }
 
     return allSortedFriends.filter(x => filter.isCorrect(x.friend));
+};
 
-    function fillSortedFriends(allSortedFriend, crLvl, num) {
-        crLvl = removeDuplicates(crLvl);
-        crLvl.forEach(x => allSortedFriend.push(new FriendData(x, num)));
-    }
+Iterator.prototype.next = function () {
+    return this.done() ? null : this.allSortedFriends[this.pointer++].friend;
+};
 
-    function filterLevel(currLevel) {
-        return currLevel.filter(x => !visitedFriends.has(x.name))
-            .sort((x, y) => x.name.localeCompare(y.name));
-    }
-
-    function removeDuplicates(arr) {
-        const names = new Set();
-
-        return arr.filter(item => !names.has(item.name) ? names.add(item.name) : false);
-
-    }
-}
+Iterator.prototype.done = function () {
+    return this.pointer >= this.allSortedFriends.length;
+};
 
 /**
  * Итератор по друзьям
@@ -59,12 +69,8 @@ function Iterator(friends, filter) {
         throw new TypeError('Incorrect filter type!');
     }
 
-    this.allSortedFriends = getAllSortedFriends(friends, filter);
+    this.allSortedFriends = this.getAllSortedFriends(friends, filter);
     this.pointer = 0;
-
-    this.next = () => this.done() ? null : this.allSortedFriends[this.pointer++].friend;
-
-    this.done = () => this.pointer >= this.allSortedFriends.length;
 }
 
 /**
@@ -79,6 +85,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
     this.allSortedFriends = this.allSortedFriends.filter(x => x.level <= maxLevel);
 }
+
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
