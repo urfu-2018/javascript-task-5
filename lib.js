@@ -19,7 +19,7 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = friends.filter(friend => friend.best).sort(sortByName);
     let countCicle = 0;
     let invitedFriends = [];
-    while (countCicle < maxLevel && currentRound.length > 0) {
+    while (countCicle < maxLevel && currentRound.length > 0 && maxLevel > 0) {
         invitedFriends.push(...currentRound);
         currentRound = getNextRound(friends, currentRound, invitedFriends);
         countCicle++;
