@@ -7,26 +7,30 @@ function getSorted(arr) {
     return arr;
 }
 
-function notUsed(items, used) {
+function filterNotUsed(items, used) {
     return items.filter(item => !used.has(item));
+}
+
+function getUnique(items) {
+    return items.filter((item, index) => items.indexOf(item) === index);
 }
 
 function getNextWave(friendsMap, wave, used) {
     let newWave = [];
     for (let name of wave) {
-        newWave.push(...notUsed(friendsMap.get(name).friends, used));
+        newWave.push(...filterNotUsed(friendsMap.get(name).friends, used));
     }
 
-    return getSorted(newWave.filter((item, index) => newWave.indexOf(item) === index));
+    return getSorted(getUnique(newWave));
 }
 
-function getBest(friends) {
+function getBestFriendNames(friends) {
     return friends
         .filter(friend => friend.best)
         .map(friend => friend.name);
 }
 
-function toFriendsMap(friends) {
+function convertToFriendsMap(friends) {
     let friendsMap = new Map();
     for (let friend of friends) {
         friendsMap.set(friend.name, friend);
@@ -47,8 +51,8 @@ function Iterator(friends, filter) {
         throw new TypeError('filter is not instance of Filter');
     }
     this.wave = [];
-    this.firstWave = getSorted(getBest(friends));
-    this.friendsMap = toFriendsMap(friends);
+    this.firstWave = getSorted(getBestFriendNames(friends));
+    this.friendsMap = convertToFriendsMap(friends);
     this.used = new Set();
     this.index = 0;
     this.finished = false;
@@ -149,9 +153,7 @@ LimitedIterator.prototype = Object.create(Iterator.prototype, {
  */
 // eslint-disable-next-line no-empty-function
 function Filter() {
-    this.isValid = function () {
-        return true;
-    };
+    this.isValid = () => true;
 }
 
 Filter.prototype = {
@@ -161,9 +163,7 @@ Filter.prototype = {
 };
 
 function filterGender(gender) {
-    return function (friend) {
-        return friend.gender === gender;
-    };
+    return friend => friend.gender === gender;
 }
 
 /**
