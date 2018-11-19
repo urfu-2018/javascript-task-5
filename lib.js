@@ -1,6 +1,14 @@
 'use strict';
 
 Iterator.prototype = {
+
+    /**
+     * Получение друзей следующего уровня
+     * @param {Object[]} currentLevelList - список друзей текущего уровня
+     * @param {Object[]} invited - уже приглашенные на текущий момент
+     * @param {Object[]} friends - все друзья
+     * @returns {Object[]} - отсортированный массив друзей следующего уровня
+     */
     getNextLevelFriends(currentLevelList, invited, friends) {
         let nextLevelFriends = [];
         let FriendsNames = currentLevelList.reduce((prev, friend) => {
@@ -17,6 +25,14 @@ Iterator.prototype = {
 
         return nextLevelFriends.sort((a, b) => a.name.localeCompare(b.name));
     },
+
+    /**
+     * Получение списка друзей, которые будут приглашены на свадьбу
+     * @param {Object[]} friends - список всех друзей
+     * @param {Number} maxLevel - максимальный круг друзей
+     * @returns {Object[]} - отсортированный массив,
+     * кого Аркадий пригласит на свадьбу
+     */
     getInvitedFriends(friends, maxLevel = Infinity) {
         let invited = [];
         let currentLevelList = friends.filter(friend => friend.best)
