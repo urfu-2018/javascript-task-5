@@ -1,6 +1,5 @@
 'use strict';
 
-
 function sortByName(firstPerson, secondPerson) {
 
     return firstPerson.name.localeCompare(secondPerson.name);
@@ -8,7 +7,7 @@ function sortByName(firstPerson, secondPerson) {
 
 function getNextRound(friends, currentRound, invitedFriends) {
     return currentRound
-        .reduce((arrNames, currentFriend) => arrNames.concat(currentFriend.friends), [])
+        .reduce((names, currentFriend) => names.concat(currentFriend.friends), [])
         .map(friendName => friends.find(friend => friend.name === friendName))
         .filter((friend, i, arrFriends) =>
             arrFriends.indexOf(friend) === i &&
@@ -20,8 +19,8 @@ function getInvitedFriends(friends, filter, maxLevel = Infinity) {
     let currentRound = friends.filter(friend => friend.best).sort(sortByName);
     let countCicle = 0;
     let invitedFriends = [];
-    while (countCicle < maxLevel && currentRound.length > 0 && maxLevel > 0) {
-        invitedFriends = invitedFriends.concat(currentRound);
+    while (countCicle < maxLevel && currentRound.length > 0) {
+        invitedFriends.push(...currentRound);
         currentRound = getNextRound(friends, currentRound, invitedFriends);
         countCicle++;
     }
@@ -41,18 +40,21 @@ function Iterator(friends, filter) {
     }
     this.invitedFriends = getInvitedFriends(friends, filter);
     this.count = 0;
-    this.next = () => {
-        if (!this.done()) {
-            return this.invitedFriends[this.count++];
-        }
+}
 
-        return null;
-    };
+Iterator.prototype.next = function () {
+    if (!this.done()) {
+        return this.invitedFriends[this.count++];
+    }
 
+    return null;
+};
+
+Iterator.prototype.done = function () {
     this.done = () => {
         return !(this.count < this.invitedFriends.length);
     };
-}
+};
 
 /**
  * Итератор по друзям с ограничением по кругу
@@ -62,12 +64,12 @@ function Iterator(friends, filter) {
  * @param {Filter} filter
  * @param {Number} maxLevel – максимальный круг друзей
  */
-Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
-
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
     this.invitedFriends = getInvitedFriends(friends, filter, maxLevel);
 }
+
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 
 /**
  * Фильтр друзей
@@ -82,22 +84,22 @@ function Filter() {
  * @extends Filter
  * @constructor
  */
-Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
-
 function MaleFilter() {
     this.filterGender = friend => friend.gender === 'male';
 }
+
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
  * @extends Filter
  * @constructor
  */
-Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
-
 function FemaleFilter() {
     this.filterGender = friend => friend.gender === 'female';
 }
+
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
