@@ -95,7 +95,7 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.fitsTheCondition = true;
+    this.fitsTheCondition = () => true;
 }
 
 /**
