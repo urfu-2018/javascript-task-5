@@ -40,7 +40,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
 }
-function chooseFriends(friends, maxLevel) {
+function chooseFriends(friends, maxLevel = friends.length + 1) {
     var selection = [];
     var currentLevel = 1;
     var currentLevelFriends = friends.filter(friend => friend.best);
