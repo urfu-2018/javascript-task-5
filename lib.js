@@ -15,14 +15,15 @@ function getFriendsList(friends) {
         bestFriends: [],
         otherFriends: []
     };
-    friends.forEach(friend => {
+    objectFriends = friends.reduce((accum, friend) => {
         if (friend.best) {
-            objectFriends.bestFriends.push(friend);
+            accum.bestFriends.push(friend);
         } else {
-            objectFriends.otherFriends.push(friend);
+            accum.otherFriends.push(friend);
         }
-    });
 
+        return accum;
+    }, objectFriends);
     let result = [];
     result.push(objectFriends.bestFriends);
     while (objectFriends.otherFriends.length !== 0) {
@@ -79,7 +80,7 @@ Iterator.prototype.done = function () {
 };
 
 Iterator.prototype.next = function () {
-    return (this.done()) ? null : this.friends[this.place++];
+    return this.done() ? null : this.friends[this.place++];
 };
 
 
