@@ -6,9 +6,9 @@
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
- * @param {Int} maxLevel
  */
-function Iterator(friends, filter, maxLevel = friends.length + 1) {
+function Iterator(friends, filter) {
+    this.maxLevel = (this.maxLevel) ? this.maxLevel : friends.length + 1;
     this.currentIndex = 0;
     this.listOfGuests = [];
     this.next = function () {
@@ -18,7 +18,7 @@ function Iterator(friends, filter, maxLevel = friends.length + 1) {
         return this.currentIndex >= this.listOfGuests.length;
     };
     if (filter instanceof Filter) {
-        this.listOfGuests = chooseFriends(friends, maxLevel)
+        this.listOfGuests = chooseFriends(friends, this.maxLevel)
             .filter(friend => filter.isAppropriate(friend));
         this.currentIndex = 0;
     } else {
@@ -37,9 +37,10 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter, maxLevel);
+    this.maxLevel = maxLevel;
+    Iterator.call(this, friends, filter);
 }
-function chooseFriends(friends, maxLevel = friends.length + 1) {
+function chooseFriends(friends, maxLevel) {
     var selection = [];
     var currentLevel = 1;
     var currentLevelFriends = friends.filter(friend => friend.best);
