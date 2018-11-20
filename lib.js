@@ -26,7 +26,7 @@ function getGuests(friends, maxLevel = Infinity) {
 /**
  * Получить ещё не приглашенных друзей
  * @param {Object[]} currentLevelFriends
- * @param {Object[]} guests
+ * @param {Set<Object>} guests
  * @returns {Object[]}
  */
 function getUninvitedFriends(currentLevelFriends, guests) {
