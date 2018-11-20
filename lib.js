@@ -8,7 +8,7 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    this.maxLevel = (this.maxLevel) ? this.maxLevel : friends.length + 1;
+    this.maxLevel = (this.maxLevel !== undefined) ? this.maxLevel : friends.length + 1;
     this.currentIndex = 0;
     this.listOfGuests = [];
     this.next = function () {
@@ -40,7 +40,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     this.maxLevel = maxLevel;
     Iterator.call(this, friends, filter);
 }
-function chooseFriends(friends, maxLevel = friends.length + 1) {
+function chooseFriends(friends, maxLevel) {
     var selection = [];
     var currentLevel = 1;
     var currentLevelFriends = friends.filter(friend => friend.best);
