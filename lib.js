@@ -1,21 +1,28 @@
 'use strict';
-
+/* eslint linebreak-style: ["error", "windows"]*/
 function nameSort(fr1, fr2) {
     return fr1.name.localeCompare(fr2.name);
 }
 
-function sortAndFilterFriends(friends, filter, level = Infinity) {
+function sortAndFilterFriends(friends, filter) {
+    let friendsCircles = getFriendsCircles(friends);
+
+    return friendsCircles.filter(filter.genderFilter);
+}
+
+function getFriendsCircles(friends, level = Infinity) {
     let bestFriends = friends.filter(a => a.best).sort(nameSort);
     let friendsForInvite = [];
     let newCircle = bestFriends;
+    let friendsCounter = 0;
 
     function checkOnRepeat(friend, index, arr) {
         return !friendsForInvite.includes(friend) && arr.indexOf(friend) === index;
     }
 
-    while (level > 0 && newCircle.length > 0) {
+    while (level > 0 && newCircle.length > 0 && friendsCounter < friends.length) {
         friendsForInvite = friendsForInvite.concat(newCircle);
-
+        friendsCounter += newCircle.length;
         newCircle = newCircle
             .reduce((list, friend) => list.concat(friend.friends), [])
             .map(name => friends.find(friend => friend.name === name))
@@ -25,7 +32,7 @@ function sortAndFilterFriends(friends, filter, level = Infinity) {
         level--;
     }
 
-    return friendsForInvite.filter(filter.genderFilter);
+    return friendsForInvite;
 }
 
 /**
@@ -38,11 +45,9 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-
     this.filteredFriends = sortAndFilterFriends(friends, filter);
+    this.index = 0;
 }
-
-Iterator.prototype.index = 0;
 
 Iterator.prototype.next = function () {
     return this.done() ? null : this.filteredFriends[this.index++];
@@ -61,7 +66,8 @@ Iterator.prototype.done = function () {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    this.filteredFriends = sortAndFilterFriends(friends, filter, maxLevel);
+    let rightLevelFriends = getFriendsCircles(friends, maxLevel);
+    Iterator.call(this, rightLevelFriends, filter);
 }
 LimitedIterator.prototype = Object.create(Iterator.prototype);
 LimitedIterator.prototype.constructor = LimitedIterator;
