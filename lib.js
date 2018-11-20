@@ -1,5 +1,5 @@
 'use strict';
-/* eslint linebreak-style: ["error", "windows"]*/
+
 function nameSort(fr1, fr2) {
     return fr1.name.localeCompare(fr2.name);
 }
