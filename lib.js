@@ -38,6 +38,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
     this.listOfGuests = chooseFriends(friends, maxLevel)
         .filter(friend => filter.isAppropriate(friend));
+    // this.listOfGuests = this.listOfGuests.filter(friend => filter.isAppropriate(friend));
 }
 function chooseFriends(friends, maxLevel = friends.length + 1) {
     var selection = [];
@@ -62,21 +63,21 @@ function nameComparator(firstFriend, secondFriend) {
     return firstFriend.name.localeCompare(secondFriend.name);
 }
 
+Filter.prototype = {
+    isAppropriate: function () {
+        return true;
+    }
+};
+
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    Object.defineProperty(this, 'isAppropriate', {
-        value: function () {
-
-            return true;
-        },
-        writable: true
-    });
-
     return this;
 }
+
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей
@@ -84,15 +85,14 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-
-    Object.setPrototypeOf(this, new Filter());
     this.isAppropriate = function (a) {
         return a.gender === 'male';
     };
 
-
     return this;
 }
+
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -100,7 +100,6 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    Object.setPrototypeOf(this, new Filter());
     this.isAppropriate = function (a) {
         return a.gender === 'female';
     };
