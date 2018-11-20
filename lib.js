@@ -1,24 +1,42 @@
 'use strict';
 
-function sortByName(friends) {
-    return friends.sort((a, b) => {
-        return a.name.localeCompare(b.name);
-    });
-}
+const sortByName = function (a, b) {
+    return a.name.localeCompare(b.name);
+};
 
 function preparingListOfFriendsForIteration(friends, filter, maxLevel = Infinity) {
     const listOfFriends = [];
 
-    let friendsAtLevel = sortByName(friends).filter(friend => friend.best);
+    let friendsAtLevel = friends.filter(friend => friend.best).sort(sortByName);
 
     while (friendsAtLevel.length > 0 && maxLevel > 0) {
         listOfFriends.push(...friendsAtLevel);
-        friendsAtLevel = sortByName();
+        friendsAtLevel = friendsAtLevel
+            .reduce((friendsOfFriends, friend) => {
+                const arrayFriend = [];
+
+                for (let i in friend.friends) {
+                    if (!friend.friends.hasOwnProperty(i)) {
+                        continue;
+                    }
+
+                    if (!friendsOfFriends.includes(friend.friends[i])) {
+                        arrayFriend.push(friend.friends[i]);
+                    }
+                }
+
+                return friendsOfFriends.concat(arrayFriend);
+            }, [])
+            .map(nameFriend => {
+                return friends.find(friend => friend.name === nameFriend);
+            })
+            .filter(friend => !listOfFriends.includes(friend))
+            .sort(sortByName);
 
         maxLevel--;
     }
 
-    return listOfFriends.filter(filter.thisOneFits);
+    return listOfFriends.filter(filter.checkFriend);
 }
 
 /**
@@ -37,7 +55,7 @@ function Iterator(friends, filter) {
 }
 
 Iterator.prototype.next = function () {
-    if (!this.done()) {
+    if (this.done()) {
         return null;
     }
 
@@ -78,7 +96,7 @@ Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.thisOneFits = () => true;
+    this.checkFriend = () => true;
 }
 
 /**
@@ -87,7 +105,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.thisOneFits = friend => friend.gender === 'male';
+    this.checkFriend = friend => friend.gender === 'male';
 }
 
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
@@ -98,7 +116,7 @@ Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
  * @constructor
  */
 function FemaleFilter() {
-    this.thisOneFits = friend => friend.gender === 'female';
+    this.checkFriend = friend => friend.gender === 'female';
 }
 
 Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
