@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 'use strict';
 
 function compareFriends(friend1, friend2) {
@@ -49,6 +50,16 @@ function getFriendsList(friends) {
         }
         result.push(objectFriends.bestFriends);
     }
+    result = result.map((arr, index) => {
+        arr = arr.map(elem => {
+            elem.level = index + 1;
+
+            return elem;
+        });
+
+        return arr;
+    });
+    // console.info(result);
 
     return result;
 }
@@ -94,19 +105,7 @@ Iterator.prototype.next = function () {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-
-    let newFriends = getFriendsList(friends);
-    let result = [];
-    let newMaxLevel = maxLevel;
-    if (maxLevel > newFriends.length) {
-        newMaxLevel = newFriends.length;
-    }
-
-    for (let i = 0; i < newMaxLevel; i++) {
-        let halfResult = newFriends[i].filter(filter.filter).sort(compareFriends);
-        result = result.concat(halfResult);
-    }
-    this.friends = result;
+    this.friends = this.friends.filter(friend => friend.level <= maxLevel);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
