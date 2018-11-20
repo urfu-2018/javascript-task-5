@@ -105,7 +105,17 @@ Iterator.prototype.next = function () {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    this.friends = this.friends.filter(friend => friend.level <= maxLevel);
+    let newFriends = getFriendsList(friends);
+    let result = [];
+    let newMaxLevel = maxLevel;
+    if (maxLevel > newFriends.length) {
+        newMaxLevel = newFriends.length;
+    }
+    for (let i = 0; i < newMaxLevel; i++) {
+        let halfResult = newFriends[i].filter(filter.filter).sort(compareFriends);
+        result = result.concat(halfResult);
+    }
+    this.friends = result;
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
