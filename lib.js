@@ -8,16 +8,15 @@
  */
 function getGuests(friends, maxLevel = Infinity) {
     const guests = [];
-    let temporaryListOfFriends = sortByName(friends.filter(friend => friend.best));
+    let temporaryListOfFriends = friends.filter(friend => friend.best);
 
     while (maxLevel-- > 0 && temporaryListOfFriends.length > 0) {
-        guests.push(...temporaryListOfFriends);
+        guests.push(...sortByName(temporaryListOfFriends));
 
         temporaryListOfFriends = getUninvitedFriends(
             temporaryListOfFriends.map(friend => friend.friends),
             new Set(guests.map(guest => guest.name))
         ).map(friendName => friends.find(person => person.name === friendName));
-        temporaryListOfFriends = sortByName(temporaryListOfFriends);
     }
 
     return guests;
@@ -31,17 +30,17 @@ function getGuests(friends, maxLevel = Infinity) {
  */
 function getUninvitedFriends(currentLevelFriends, guests) {
     const result = new Set();
-    currentLevelFriends.map(friends => addUniqueFriends(result, friends));
+    currentLevelFriends.map(friends => addUniqueFriends(friends, result));
 
     return [...result].filter(friendName => !guests.has(friendName));
 }
 
 /**
  * Добавляет уникальных друзей
- * @param {Set<Object>} uniqueFriends
  * @param {Object[]} friends
+ * @param {Set<Object>} uniqueFriends
  */
-function addUniqueFriends(uniqueFriends, friends) {
+function addUniqueFriends(friends, uniqueFriends) {
     friends.map(friend => uniqueFriends.add(friend));
 }
 
@@ -96,7 +95,7 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
-    this.fitsTheCondition = () => true;
+    this.fitsTheCondition = true;
 }
 
 /**
