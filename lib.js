@@ -28,13 +28,13 @@ function getFriendsList(friends) {
     let result = [];
     result.push(objectFriends.bestFriends);
     while (objectFriends.otherFriends.length !== 0) {
-        let length = objectFriends.otherFriends.length;
+        const length = objectFriends.otherFriends.length;
         let friendsFriend = [];
         objectFriends.bestFriends.forEach(friend => {
             friendsFriend = friendsFriend.concat(friend.friends);
         });
 
-        let halfResult = objectFriends.otherFriends.reduce(function (accum, elem) {
+        const halfResult = objectFriends.otherFriends.reduce(function (accum, elem) {
             if (friendsFriend.includes(elem.name)) {
                 accum[0].push(elem);
             } else {
@@ -52,7 +52,9 @@ function getFriendsList(friends) {
     }
     result = result.map((arr, index) => {
         arr = arr.map(elem => {
-            elem.level = index + 1;
+            if (elem.level === undefined) {
+                elem.level = index + 1;
+            }
 
             return elem;
         });
@@ -84,6 +86,7 @@ function Iterator(friends, filter) {
 
     this.friends = result;
     this.place = 0;
+
 }
 
 Iterator.prototype.done = function () {
@@ -116,6 +119,7 @@ function LimitedIterator(friends, filter, maxLevel) {
         let halfResult = newFriends[i].filter(filter.filter).sort(compareFriends);
         result = result.concat(halfResult);
     } */
+
     this.friends = this.friends.filter(elem => elem.level <= maxLevel);
 }
 
