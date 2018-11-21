@@ -21,12 +21,13 @@ function getResultFriends(friends, filter, maxLvl = Infinity) {
     }
     let bestFriends = friends.filter(friend => friend.best).sort(sortByName);
     let resultFriends = [];
-    for (; maxLvl > 0 && bestFriends.length > 0; maxLvl--) {
+    while (maxLvl > 0 && bestFriends.length > 0) {
         resultFriends = resultFriends.concat(bestFriends);
-        bestFriends = getNewNames(bestFriends)
+        bestFriends = Array.from(new Set(getNewNames(bestFriends)))
             .map(name => friends.find(human => human.name === name))
-            .filter(checkFriends(resultFriends));
-        bestFriends = Array.from(new Set(bestFriends)).sort(sortByName);
+            .filter(checkFriends(resultFriends))
+            .sort(sortByName);
+        maxLvl--;
     }
 
     return resultFriends.filter(friend => filter.check(friend));
