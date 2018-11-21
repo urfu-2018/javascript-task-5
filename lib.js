@@ -1,4 +1,3 @@
-/* eslint-disable max-statements */
 'use strict';
 
 function compareFriends(friend1, friend2) {
@@ -12,11 +11,7 @@ function compareFriends(friend1, friend2) {
 }
 
 function getFriendsList(friends) {
-    let objectFriends = {
-        bestFriends: [],
-        otherFriends: []
-    };
-    objectFriends = friends.reduce((accum, friend) => {
+    const objectFriends = friends.reduce((accum, friend) => {
         if (friend.best) {
             accum.bestFriends.push(friend);
         } else {
@@ -24,9 +19,11 @@ function getFriendsList(friends) {
         }
 
         return accum;
-    }, objectFriends);
-    let result = [];
-    result.push(objectFriends.bestFriends);
+    }, {
+        bestFriends: [],
+        otherFriends: []
+    });
+    let result = [objectFriends.bestFriends];
     while (objectFriends.otherFriends.length !== 0) {
         const length = objectFriends.otherFriends.length;
         let friendsFriend = [];
@@ -52,9 +49,7 @@ function getFriendsList(friends) {
     }
     result = result.map((arr, index) => {
         arr = arr.map(elem => {
-            if (elem.level === undefined) {
-                elem.level = index + 1;
-            }
+            elem.level = index + 1;
 
             return elem;
         });
@@ -77,14 +72,12 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('Bad filter(');
     }
-    let newFriends = getFriendsList(friends);
-    let result = [];
-    newFriends.forEach(friend => {
-        let halfResult = friend.filter(filter.filter).sort(compareFriends);
-        result = result.concat(halfResult);
-    });
+    const newFriends = getFriendsList(friends);
 
-    this.friends = result;
+    this.friends = newFriends.reduce((accum, friendLevel) => accum.concat(friendLevel
+        .filter(filter.filter)
+        .sort(compareFriends)
+    ), []);
     this.place = 0;
 
 }
@@ -109,7 +102,7 @@ Iterator.prototype.next = function () {
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
 
-    /* let newFriends = getFriendsList(friends);
+    let newFriends = getFriendsList(friends);
     let result = [];
     let newMaxLevel = maxLevel;
     if (maxLevel > newFriends.length) {
@@ -118,9 +111,9 @@ function LimitedIterator(friends, filter, maxLevel) {
     for (let i = 0; i < newMaxLevel; i++) {
         let halfResult = newFriends[i].filter(filter.filter).sort(compareFriends);
         result = result.concat(halfResult);
-    } */
+    }
 
-    this.friends = this.friends.filter(elem => elem.level <= maxLevel);
+    this.friends = result;
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);

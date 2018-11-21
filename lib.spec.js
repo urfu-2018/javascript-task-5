@@ -78,6 +78,27 @@ describe('Итераторы', () => {
         ]);
     });
 
+    it('repeat чуть-чуть по другому', () => {
+        const maleFilter2 = new lib.MaleFilter();
+        const maleIterator2 = new lib.Iterator(friends, maleFilter2);
+        const newFriends = [];
+        while (!maleIterator2.done()) {
+            newFriends.push(maleIterator2.next());
+        }
+        const maleLimitedIterator = new lib.LimitedIterator(friends, maleFilter2, 2);
+        console.info(maleLimitedIterator);
+        const newLimitedFriends = [];
+        while (!maleLimitedIterator.done()) {
+            newLimitedFriends.push(maleLimitedIterator.next());
+        }
+        console.info(newLimitedFriends);
+        assert.deepStrictEqual(newLimitedFriends, [
+            friend('Sam'), friend('Brad'), friend('Mat')
+        ]);
+
+    });
+
+
     function friend(name) {
         let len = friends.length;
 
