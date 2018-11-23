@@ -5,7 +5,7 @@ function getChosenFriendsList(friends, circlesCount = Infinity) {
     let currentCircle = friendsOrdered.filter(f => f.best);
     let result = [];
 
-    for (let i = 0; i < circlesCount && currentCircle.length; i++) {
+    while (currentCircle.length && circlesCount-- > 0) {
         result = result.concat(currentCircle);
         const usedNames = result.map(e => e.name);
         const nextCircleNames = currentCircle
