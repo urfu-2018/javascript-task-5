@@ -73,7 +73,7 @@ Iterator.prototype = {
         return this.nextIndex >= this.friends.length;
     },
     next() {
-        return this.done() ? null : this.friends[this.nextIndex++].name;
+        return this.done() ? null : this.friends[this.nextIndex++];
     }
 };
 
