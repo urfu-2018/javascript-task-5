@@ -43,9 +43,6 @@ function sorting(friends) {
         }
     });
     let levelFriends = friends.filter(friend => friend.level);
-    if (!levelFriends[0]) {
-        friends = [];
-    }
     while (levelFriends[0]) {
         levelFriends = levelDetermination(levelFriends, friends);
     }
@@ -89,8 +86,8 @@ function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     isInstanceFilter(filter);
     friends = sorting(friends);
-    friends = filter.splitBySex(friends);
     friends = friends.filter(friend => friend.level <= maxLevel);
+    friends = filter.splitBySex(friends);
     this.nextIndex = 0;
     this.friends = friends;
     Object.setPrototypeOf(this, Iterator.prototype);
