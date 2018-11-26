@@ -1,26 +1,30 @@
 'use strict';
 
 function formGuestList(friends, maxLevel = Infinity) {
-    let currentGuestsList = friends.filter(friend => {
-        return friend.best;
-    }).sort((firstFriend, secondFriend) => {
-        return firstFriend.name.localeCompare(secondFriend.name);
-    });
+    let currentGuestsList = friends
+        .filter(friend => {
+            return friend.best;
+        })
+        .sort((firstFriend, secondFriend) => {
+            return firstFriend.name.localeCompare(secondFriend.name);
+        });
 
     const finalGuestsList = [];
 
     while (currentGuestsList.length > 0 && maxLevel > 0) {
         finalGuestsList.push(...currentGuestsList);
-        currentGuestsList = currentGuestsList.reduce((acc, friend) => {
-            friend.friends.forEach(friendName => {
-                const newFriend = friends.find(person => person.name === friendName);
-                if (!finalGuestsList.includes(newFriend) && !acc.includes(newFriend)) {
-                    acc.push(newFriend);
-                }
-            });
+        currentGuestsList = currentGuestsList
+            .reduce((acc, friend) => {
+                friend.friends.forEach(friendName => {
+                    const newFriend = friends.find(person => person.name === friendName);
+                    if (!finalGuestsList.includes(newFriend) && !acc.includes(newFriend)) {
+                        acc.push(newFriend);
+                    }
+                });
 
-            return acc;
-        }, []).sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
+                return acc;
+            }, [])
+            .sort((friend1, friend2) => friend1.name.localeCompare(friend2.name));
         maxLevel--;
     }
 
