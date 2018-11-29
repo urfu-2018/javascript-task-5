@@ -11,8 +11,10 @@ function compareFriends(friend1, friend2) {
 }
 
 function getFriendsList(friends) {
+    let level = 1;
     const objectFriends = friends.reduce((accum, friend) => {
         if (friend.best) {
+            friend.level = level;
             accum.bestFriends.push(friend);
         } else {
             accum.otherFriends.push(friend);
@@ -25,14 +27,15 @@ function getFriendsList(friends) {
     });
     let result = [objectFriends.bestFriends];
     while (objectFriends.otherFriends.length !== 0) {
+        level++;
         const length = objectFriends.otherFriends.length;
-        let friendsFriend = [];
-        objectFriends.bestFriends.forEach(friend => {
-            friendsFriend = friendsFriend.concat(friend.friends);
-        });
-
+        let friendsFriend = objectFriends.bestFriends.reduce((accum, elem) => {
+            return accum.concat(elem.friends);
+        }, []);
+        /* eslint-disable no-loop-func */
         const halfResult = objectFriends.otherFriends.reduce(function (accum, elem) {
             if (friendsFriend.includes(elem.name)) {
+                elem.level = level;
                 accum[0].push(elem);
             } else {
                 accum[1].push(elem);
@@ -40,6 +43,8 @@ function getFriendsList(friends) {
 
             return accum;
         }, [[], []]);
+        /* eslint-enable no-loop-func*/
+
         objectFriends.bestFriends = halfResult[0];
         objectFriends.otherFriends = halfResult[1];
         if (length === objectFriends.otherFriends.length) {
@@ -47,16 +52,6 @@ function getFriendsList(friends) {
         }
         result.push(objectFriends.bestFriends);
     }
-    result = result.map((arr, index) => {
-        arr = arr.map(elem => {
-            elem.level = index + 1;
-
-            return elem;
-        });
-
-        return arr;
-    });
-    // console.info(result);
 
     return result;
 }
