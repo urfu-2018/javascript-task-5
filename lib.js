@@ -6,12 +6,12 @@ function isInstanceFilter(filter) {
     }
 }
 
-function sortByName(object) {
-    return object.sort(function (a, b) {
-        if (a.name > b.name) {
+function sortByName(arrObjects) {
+    return arrObjects.sort(function (a, b) {
+        if (a.info.name > b.info.name) {
             return 1;
         }
-        if (a.name < b.name) {
+        if (a.info.name < b.info.name) {
             return -1;
         }
 
@@ -19,35 +19,48 @@ function sortByName(object) {
     });
 }
 
-function levelDetermination(levelFriends, friends) {
+function levelDetermination(levelFriends, friends, invited) {
     const newLevelFriends = [];
     levelFriends.forEach(bestFriend => {
-        bestFriend.friends.forEach((friendOfBestFriend) => {
-            friends.forEach(friend => {
-                if (friend.name === friendOfBestFriend && !friend.level) {
-                    friend.level = bestFriend.level + 1;
-                    newLevelFriends.push(friend);
-                }
-            });
+        bestFriend.info.friends.forEach((friendOfBestFriend) => {
+            if (invited.find(friend => friend.info.name ===
+            friendOfBestFriend)) {
+                return;
+            }
+            const info = friends.find(friend => friend.name ===
+            friendOfBestFriend);
+            if (info) {
+                newLevelFriends.push({
+                    info,
+                    level: bestFriend.level + 1
+                });
+            }
         });
     });
 
     return newLevelFriends;
 }
 
-function sorting(friends) {
-    friends = sortByName(friends);
-    friends.forEach((friend) => {
-        if (friend.best === true) {
-            friend.level = 1;
+function definitionInvitedFriends(friends) {
+    let levelFriends = friends.reduce((bestFriends, friend) => {
+        if (friend.best === true &&
+        (bestFriends.find(bestFriend => bestFriend.info.name ===
+        friend.name) === undefined)) {
+            bestFriends.push({
+                info: friend,
+                level: 1
+            });
         }
-    });
-    let levelFriends = friends.filter(friend => friend.level);
+
+        return bestFriends;
+    }, []);
+    let invited = [];
     while (levelFriends[0]) {
-        levelFriends = levelDetermination(levelFriends, friends);
+        invited = invited.concat(sortByName(levelFriends));
+        levelFriends = levelDetermination(levelFriends, friends, invited);
     }
 
-    return friends.sort((a, b) => a.level - b.level);
+    return invited;
 }
 
 /**
@@ -59,7 +72,7 @@ function sorting(friends) {
 function Iterator(friends, filter) {
     console.info(friends, filter);
     isInstanceFilter(filter);
-    friends = sorting(friends);
+    friends = definitionInvitedFriends(friends);
     friends = filter.splitBySex(friends);
     this.nextIndex = 0;
     this.friends = friends;
@@ -70,7 +83,7 @@ Iterator.prototype = {
         return this.nextIndex >= this.friends.length;
     },
     next() {
-        return this.done() ? null : this.friends[this.nextIndex++];
+        return this.done() ? null : this.friends[this.nextIndex++].info;
     }
 };
 
@@ -85,7 +98,7 @@ Iterator.prototype = {
 function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     isInstanceFilter(filter);
-    friends = sorting(friends);
+    friends = definitionInvitedFriends(friends);
     friends = friends.filter(friend => friend.level <= maxLevel);
     friends = filter.splitBySex(friends);
     this.nextIndex = 0;
@@ -102,7 +115,7 @@ function Filter() {
 }
 
 Filter.prototype.splitBySex = function (friends) {
-    return friends.filter(friend => friend.gender === this.gender);
+    return friends.filter(friend => this.checkFilter(friend));
 };
 
 /**
@@ -114,8 +127,10 @@ function MaleFilter() {
     console.info('MaleFilter');
 
     return Object.create(Filter.prototype, {
-        gender: {
-            value: 'male',
+        checkFilter: {
+            value(friend) {
+                return friend.info.gender === 'male';
+            },
             enumerable: true
         }
     });
@@ -130,8 +145,10 @@ function FemaleFilter() {
     console.info('FemaleFilter');
 
     return Object.create(Filter.prototype, {
-        gender: {
-            value: 'female',
+        checkFilter: {
+            value(friend) {
+                return friend.info.gender === 'female';
+            },
             enumerable: true
         }
     });
