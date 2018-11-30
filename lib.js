@@ -29,11 +29,14 @@ function levelDetermination(levelFriends, friends, invited) {
             friendOfBestFriend)) {
                 return;
             }
-            newLevelFriends.push({
-                info: friends.find(friend => friend.name ===
-                    friendOfBestFriend),
-                level: bestFriend.level + 1
-            });
+            const info = friends.find(friend => friend.name ===
+            friendOfBestFriend);
+            if (info) {
+                newLevelFriends.push({
+                    info,
+                    level: bestFriend.level + 1
+                });
+            }
         });
     });
 
@@ -124,10 +127,14 @@ Filter.prototype.splitBySex = function (friends) {
  */
 function MaleFilter() {
     console.info('MaleFilter');
-    Object.setPrototypeOf(this, Filter.prototype);
-    this.checkFilter = function (friend) {
-        return friend.info.gender === 'male';
-    };
+
+    return Object.create(Filter.prototype, {
+        checkFilter: {
+            value(friend) {
+                return friend.info.gender === 'male';
+            }
+        }
+    });
 }
 
 /**
@@ -137,10 +144,14 @@ function MaleFilter() {
  */
 function FemaleFilter() {
     console.info('FemaleFilter');
-    Object.setPrototypeOf(this, Filter.prototype);
-    this.checkFilter = function (friend) {
-        return friend.info.gender === 'female';
-    };
+
+    return Object.create(Filter.prototype, {
+        checkFilter: {
+            value(friend) {
+                return friend.info.gender === 'female';
+            }
+        }
+    });
 }
 
 exports.Iterator = Iterator;
