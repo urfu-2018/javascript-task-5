@@ -24,7 +24,7 @@ function levelDetermination(levelFriends, friends, invited) {
     levelFriends.forEach(bestFriend => {
         bestFriend.info.friends.forEach((friendOfBestFriend) => {
             if (invited.concat(newLevelFriends)
-            .some(friend => friend.info.name === friendOfBestFriend)) {
+                .some(friend => friend.info.name === friendOfBestFriend)) {
                 return;
             }
             newLevelFriends.push({
