@@ -24,6 +24,8 @@ function levelDetermination(levelFriends, friends, invited) {
     levelFriends.forEach(bestFriend => {
         bestFriend.info.friends.forEach((friendOfBestFriend) => {
             if (invited.some(friend => friend.info.name ===
+            friendOfBestFriend) ||
+            newLevelFriends.some(friend => friend.info.name ===
             friendOfBestFriend)) {
                 return;
             }
