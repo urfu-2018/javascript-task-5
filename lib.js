@@ -23,7 +23,7 @@ function levelDetermination(levelFriends, friends, invited) {
     const newLevelFriends = [];
     levelFriends.forEach(bestFriend => {
         bestFriend.info.friends.forEach((friendOfBestFriend) => {
-            if (invited.find(friend => friend.info.name ===
+            if (invited.some(friend => friend.info.name ===
             friendOfBestFriend)) {
                 return;
             }
@@ -44,8 +44,8 @@ function levelDetermination(levelFriends, friends, invited) {
 function definitionInvitedFriends(friends) {
     let levelFriends = friends.reduce((bestFriends, friend) => {
         if (friend.best === true &&
-        (bestFriends.find(bestFriend => bestFriend.info.name ===
-        friend.name) === undefined)) {
+        !bestFriends.some(bestFriend => bestFriend.info.name ===
+        friend.name)) {
             bestFriends.push({
                 info: friend,
                 level: 1
@@ -103,7 +103,7 @@ function LimitedIterator(friends, filter, maxLevel) {
     friends = filter.splitBySex(friends);
     this.nextIndex = 0;
     this.friends = friends;
-    Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
+    Object.setPrototypeOf(this, Iterator.prototype);
 }
 
 /**
