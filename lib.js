@@ -99,6 +99,9 @@ function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     isInstanceFilter(filter);
     friends = definitionInvitedFriends(friends);
+    if (typeof maxLevel !== 'number') {
+        maxLevel = 0;
+    }
     friends = friends.filter(friend => friend.level <= maxLevel);
     friends = filter.splitBySex(friends);
     this.nextIndex = 0;
@@ -127,9 +130,6 @@ function MaleFilter() {
     console.info('MaleFilter');
 
     return Object.create(Filter.prototype, {
-        constructor: {
-            value: MaleFilter
-        },
         checkFilter: {
             value(friend) {
                 return friend.info.gender === 'male';
@@ -147,9 +147,6 @@ function FemaleFilter() {
     console.info('FemaleFilter');
 
     return Object.create(Filter.prototype, {
-        constructor: {
-            value: FemaleFilter
-        },
         checkFilter: {
             value(friend) {
                 return friend.info.gender === 'female';
