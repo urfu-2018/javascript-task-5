@@ -99,14 +99,11 @@ function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     isInstanceFilter(filter);
     friends = definitionInvitedFriends(friends);
-    if (typeof maxLevel !== 'number') {
-        maxLevel = 0;
-    }
     friends = friends.filter(friend => friend.level <= maxLevel);
     friends = filter.splitBySex(friends);
     this.nextIndex = 0;
     this.friends = friends;
-    Object.setPrototypeOf(this, Iterator.prototype);
+    Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 }
 
 /**
