@@ -125,9 +125,9 @@ Filter.prototype.splitBySex = function (friends) {
 function MaleFilter() {
     console.info('MaleFilter');
     Object.setPrototypeOf(this, Filter.prototype);
-    this.checkFilter = function(friend) {
+    this.checkFilter = function (friend) {
         return friend.info.gender === 'male';
-    }
+    };
 }
 
 /**
@@ -138,9 +138,9 @@ function MaleFilter() {
 function FemaleFilter() {
     console.info('FemaleFilter');
     Object.setPrototypeOf(this, Filter.prototype);
-    this.checkFilter = function(friend) {
+    this.checkFilter = function (friend) {
         return friend.info.gender === 'female';
-    }
+    };
 }
 
 exports.Iterator = Iterator;
