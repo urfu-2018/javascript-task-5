@@ -23,20 +23,15 @@ function levelDetermination(levelFriends, friends, invited) {
     const newLevelFriends = [];
     levelFriends.forEach(bestFriend => {
         bestFriend.info.friends.forEach((friendOfBestFriend) => {
-            if (invited.some(friend => friend.info.name ===
-            friendOfBestFriend) ||
-            newLevelFriends.some(friend => friend.info.name ===
-            friendOfBestFriend)) {
+            if (invited.concat(newLevelFriends)
+            .some(friend => friend.info.name === friendOfBestFriend)) {
                 return;
             }
-            const info = friends.find(friend => friend.name ===
-            friendOfBestFriend);
-            if (info) {
-                newLevelFriends.push({
-                    info,
-                    level: bestFriend.level + 1
-                });
-            }
+            newLevelFriends.push({
+                info: friends.find(friend => friend.name ===
+                    friendOfBestFriend),
+                level: bestFriend.level + 1
+            });
         });
     });
 
