@@ -27,14 +27,11 @@ function levelDetermination(levelFriends, friends, invited) {
             friendOfBestFriend)) {
                 return;
             }
-            const info = friends.find(friend => friend.name ===
-            friendOfBestFriend);
-            if (info) {
-                newLevelFriends.push({
-                    info,
-                    level: bestFriend.level + 1
-                });
-            }
+            newLevelFriends.push({
+                info: friends.find(friend => friend.name ===
+                    friendOfBestFriend),
+                level: bestFriend.level + 1
+            });
         });
     });
 
