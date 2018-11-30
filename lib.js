@@ -72,18 +72,18 @@ function definitionInvitedFriends(friends) {
 function Iterator(friends, filter) {
     console.info(friends, filter);
     isInstanceFilter(filter);
-    let invited = definitionInvitedFriends(friends);
-    invited = filter.splitBySex(invited);
+    friends = definitionInvitedFriends(friends);
+    friends = filter.splitBySex(friends);
     this.nextIndex = 0;
-    this.invited = invited;
+    this.friends = friends;
 }
 
 Iterator.prototype = {
     done() {
-        return this.nextIndex >= this.invited.length;
+        return this.nextIndex >= this.friends.length;
     },
     next() {
-        return this.done() ? null : this.invited[this.nextIndex++].info;
+        return this.done() ? null : this.friends[this.nextIndex++].info;
     }
 };
 
@@ -98,11 +98,11 @@ Iterator.prototype = {
 function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     isInstanceFilter(filter);
-    let invited = definitionInvitedFriends(friends);
-    invited = invited.filter(friend => friend.level <= maxLevel);
-    invited = filter.splitBySex(invited);
+    friends = definitionInvitedFriends(friends);
+    friends = friends.filter(friend => friend.level <= maxLevel);
+    friends = filter.splitBySex(friends);
     this.nextIndex = 0;
-    this.invited = invited;
+    this.friends = friends;
     Object.setPrototypeOf(this, Iterator.prototype);
 }
 
@@ -115,7 +115,7 @@ function Filter() {
 }
 
 Filter.prototype.splitBySex = function (friends) {
-    return friends.filter(friend => this.checkFilter(friend));
+    return friends.filter(friend => friend.info.gender === this.gender);
 };
 
 /**
@@ -127,10 +127,8 @@ function MaleFilter() {
     console.info('MaleFilter');
 
     return Object.create(Filter.prototype, {
-        checkFilter: {
-            value(friend) {
-                return friend.info.gender === 'male';
-            },
+        gender: {
+            value: 'male',
             enumerable: true
         }
     });
@@ -145,10 +143,8 @@ function FemaleFilter() {
     console.info('FemaleFilter');
 
     return Object.create(Filter.prototype, {
-        checkFilter: {
-            value(friend) {
-                return friend.info.gender === 'female';
-            },
+        gender: {
+            value: 'female',
             enumerable: true
         }
     });
