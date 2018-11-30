@@ -115,7 +115,7 @@ function Filter() {
 }
 
 Filter.prototype.splitBySex = function (friends) {
-    return friends.filter(friend => friend.info.gender === this.gender);
+    return friends.filter(friend => this.checkFilter(friend));
 };
 
 /**
@@ -127,9 +127,13 @@ function MaleFilter() {
     console.info('MaleFilter');
 
     return Object.create(Filter.prototype, {
-        gender: {
-            value: 'male',
-            enumerable: true
+        constructor: {
+            value: MaleFilter
+        },
+        checkFilter: {
+            value(friend) {
+                return friend.info.gender === 'male';
+            }
         }
     });
 }
@@ -143,9 +147,13 @@ function FemaleFilter() {
     console.info('FemaleFilter');
 
     return Object.create(Filter.prototype, {
-        gender: {
-            value: 'female',
-            enumerable: true
+        constructor: {
+            value: FemaleFilter
+        },
+        checkFilter: {
+            value(friend) {
+                return friend.info.gender === 'female';
+            }
         }
     });
 }
