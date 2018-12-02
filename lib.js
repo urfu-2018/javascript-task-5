@@ -43,8 +43,10 @@ class Iterator {
                 .map(p => p.friends)
                 .reduce((result, f) => result.concat(f), [])
                 .map(n => friends
-                    .find(f => f.name === n))
-                .filter(friend => !guests.includes(friend)))]
+                    .find(f => f.name === n)
+                )
+                .filter(friend => !guests.includes(friend)))
+            ]
                 .sort((a, b) => a.name.localeCompare(b.name));
         }
         this.collection = guests.filter(e => filter.check(e));
