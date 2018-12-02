@@ -7,10 +7,9 @@ function getFriendsQueue(friends, filter, maxLevel = Infinity) {
         tempDic[x.name] = x;
     });
     const queue = friends.filter(person => person.best === true);
-    queue
-        .forEach(person => {
-            friendsLevels[person.name] = 1;
-        });
+    queue.forEach(person => {
+        friendsLevels[person.name] = 1;
+    });
 
     for (let i = 0; i < friends.length && i < queue.length; i++) {
         const person = queue[i];
@@ -24,9 +23,8 @@ function getFriendsQueue(friends, filter, maxLevel = Infinity) {
 
     return queue
         .filter(person => filter.filter(person) && friendsLevels[person.name] <= maxLevel)
-        .sort(
-            (first, second) => friendsLevels[first.name] - friendsLevels[second.name] ||
-                first.name.localeCompare(second.name));
+        .sort((first, second) => friendsLevels[first.name] - friendsLevels[second.name] ||
+            first.name.localeCompare(second.name));
 }
 
 /**
@@ -79,7 +77,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.filter = x => x.gender === 'male';
+    this.filter = ({ gender }) => gender === 'male';
 }
 
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
