@@ -44,7 +44,7 @@ LimitedIterator.prototype.constructor = LimitedIterator;
 
 class InitializeBFSCarcass {
     constructor(friends) {
-        this.friends = friends;
+        this.friends = friends.sort(friendsCompare);
         this.used = arrayWithZeros(friends.length);
         this.queue = this.friends.filter(x => x.best === true);
         this.namesDict = {};
