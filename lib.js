@@ -40,28 +40,19 @@ LimitedIterator.prototype.constructor = LimitedIterator;
 
 class InitializeBFSCarcass {
     constructor(friends) {
-        this.sortedFriend = sortFriend(friends);
+        this.friends = friends;
         this.used = arrayWithZeros(friends.length);
-        this.queue = takeBestFriends(this.sortedFriend);
+        this.queue = friends.filter(x => x.best === true);
         this.namesDict = {};
 
-        for (let i = 0; i < this.sortedFriend.length; ++i) {
-            this.namesDict[this.sortedFriend[i].name] = i;
+        for (let i = 0; i < this.friends.length; ++i) {
+            this.namesDict[this.friends[i].name] = i;
         }
 
         for (let i = 0; i < this.queue.length; ++i) {
             this.used[i] = true;
         }
     }
-}
-
-function takeBestFriends(sortedFriend) {
-    let result = [];
-    for (let i = 0; i < sortedFriend.length && sortedFriend[i].best === true; ++i) {
-        result.push(sortedFriend[i]);
-    }
-
-    return result;
 }
 
 function arrayWithZeros(size) {
@@ -71,15 +62,6 @@ function arrayWithZeros(size) {
     }
 
     return result;
-}
-function sortFriend(friends) {
-    return friends.sort(function (a, b) {
-        if (a.best && b.best) {
-            return a.name.localeCompare(b.name);
-        }
-
-        return b.best;
-    });
 }
 
 function bfsWithFilter(friends, filter, maxLevel = Infinity) {
@@ -92,7 +74,7 @@ function bfsWithFilter(friends, filter, maxLevel = Infinity) {
         let friendId = bfs.namesDict[toFriend];
         if (!bfs.used[friendId]) {
             bfs.used[friendId] = true;
-            nextLevel.push(bfs.sortedFriend[friendId]);
+            nextLevel.push(bfs.friends[friendId]);
         }
     }
 
@@ -100,7 +82,7 @@ function bfsWithFilter(friends, filter, maxLevel = Infinity) {
         while (bfs.queue.length > 0 && level < maxLevel) {
             nextLevel = [];
             console.info(bfs.queue);
-            for (let i = 0; i < bfs.queue.length; ++i) {
+            for (let i = 0; i < bfs.queue.length; i++) {
                 bfs.queue[i].friends.forEach(pushFriends);
             }
 
