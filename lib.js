@@ -46,7 +46,7 @@ class InitializeBFSCarcass {
     constructor(friends) {
         this.friends = friends;
         this.used = arrayWithZeros(friends.length);
-        this.queue = friends.filter(x => x.best === true).sort(friendsCompare);
+        this.queue = this.friends.filter(x => x.best === true);
         this.namesDict = {};
 
         for (let i = 0; i < this.friends.length; ++i) {
@@ -86,16 +86,19 @@ function bfsWithFilter(friends, filter, maxLevel = Infinity) {
         while (bfs.queue.length > 0 && level < maxLevel) {
             nextLevel = [];
             console.info(bfs.queue);
+
+            bfs.queue = bfs.queue.sort(friendsCompare);
             for (let i = 0; i < bfs.queue.length; i++) {
                 bfs.queue[i].friends.forEach(pushFriends);
             }
 
             let filteringFriends = bfs.queue.filter(f => filter.it(f));
-            bfs.queue = nextLevel.sort((a, b) => a.name.localeCompare(b.name));
-            ++level;
             for (let i = 0; i < filteringFriends.length; ++i) {
                 result.push(filteringFriends[i]);
             }
+
+            bfs.queue = nextLevel;
+            ++level;
         }
     }
 
