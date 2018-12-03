@@ -22,6 +22,10 @@ function Iterator(friends, filter) {
     };
 }
 
+function friendsCompare(a, b) {
+    return a.name.localeCompare(b.name);
+}
+
 /**
  * Итератор по друзям с ограничением по кругу
  * @extends Iterator
@@ -42,7 +46,7 @@ class InitializeBFSCarcass {
     constructor(friends) {
         this.friends = friends;
         this.used = arrayWithZeros(friends.length);
-        this.queue = friends.filter(x => x.best === true);
+        this.queue = friends.filter(x => x.best === true).sort(friendsCompare);
         this.namesDict = {};
 
         for (let i = 0; i < this.friends.length; ++i) {
