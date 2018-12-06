@@ -109,9 +109,14 @@ function LimitedIterator(friends, filter, maxLevel) {
  */
 function Filter() {
     console.info('Filter');
+    this.default = true;
 }
 
 Filter.prototype.splitBySex = function (friends) {
+    if (this.default) {
+        return false;
+    }
+
     return friends.filter(friend => this.checkFilter(friend));
 };
 
