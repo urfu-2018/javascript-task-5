@@ -125,7 +125,7 @@ function MaleFilter() {
 
     return Object.create(Filter.prototype, {
         checkFilter: {
-            value(friend) {
+            value: function (friend) {
                 return friend.info.gender === 'male';
             }
         }
@@ -142,7 +142,7 @@ function FemaleFilter() {
 
     return Object.create(Filter.prototype, {
         checkFilter: {
-            value(friend) {
+            value: function (friend) {
                 return friend.info.gender === 'female';
             }
         }
