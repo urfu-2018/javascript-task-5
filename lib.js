@@ -114,7 +114,7 @@ function Filter() {
 
 Filter.prototype.splitBySex = function (friends) {
     if (this.default) {
-        return [];
+        return friends;
     }
 
     return friends.filter(friend => this.checkFilter(friend));
