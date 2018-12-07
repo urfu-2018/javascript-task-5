@@ -1,18 +1,18 @@
 'use strict';
 
 /**
- * Сравнение для имен
+ * Сравнение для имён
  * @constructor
- * @param {Object} person1
- * @param {Object} person2
+ * @param {Object} name1
+ * @param {Object} name2
  * @returns {number}
  */
-function compareForName(person1, person2) {
+function compareForName(name1, name2) {
     let result = 0;
-    if (person1.name < person2.name) {
+    if (name1.name < name2.name) {
         result = -1;
     }
-    if (person1.name > person2.name) {
+    if (name1.name > name2.name) {
         result = 1;
     }
 
@@ -29,19 +29,19 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    friends = (friends.sort(compareForName)); // нужные в алфавитном порядке
+    friends.sort(compareForName); // нужные в алфавитном порядке
     let currentFriendList = getBestFriends(friends); // список имен
-    let listOfAllFriends = currentFriendList; // пока взяли только лучших друзей
-    listOfAllFriends = getAllFriends(currentFriendList, friends, listOfAllFriends);
-    listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr)); // фильтр по полу
+    let listOfAllInvited = currentFriendList; // пока взяли только лучших друзей
+    listOfAllInvited = getInvitedFriends(currentFriendList, friends, listOfAllInvited);
+    listOfAllInvited = listOfAllInvited.filter(fr => filter.isNecessary(fr)); // фильтр по полу
     this.index = 0;
     this.done = function () {
-        return this.index >= listOfAllFriends.length;
+        return this.index >= listOfAllInvited.length;
     };
     this.next = function () {
         this.index++;
 
-        return listOfAllFriends[this.index - 1] ? listOfAllFriends[this.index - 1] : null;
+        return listOfAllInvited[this.index - 1] ? listOfAllInvited[this.index - 1] : null;
     };
 
 }
@@ -60,11 +60,11 @@ function LimitedIterator(friends, filter, maxLevel) {
     const limitedIterator = Object.create(basicIterator);
     limitedIterator.index = basicIterator.index;
     let currentFriendList = getBestFriends(friends); // список имен
-    let listOfAllFriends = currentFriendList;
-    listOfAllFriends = getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel);
-    listOfAllFriends = listOfAllFriends.filter(fr => filter.isNecessary(fr));
+    let listOfAllInvited = currentFriendList;
+    listOfAllInvited = getInvitedFriends(currentFriendList, friends, listOfAllInvited, maxLevel);
+    listOfAllInvited = listOfAllInvited.filter(fr => filter.isNecessary(fr));
     limitedIterator.done = function () {
-        return limitedIterator.index >= listOfAllFriends.length || maxLevel <= 0;
+        return limitedIterator.index >= listOfAllInvited.length || maxLevel <= 0;
     };
     limitedIterator.next = function () {
         if (limitedIterator.done()) {
@@ -72,22 +72,22 @@ function LimitedIterator(friends, filter, maxLevel) {
         }
         limitedIterator.index++;
 
-        return (listOfAllFriends[limitedIterator.index - 1] && maxLevel > 0)
-            ? listOfAllFriends[limitedIterator.index - 1] : null;
+        return (listOfAllInvited[limitedIterator.index - 1] && maxLevel > 0)
+            ? listOfAllInvited[limitedIterator.index - 1] : null;
     };
 
     return limitedIterator;
 }
 
-function getAllFriends(currentFriendList, friends, listOfAllFriends, maxLevel = Infinity) {
+function getInvitedFriends(currentFriendList, friends, listOfAllFriends, maxLevel = Infinity) {
     for (let i = 1; i < maxLevel; i++) {
         currentFriendList = getCircle(currentFriendList);
-        currentFriendList = getVertex(friends, currentFriendList);
-        let currentlistOfAllFriends = getFriendsList(currentFriendList, listOfAllFriends);
-        if (!currentlistOfAllFriends) {
+        currentFriendList = getGraph(friends, currentFriendList);
+        let currentListOfAllFriends = getFriendsList(currentFriendList, listOfAllFriends);
+        if (!currentListOfAllFriends) {
             break;
         }
-        listOfAllFriends = currentlistOfAllFriends;
+        listOfAllFriends = currentListOfAllFriends;
     }
 
     return listOfAllFriends;
@@ -108,7 +108,7 @@ function getFriendsList(currentFriendList, listOfAllFriends) {
     return listOfAllFriends;
 }
 
-function getVertex(friends, currentFriendList) {
+function getGraph(friends, currentFriendList) {
     currentFriendList = friends.filter(fr => currentFriendList.includes(fr.name));
 
     return currentFriendList;
@@ -123,8 +123,7 @@ function getBestFriends(friends) {
 function getCircle(currentFriendList) {
     let result = [];
     for (let person of currentFriendList) {
-        let currentRes = person.friends;
-        result = result.concat(currentRes);
+        result = result.concat(person.friends);
     }
     result.sort(compareForName);
 
