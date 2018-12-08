@@ -43,7 +43,9 @@ LimitedIterator.prototype.constructor = LimitedIterator;
  * @constructor
  */
 function Filter() {
-    this.getAppropriateItem = () => true;
+    this.getAppropriateItem = function () {
+        return true;
+    };
 }
 
 
@@ -53,7 +55,9 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.getAppropriateItem = (person) => person.gender === 'male';
+    this.getAppropriateItem = function (person) {
+        return person.gender === 'male';
+    };
 }
 
 MaleFilter.prototype = Object.create(Filter.prototype);
@@ -65,7 +69,9 @@ MaleFilter.prototype.constructor = MaleFilter;
  * @constructor
  */
 function FemaleFilter() {
-    this.getAppropriateItem = (person) => person.gender === 'female';
+    this.getAppropriateItem = function (person) {
+        return person.gender === 'female';
+    };
 }
 
 FemaleFilter.prototype = Object.create(Filter.prototype);
