@@ -16,10 +16,6 @@ function preparingListOfFriendsForIteration(friends, filter, maxLevel = Infinity
                 const arrayFriend = [];
 
                 for (let i in friend.friends) {
-                    if (!friend.friends.hasOwnProperty(i)) {
-                        continue;
-                    }
-
                     if (!friendsOfFriends.includes(friend.friends[i])) {
                         arrayFriend.push(friend.friends[i]);
                     }
@@ -47,7 +43,7 @@ function preparingListOfFriendsForIteration(friends, filter, maxLevel = Infinity
  */
 function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
-        throw new TypeError();
+        throw new TypeError('Передаваемый фильтр не принадлежит классу Filter');
     }
 
     this.friends = preparingListOfFriendsForIteration(friends, filter);
@@ -65,11 +61,7 @@ Iterator.prototype.next = function () {
 };
 
 Iterator.prototype.done = function () {
-    if (this.index === this.friends.length - 1) {
-        return true;
-    }
-
-    return false;
+    return this.index === this.friends.length - 1;
 };
 
 /**
@@ -82,7 +74,7 @@ Iterator.prototype.done = function () {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     if (!(filter instanceof Filter)) {
-        throw new TypeError();
+        throw new TypeError('Передаваемый фильтр не принадлежит классу Filter');
     }
 
     this.friends = preparingListOfFriendsForIteration(friends, filter, maxLevel);
