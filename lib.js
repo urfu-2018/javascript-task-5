@@ -15,9 +15,9 @@ function preparingListOfFriendsForIteration(friends, filter, maxLevel = Infinity
             .reduce((friendsOfFriends, friend) => {
                 const arrayFriend = [];
 
-                for (let i in friend.friends) {
-                    if (!friendsOfFriends.includes(friend.friends[i])) {
-                        arrayFriend.push(friend.friends[i]);
+                for (let i of friend.friends) {
+                    if (!friendsOfFriends.includes(i)) {
+                        arrayFriend.push(i);
                     }
                 }
 
