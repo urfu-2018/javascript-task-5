@@ -4,25 +4,25 @@
  * Итератор по друзьям
  * @constructor
  * @param {Object[]} friends
- * @param {Filter} ffilter
+ * @param {Filter} filter
  */
-function Iterator(friends, ffilter) {
-    if (!(ffilter instanceof Filter)) {
+function Iterator(friends, filter) {
+    if (!(filter instanceof Filter)) {
         throw new TypeError('filter must be instance Filter');
     }
 
-    this.ffriends = this.getCircles(friends, this.maxLevel)
-        .filter(ffilter.check);
+    this.friends = this.getCircles(friends, this.maxLevel)
+        .filter(filter.check);
 }
 
-function getNextCircle(currentCircle, circles, friends) {
+function getNextCircle(circle, circles, friends) {
     const nextCircle = [];
 
-    currentCircle.forEach(curFriend =>
-        curFriend.friends.forEach(name => {
-            const friend = friends.find(person => person.name === name);
-            if (!circles.includes(friend)) {
-                nextCircle.push(friend);
+    circle.forEach(friend =>
+        friend.friends.forEach(name => {
+            const human = friends.find(person => person.name === name);
+            if (!circles.includes(human)) {
+                nextCircle.push(human);
             }
         })
     );
@@ -33,20 +33,20 @@ function getNextCircle(currentCircle, circles, friends) {
 Iterator.prototype = {
     constructor: Iterator,
     done() {
-        return this.ffriends.length === 0;
+        return this.friends.length === 0;
     },
     next() {
-        return this.done() ? null : this.ffriends.shift();
+        return this.done() ? null : this.friends.shift();
     },
     getCircles(friends, maxLevel = Infinity) {
-        let currentCircle = friends.filter(friend => friend.best)
+        let circle = friends.filter(friend => friend.best)
             .sort((a, b) => a.name.localeCompare(b.name));
         const circles = [];
-
-        while (currentCircle.length > 0 && maxLevel > 0) {
-            circles.push(...currentCircle);
-            currentCircle = getNextCircle(currentCircle, circles, friends);
-            maxLevel--;
+        let i = maxLevel;
+        while (circle.length > 0 && i > 0) {
+            circles.push(...circle);
+            circle = getNextCircle(circle, circles, friends);
+            i--;
         }
 
         return circles;
