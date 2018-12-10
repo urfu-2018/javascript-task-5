@@ -69,8 +69,7 @@ function definitionInvitedFriends(friends) {
  */
 function Iterator(friends, filter) {
     console.info(friends, filter);
-    this.friends = this.define(friends, filter);
-    this.nextIndex = 0;
+    this.define(friends, filter);
 }
 
 Iterator.prototype = {
@@ -87,8 +86,8 @@ Iterator.prototype = {
             friends = friends.filter(friend => friend.level <= maxLevel);
         }
         friends = friends.filter(friend => filter.checkFilter(friend));
-
-        return friends;
+        this.nextIndex = 0;
+        this.friends = friends;
     }
 };
 
@@ -103,8 +102,7 @@ Iterator.prototype = {
 function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     Object.setPrototypeOf(this, Iterator.prototype);
-    this.friends = this.define(friends, filter, maxLevel);
-    this.nextIndex = 0;
+    this.define(friends, filter, maxLevel);
 }
 
 /**
