@@ -11,7 +11,7 @@ function Iterator(friends, filter) {
         throw new TypeError('filter must be instance Filter');
     }
 
-    this.friends = this.getCircles(friends, this.maxLevel)
+    this.friends = this.getCircles(friends)
         .filter(filter.check);
 }
 
@@ -31,6 +31,7 @@ function getNextCircle(circle, circles, friends) {
 }
 
 Iterator.prototype = {
+    maxLevel: Infinity,
     constructor: Iterator,
     done() {
         return this.friends.length === 0;
@@ -38,11 +39,11 @@ Iterator.prototype = {
     next() {
         return this.done() ? null : this.friends.shift();
     },
-    getCircles(friends, maxLevel = Infinity) {
+    getCircles(friends) {
         let circle = friends.filter(friend => friend.best)
             .sort((a, b) => a.name.localeCompare(b.name));
         const circles = [];
-        let i = maxLevel;
+        let i = this.maxLevel;
         while (circle.length > 0 && i > 0) {
             circles.push(...circle);
             circle = getNextCircle(circle, circles, friends);
