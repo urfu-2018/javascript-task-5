@@ -87,6 +87,7 @@ Iterator.prototype = {
             friends = friends.filter(friend => friend.level <= maxLevel);
         }
         friends = friends.filter(friend => filter.checkFilter(friend));
+
         return friends;
     }
 };
