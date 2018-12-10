@@ -2,8 +2,7 @@
 
 function isInstanceFilter(filter) {
     if (!(filter instanceof Filter)) {
-        throw new TypeError('Объект Filter.prototype не присутствует в ' +
-        'цепочке прототипов filter');
+        throw new TypeError('Нет Filter.prototype в цепочке filter');
     }
 }
 
