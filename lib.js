@@ -69,7 +69,6 @@ function definitionInvitedFriends(friends) {
  */
 function Iterator(friends, filter) {
     console.info(friends, filter);
-    isInstanceFilter(filter);
     this.define(friends, filter);
 }
 
@@ -81,6 +80,7 @@ Iterator.prototype = {
         return this.done() ? null : this.friends[this.nextIndex++].info;
     },
     define(friends, filter, maxLevel) {
+        isInstanceFilter(filter);
         friends = definitionInvitedFriends(friends);
         if (maxLevel) {
             friends = friends.filter(friend => friend.level <= maxLevel);
@@ -101,7 +101,6 @@ Iterator.prototype = {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
-    isInstanceFilter(filter);
     Object.setPrototypeOf(this, Iterator.prototype);
     this.define(friends, filter, maxLevel);
 }
