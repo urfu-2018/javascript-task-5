@@ -2,7 +2,8 @@
 
 function isInstanceFilter(filter) {
     if (!(filter instanceof Filter)) {
-        throw new TypeError('Нет Filter.prototype в цепочке filter');
+        throw new TypeError('Объект Filter.prototype не присутствует в ' +
+        'цепочке прототипов filter');
     }
 }
 
@@ -69,6 +70,8 @@ function definitionInvitedFriends(friends) {
 function Iterator(friends, filter) {
     console.info(friends, filter);
     this.define(friends, filter);
+    this.nextIndex = 0;
+    this.friends = friends;
 }
 
 Iterator.prototype = {
@@ -85,8 +88,6 @@ Iterator.prototype = {
             friends = friends.filter(friend => friend.level <= maxLevel);
         }
         friends = friends.filter(friend => filter.checkFilter(friend));
-        this.nextIndex = 0;
-        this.friends = friends;
     }
 };
 
@@ -102,6 +103,8 @@ function LimitedIterator(friends, filter, maxLevel) {
     console.info(friends, filter, maxLevel);
     Object.setPrototypeOf(this, Iterator.prototype);
     this.define(friends, filter, maxLevel);
+    this.nextIndex = 0;
+    this.friends = friends;
 }
 
 /**
