@@ -17,11 +17,10 @@ function getFriends(friends, filter, maxLevel) {
         .sort((a, b)=>a.name.localeCompare(b.name));
     for (let i = 1; i < maxLevel; i++) {
         let nextFriends = getFriendsFriends(bestFriends, friends);
-        if (nextFriends.length) {
-            bestFriends = bestFriends.concat(nextFriends);
-        } else {
+        if (!nextFriends.length) {
             break;
         }
+        bestFriends = bestFriends.concat(nextFriends);
     }
 
     return bestFriends.filter(filter.filter);
