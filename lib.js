@@ -13,8 +13,8 @@ function getFriends(friends, filter, maxLevel) {
             .sort((a, b)=>a.name.localeCompare(b.name));
     };
     let bestFriends = friends
-        .sort((a, b)=>a.name.localeCompare(b.name))
-        .filter(friend => friend.best);
+        .filter(friend => friend.best)
+        .sort((a, b)=>a.name.localeCompare(b.name));
     for (let i = 1; i < maxLevel; i++) {
         let nextFriends = getFriendsFriends(bestFriends, friends);
         if (nextFriends.length) {
