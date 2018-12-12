@@ -1,19 +1,6 @@
 'use strict';
 
-function getFriendsFriends(currFriends, allFriends) {
-    return currFriends
-        .reduce((listFriends, friend) => listFriends.concat(friend.friends), [])
-        .map(name => allFriends.find(friend => friend.name === name))
-        .filter((friend, ind, arr) => !currFriends.includes(friend) &&
-            arr.indexOf(friend) === ind)
-        .sort((a, b)=>a.name.localeCompare(b.name));
-}
-
 function getFriends(friends, filter, maxLevel) {
-    if (!maxLevel || maxLevel < 1) {
-        return [];
-    }
-
     let bestFriends = friends
         .filter(friend => friend.best)
         .sort((a, b)=>a.name.localeCompare(b.name));
@@ -28,6 +15,23 @@ function getFriends(friends, filter, maxLevel) {
     return bestFriends.filter(filter.filter);
 }
 
+function getFriendsFriends(currFriends, allFriends) {
+    return currFriends
+        .reduce((listFriends, friend) => listFriends.concat(friend.friends), [])
+        .map(name => allFriends.find(friend => friend.name === name))
+        .filter((friend, ind, arr) => !currFriends.includes(friend) &&
+            arr.indexOf(friend) === ind)
+        .sort((a, b)=>a.name.localeCompare(b.name));
+}
+
+function getAllFriends(friends, filter, maxLevel) {
+    if (maxLevel && friends && filter && maxLevel >= 1) {
+        return getFriends(friends, filter, maxLevel);
+    }
+
+    return [];
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -38,7 +42,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.friends = (!friends || !filter) ? [] : getFriends(
+    this.friends = getAllFriends(
         friends, filter, this.maxLevel ? this.maxLevel : Infinity);
     this.i = 0;
     this.done = () => this.i >= this.friends.length;
