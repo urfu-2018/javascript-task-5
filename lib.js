@@ -1,17 +1,19 @@
 'use strict';
 
+function getFriendsFriends(currFriends, allFriends) {
+    return currFriends
+        .reduce((listFriends, friend) => listFriends.concat(friend.friends), [])
+        .map(name => allFriends.find(friend => friend.name === name))
+        .filter((friend, ind, arr) => !currFriends.includes(friend) &&
+            arr.indexOf(friend) === ind)
+        .sort((a, b)=>a.name.localeCompare(b.name));
+}
+
 function getFriends(friends, filter, maxLevel) {
     if (!maxLevel || maxLevel < 1) {
         return [];
     }
-    let getFriendsFriends = (currFriends, allFriends) => {
-        return currFriends
-            .reduce((listFriends, friend) => listFriends.concat(friend.friends), [])
-            .map(name => allFriends.find(friend => friend.name === name))
-            .filter((friend, ind, arr) => !currFriends.includes(friend) &&
-                arr.indexOf(friend) === ind)
-            .sort((a, b)=>a.name.localeCompare(b.name));
-    };
+
     let bestFriends = friends
         .filter(friend => friend.best)
         .sort((a, b)=>a.name.localeCompare(b.name));
