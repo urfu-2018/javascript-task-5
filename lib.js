@@ -37,7 +37,8 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.friends = getFriends(friends, filter, this.maxLevel ? this.maxLevel : Infinity);
+    this.friends = (!friends || !filter) ? [] : getFriends(
+        friends, filter, this.maxLevel ? this.maxLevel : Infinity);
     this.i = 0;
     this.done = () => this.i >= this.friends.length;
     this.next = () => this.done() ? null : this.friends[this.i++];
