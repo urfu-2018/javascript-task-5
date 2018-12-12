@@ -1,7 +1,7 @@
 'use strict';
 
 function getFriends(friends, filter, maxLevel) {
-    if (!friends || !filter || maxLevel < 1) {
+    if (!friends || !filter || !maxLevel) {
         return [];
     }
     let getFriendsFriends = (currFriends, allFriends) => {
