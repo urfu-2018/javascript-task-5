@@ -10,10 +10,6 @@ function getFriendsFriends(currFriends, allFriends) {
 }
 
 function getFriends(friends, filter, maxLevel) {
-    if (!maxLevel || maxLevel < 1) {
-        return [];
-    }
-
     let bestFriends = friends
         .filter(friend => friend.best)
         .sort((a, b)=>a.name.localeCompare(b.name));
@@ -28,6 +24,14 @@ function getFriends(friends, filter, maxLevel) {
     return bestFriends.filter(filter.filter);
 }
 
+function getAllFriends(friends, filter, maxLevel) {
+    if (!maxLevel || maxLevel < 1 || !friends || !filter) {
+        return [];
+    }
+
+    return getFriends(friends, filter, maxLevel);
+}
+
 /**
  * Итератор по друзьям
  * @constructor
@@ -38,8 +42,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.friends = (!friends || !filter) ? [] : getFriends(
-        friends, filter, this.maxLevel ? this.maxLevel : Infinity);
+    this.friends = getAllFriends(friends, filter, this.maxLevel ? this.maxLevel : Infinity);
     this.i = 0;
     this.done = () => this.i >= this.friends.length;
     this.next = () => this.done() ? null : this.friends[this.i++];
