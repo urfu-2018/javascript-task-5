@@ -69,6 +69,7 @@ LimitedIterator.prototype = Object.create(Iterator.prototype);
  * @constructor
  */
 function Filter() {
+    this.call = this.filter;
     this.filter = () => true;
 }
 
@@ -78,6 +79,7 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
+    Filter.call(this);
     this.filter = (friend) => friend.gender === 'male';
 }
 
@@ -87,6 +89,7 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
+    Filter.call(this);
     this.filter = (friend) => friend.gender !== 'male';
 }
 
