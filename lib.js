@@ -6,7 +6,8 @@ function getFriends(friends, filter, maxLevel) {
             .reduce((listFriends, friend) => listFriends.concat(friend.friends), [])
             .map(name => allFriends.find(friend => friend.name === name))
             .sort((a, b)=>a.name.localeCompare(b.name))
-            .filter((friend) => !currFriends.includes(friend));
+            .filter((friend, ind, arr) => !currFriends.includes(friend) &&
+                arr.indexOf(friend) === ind);
     };
     let bestFriends = friends
         .sort((a, b)=>a.name.localeCompare(b.name))
