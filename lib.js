@@ -44,9 +44,8 @@ function Iterator(friends, filter) {
     }
     this.friends = getAllFriends(
         friends, filter, this.maxLevel ? this.maxLevel : Infinity);
-    this.i = 0;
-    this.done = () => this.i >= this.friends.length;
-    this.next = () => this.done() ? null : this.friends[this.i++];
+    this.done = () => this.friends.length === 0;
+    this.next = () => this.done() ? null : this.friends.shift();
 }
 
 /**
