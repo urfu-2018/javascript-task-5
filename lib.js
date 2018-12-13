@@ -76,40 +76,11 @@ function FemaleFilter() {
 FemaleFilter.prototype = Object.create(Filter.prototype);
 
 function nameCompare(a, b) {
-    return a.name < b.name ? -1 : 1;
-}
-
-function internal(currentLevel, sortedFriends, result, i) {
-
-    const currentFriend = sortedFriends[i].friend;
-    if (currentLevel === 1) {
-        if (currentFriend.best) {
-            return takeVisited(currentLevel, sortedFriends, result, i);
-        }
-    } else {
-        const q = result
-            .filter(r => r.level === currentLevel - 1)
-            .map(r => r.friend.friends);
-        const isFriend = q.reduce(flat, [])
-            .includes(currentFriend.name);
-        if (isFriend) {
-            return takeVisited(currentLevel, sortedFriends, result, i);
-        }
-    }
-
-    return 0;
+    return a.name.localeCompare(b.name);
 }
 
 function flat(accumulator, currentValue) {
     return accumulator.concat(currentValue);
-}
-
-function takeVisited(currentLevel, sortedFriends, result, i) {
-    const el = sortedFriends.splice(i, 1)[0];
-    el.level = currentLevel;
-    result.push(el);
-
-    return -1;
 }
 
 function filterAndOrder(friends, filter, maxLevel = Infinity) {
@@ -117,32 +88,61 @@ function filterAndOrder(friends, filter, maxLevel = Infinity) {
         throw new TypeError();
     }
 
-    let result = [];
+    let invitedFriends = [];
+    invitedFriends.push([]);
     const sortedFriends = friends
         .sort(nameCompare)
         .map(friend => {
             return {
                 friend: friend,
-                level: Infinity
+                level: Infinity,
+                visited: false
             };
         });
 
-    let currentLevel = 1;
-    while (currentLevel <= maxLevel) {
-        let iterationResult = result.slice();
-        for (let i = 0; i < sortedFriends.length; i++) {
-            i = i + internal(currentLevel, sortedFriends, iterationResult, i);
-        }
-        if (iterationResult.length === result.length) {
+    let level = 1;
+    while (level <= maxLevel) {
+        const notVisitedFriends = sortedFriends
+            .filter(friend => !friend.visited);
+        const currentLevelFriends =
+            getCurrentLevelFriends(level, notVisitedFriends, invitedFriends[level - 1]);
+        if (currentLevelFriends.length === 0) {
             break;
         }
-        result = iterationResult;
-        currentLevel++;
+        invitedFriends.push(currentLevelFriends);
+        level++;
     }
 
-    return result
-        .map(f => f.friend)
-        .filter(f => filter.apply(f));
+    return invitedFriends
+        .reduce(flat, [])
+        .filter(friend => filter.apply(friend));
+}
+
+function getCurrentLevelFriends(level, notVisitedFriends, previousLevelVisitedFriends) {
+    const friends = [];
+    notVisitedFriends.forEach(friend => {
+        if (level === 1) {
+            if (friend.friend.best) {
+                visitFriend(friend, friends, level);
+            }
+        } else {
+            const isThisLevelFriend = previousLevelVisitedFriends
+                .map(previousLevelFriend => previousLevelFriend.friends)
+                .reduce(flat, [])
+                .includes(friend.friend.name);
+            if (isThisLevelFriend) {
+                visitFriend(friend, friends, level);
+            }
+        }
+    });
+
+    return friends;
+}
+
+function visitFriend(friend, friends, level) {
+    friend.visited = true;
+    friend.level = level;
+    friends.push(friend.friend);
 }
 
 exports.Iterator = Iterator;
