@@ -7,21 +7,18 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    this.friendsWrapper = filterAndOrder(friends, filter);
+    this.current = 0;
+    this.friends = filterAndOrder(friends, filter);
 }
 
 Object.assign(Iterator.prototype, {
     done() {
-        const friendsWrapper = this.friendsWrapper;
-
-        return friendsWrapper.friends.length === friendsWrapper.current;
+        return this.friends.length === this.current;
     },
     next() {
-        const friendsWrapper = this.friendsWrapper;
-
         return this.done()
             ? null
-            : friendsWrapper.friends[friendsWrapper.current++];
+            : this.friends[this.current++];
     }
 });
 
@@ -35,7 +32,8 @@ Object.assign(Iterator.prototype, {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     const correctedLevel = typeof maxLevel === 'number' && maxLevel > 0 ? maxLevel : 0;
-    this.friendsWrapper = filterAndOrder(friends, filter, correctedLevel);
+    this.current = 0;
+    this.friends = filterAndOrder(friends, filter, correctedLevel);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
@@ -122,9 +120,9 @@ function filterAndOrder(friends, filter, maxLevel = Infinity) {
     let result = [];
     const sortedFriends = friends
         .sort(nameCompare)
-        .map(f => {
+        .map(friend => {
             return {
-                friend: f,
+                friend: friend,
                 level: Infinity
             };
         });
@@ -142,12 +140,9 @@ function filterAndOrder(friends, filter, maxLevel = Infinity) {
         currentLevel++;
     }
 
-    return {
-        current: 0,
-        friends: result
-            .map(f => f.friend)
-            .filter(f => filter.apply(f))
-    };
+    return result
+        .map(f => f.friend)
+        .filter(f => filter.apply(f));
 }
 
 exports.Iterator = Iterator;
