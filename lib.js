@@ -20,9 +20,9 @@ function sortByName(arrObjects) {
     });
 }
 
-function levelDetermination(counter, friends, invited) {
+function levelDetermination(level, friends, invited) {
     let newLevelFriends = [];
-    invited.get(counter).forEach(parent => {
+    invited.get(level).forEach(parent => {
         newLevelFriends = newLevelFriends.concat(parent.friends);
     });
     newLevelFriends.forEach((child, indexChild) => {
@@ -52,12 +52,12 @@ function definitionInvitedFriends(friends) {
             }
         });
     });
-    let counter = 1;
+    let level = 1;
     let invited = new Map();
     while (levelFriends[0]) {
-        invited.set(counter, sortByName(levelFriends));
-        levelFriends = levelDetermination(counter, friends, invited);
-        counter++;
+        invited.set(level, sortByName(levelFriends));
+        levelFriends = levelDetermination(level, friends, invited);
+        level++;
     }
 
     return invited;
