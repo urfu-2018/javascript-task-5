@@ -20,9 +20,9 @@ function sortByName(arrObjects) {
     });
 }
 
-function levelDetermination(counter, friends, map) {
+function levelDetermination(counter, friends, invited) {
     let newLevelFriends = [];
-    map.get(counter).forEach(parent => {
+    invited.get(counter).forEach(parent => {
         newLevelFriends = newLevelFriends.concat(parent.friends);
     });
     newLevelFriends.forEach((child, indexChild) => {
@@ -32,14 +32,13 @@ function levelDetermination(counter, friends, map) {
             }
         });
     });
-    let invited = [];
-    for (let levelArr of map.values()) {
-        invited = invited.concat(levelArr);
+    let invitedArr = [];
+    for (let levelArr of invited.values()) {
+        invitedArr = invitedArr.concat(levelArr);
     }
     newLevelFriends = newLevelFriends.filter(child =>
-        !invited.some(friend => friend.name === child))
-        .map(child => friends.find(friend => friend.name ===
-            child));
+        !invitedArr.some(friend => friend.name === child))
+        .map(child => friends.find(friend => friend.name === child));
 
     return newLevelFriends;
 }
@@ -54,14 +53,14 @@ function definitionInvitedFriends(friends) {
         });
     });
     let counter = 1;
-    let map = new Map();
+    let invited = new Map();
     while (levelFriends[0]) {
-        map.set(counter, sortByName(levelFriends));
-        levelFriends = levelDetermination(counter, friends, map);
+        invited.set(counter, sortByName(levelFriends));
+        levelFriends = levelDetermination(counter, friends, invited);
         counter++;
     }
 
-    return map;
+    return invited;
 }
 
 /**
@@ -84,9 +83,9 @@ Iterator.prototype = {
     },
     define(friends, filter, maxLevel) {
         isInstanceFilter(filter);
-        const map = definitionInvitedFriends(friends);
+        const invited = definitionInvitedFriends(friends);
         friends = [];
-        for (let levelFriends of map) {
+        for (let levelFriends of invited) {
             if (maxLevel && maxLevel > 0 && levelFriends[0] <= maxLevel ||
             maxLevel === undefined) {
                 friends = friends.concat(levelFriends[1]);
