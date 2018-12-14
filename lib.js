@@ -88,7 +88,7 @@ Iterator.prototype = {
         friends = [];
         for (let levelFriends of map) {
             if (maxLevel && maxLevel > 0 && levelFriends[0] <= maxLevel ||
-            !maxLevel) {
+            maxLevel === undefined) {
                 friends = friends.concat(levelFriends[1]);
             }
         }
