@@ -21,26 +21,32 @@ function sortByName(arrObjects) {
 }
 
 function levelDetermination(levelFriends, friends, invited) {
-    const newLevelFriends = [];
+    let newLevelFriends = [];
     levelFriends.forEach(parent => {
-        parent.info.friends.forEach(child => {
-            if (invited.concat(newLevelFriends)
-                .some(friend => friend.info.name === child)) {
-                return;
+        newLevelFriends = newLevelFriends.concat(parent.info.friends);
+    });
+    newLevelFriends.forEach((child, indexChild) => {
+        newLevelFriends.forEach((element, index) => {
+            if (indexChild !== index && element === child) {
+                newLevelFriends.splice(index, 1);
             }
-            newLevelFriends.push({
-                info: friends.find(friend => friend.name ===
-                    child),
-                level: parent.level + 1
-            });
-        });
+        })
+    });
+    newLevelFriends = newLevelFriends.filter(child =>
+        !invited.some(friend => friend.info.name === child))
+    .map(child => {
+        return {
+            info: friends.find(friend => friend.name ===
+                child),
+            level: levelFriends[1].level + 1
+        };
     });
 
     return newLevelFriends;
 }
 
 function definitionInvitedFriends(friends) {
-    let levelFriends = friends.reduce((bestFriends, friend) => {
+        let levelFriends = friends.reduce((bestFriends, friend) => {
         if (friend.best === true &&
         !bestFriends.some(bestFriend => bestFriend.info.name ===
         friend.name)) {
