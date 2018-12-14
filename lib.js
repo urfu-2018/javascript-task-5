@@ -30,23 +30,23 @@ function levelDetermination(levelFriends, friends, invited) {
             if (indexChild !== index && element === child) {
                 newLevelFriends.splice(index, 1);
             }
-        })
+        });
     });
     newLevelFriends = newLevelFriends.filter(child =>
         !invited.some(friend => friend.info.name === child))
-    .map(child => {
-        return {
-            info: friends.find(friend => friend.name ===
+        .map(child => {
+            return {
+                info: friends.find(friend => friend.name ===
                 child),
-            level: levelFriends[1].level + 1
-        };
-    });
+                level: levelFriends[1].level + 1
+            };
+        });
 
     return newLevelFriends;
 }
 
 function definitionInvitedFriends(friends) {
-        let levelFriends = friends.reduce((bestFriends, friend) => {
+    let levelFriends = friends.reduce((bestFriends, friend) => {
         if (friend.best === true &&
         !bestFriends.some(bestFriend => bestFriend.info.name ===
         friend.name)) {
