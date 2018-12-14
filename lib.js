@@ -58,7 +58,7 @@ function definitionInvitedFriends(friends) {
         return {
             info: parent,
             level: 1
-        }
+        };
     });
     let invited = [];
     while (levelFriends[0]) {
