@@ -46,18 +46,20 @@ function levelDetermination(levelFriends, friends, invited) {
 }
 
 function definitionInvitedFriends(friends) {
-    let levelFriends = friends.reduce((bestFriends, friend) => {
-        if (friend.best === true &&
-        !bestFriends.some(bestFriend => bestFriend.info.name ===
-        friend.name)) {
-            bestFriends.push({
-                info: friend,
-                level: 1
-            });
+    let levelFriends = friends.filter(friend => friend.best);
+    levelFriends.forEach((parent, indexParent) => {
+        levelFriends.forEach((element, index) => {
+            if (indexParent !== index && element.name === parent.name) {
+                levelFriends.splice(index, 1);
+            }
+        });
+    });
+    levelFriends = levelFriends.map(parent => {
+        return {
+            info: parent,
+            level: 1
         }
-
-        return bestFriends;
-    }, []);
+    });
     let invited = [];
     while (levelFriends[0]) {
         invited = invited.concat(sortByName(levelFriends));
