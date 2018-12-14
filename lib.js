@@ -82,7 +82,10 @@ Iterator.prototype = {
     define(friends, filter, maxLevel) {
         isInstanceFilter(filter);
         friends = definitionInvitedFriends(friends);
-        if (maxLevel > 0) {
+        if (maxLevel < 1) {
+            friends = [];
+        }
+        if (maxLevel) {
             friends = friends.filter(friend => friend.level <= maxLevel);
         }
         friends = friends.filter(friend => filter.checkFilter(friend));
