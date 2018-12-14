@@ -9,10 +9,10 @@ function isInstanceFilter(filter) {
 
 function sortByName(arrObjects) {
     return arrObjects.sort(function (a, b) {
-        if (a.info.name > b.info.name) {
+        if (a.name > b.name) {
             return 1;
         }
-        if (a.info.name < b.info.name) {
+        if (a.name < b.name) {
             return -1;
         }
 
@@ -20,10 +20,10 @@ function sortByName(arrObjects) {
     });
 }
 
-function levelDetermination(levelFriends, friends, invited) {
+function levelDetermination(counter, friends, map) {
     let newLevelFriends = [];
-    levelFriends.forEach(parent => {
-        newLevelFriends = newLevelFriends.concat(parent.info.friends);
+    map.get(counter).forEach(parent => {
+        newLevelFriends = newLevelFriends.concat(parent.friends);
     });
     newLevelFriends.forEach((child, indexChild) => {
         newLevelFriends.forEach((element, index) => {
@@ -32,15 +32,14 @@ function levelDetermination(levelFriends, friends, invited) {
             }
         });
     });
+    let invited = [];
+    for (let levelArr of map.values()) {
+        invited = invited.concat(levelArr);
+    }
     newLevelFriends = newLevelFriends.filter(child =>
-        !invited.some(friend => friend.info.name === child))
-        .map(child => {
-            return {
-                info: friends.find(friend => friend.name ===
-                child),
-                level: levelFriends[1].level + 1
-            };
-        });
+        !invited.some(friend => friend.name === child))
+        .map(child => friends.find(friend => friend.name ===
+            child));
 
     return newLevelFriends;
 }
@@ -54,19 +53,15 @@ function definitionInvitedFriends(friends) {
             }
         });
     });
-    levelFriends = levelFriends.map(parent => {
-        return {
-            info: parent,
-            level: 1
-        };
-    });
-    let invited = [];
+    let counter = 1;
+    let map = new Map();
     while (levelFriends[0]) {
-        invited = invited.concat(sortByName(levelFriends));
-        levelFriends = levelDetermination(levelFriends, friends, invited);
+        map.set(counter, sortByName(levelFriends));
+        levelFriends = levelDetermination(counter, friends, map);
+        counter++;
     }
 
-    return invited;
+    return map;
 }
 
 /**
@@ -85,16 +80,17 @@ Iterator.prototype = {
         return this.nextIndex >= this.friends.length;
     },
     next() {
-        return this.done() ? null : this.friends[this.nextIndex++].info;
+        return this.done() ? null : this.friends[this.nextIndex++];
     },
     define(friends, filter, maxLevel) {
         isInstanceFilter(filter);
-        friends = definitionInvitedFriends(friends);
-        if (maxLevel < 1) {
-            friends = [];
-        }
-        if (maxLevel) {
-            friends = friends.filter(friend => friend.level <= maxLevel);
+        const map = definitionInvitedFriends(friends);
+        friends = [];
+        for (let levelFriends of map) {
+            if (maxLevel && maxLevel > 0 && levelFriends[0] <= maxLevel ||
+            !maxLevel) {
+                friends = friends.concat(levelFriends[1]);
+            }
         }
         friends = friends.filter(friend => filter.checkFilter(friend));
         this.nextIndex = 0;
@@ -139,7 +135,7 @@ function MaleFilter() {
     return Object.create(Filter.prototype, {
         checkFilter: {
             value: function (friend) {
-                return friend.info.gender === 'male';
+                return friend.gender === 'male';
             }
         }
     });
@@ -156,7 +152,7 @@ function FemaleFilter() {
     return Object.create(Filter.prototype, {
         checkFilter: {
             value: function (friend) {
-                return friend.info.gender === 'female';
+                return friend.gender === 'female';
             }
         }
     });
