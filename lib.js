@@ -14,7 +14,7 @@ const getFriendsOf = (selected, all) => selected
     .sort(ascNames);
 
 function getLevels(invited, friends, maxLevel) {
-    for (var level = 1; level < maxLevel; level++) {
+    for (let level = 1; level < maxLevel; level++) {
         let friendsOfFriends = getFriendsOf(invited, friends);
         if (!friendsOfFriends.length) {
             break;
