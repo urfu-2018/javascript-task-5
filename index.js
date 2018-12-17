@@ -4,45 +4,80 @@ const lib = require('./lib');
 
 const friends = [
     {
-        name: 'Sam',
-        friends: ['Mat', 'Sharon'],
+        name: 'Sergey',
+        friends: ['Denis', 'Maria'],
         gender: 'male',
         best: true
     },
     {
-        name: 'Sally',
-        friends: ['Brad', 'Emily'],
+        name: 'Lena',
+        friends: ['Dasha', 'Egor'],
         gender: 'female',
         best: true
     },
     {
-        name: 'Mat',
-        friends: ['Sam', 'Sharon'],
-        gender: 'male'
+        name: 'Denis',
+        gender: 'male',
+        friends: ['Sergey', 'Vasily', 'Katya']
     },
     {
-        name: 'Sharon',
-        friends: ['Sam', 'Itan', 'Mat'],
-        gender: 'female'
+        name: 'Maria',
+        gender: 'female',
+        friends: ['Sergey', 'Pavel', 'Liza']
     },
     {
-        name: 'Brad',
-        friends: ['Sally', 'Emily', 'Julia'],
-        gender: 'male'
+        name: 'Vasily',
+        gender: 'male',
+        friends: ['Denis']
     },
     {
-        name: 'Emily',
-        friends: ['Sally', 'Brad'],
-        gender: 'female'
+        name: 'Katya',
+        gender: 'female',
+        friends: ['Denis']
     },
     {
-        name: 'Itan',
-        friends: ['Sharon', 'Julia'],
-        gender: 'male'
+        name: 'Pavel',
+        gender: 'male',
+        friends: ['Maria']
     },
     {
-        name: 'Julia',
-        friends: ['Brad', 'Itan'],
+        name: 'Liza',
+        gender: 'female',
+        friends: ['Maria']
+    },
+    {
+        name: 'Egor',
+        gender: 'male',
+        friends: ['Lena', 'Leonid', 'Nastya']
+    },
+    {
+        name: 'Dasha',
+        gender: 'female',
+        friends: ['Lena', 'Ibragim', 'Diana']
+    },
+    {
+        name: 'Leonid',
+        gender: 'male',
+        friends: ['Egor', 'Serafima']
+    },
+    {
+        name: 'Nastya',
+        gender: 'female',
+        friends: ['Egor']
+    },
+    {
+        name: 'Ibragim',
+        gender: 'male',
+        friends: ['Dasha']
+    },
+    {
+        name: 'Diana',
+        gender: 'female',
+        friends: ['Dasha']
+    },
+    {
+        name: 'Serafima',
+        friends: ['Leonid'],
         gender: 'female'
     }
 ];
@@ -55,21 +90,25 @@ const femaleFilter = new lib.FemaleFilter();
 const femaleIterator = new lib.Iterator(friends, femaleFilter);
 
 // Среди парней приглашаем только луших друзей и друзей лучших друзей
-const maleIterator = new lib.LimitedIterator(friends, maleFilter, 2);
+const maleIterator = new lib.LimitedIterator(friends, maleFilter, 1);
 
 const invitedFriends = [];
+
+function toName(friend) {
+    return friend.name;
+}
 
 // Собираем пары «парень + девушка»
 while (!maleIterator.done() && !femaleIterator.done()) {
     invitedFriends.push([
-        maleIterator.next(),
-        femaleIterator.next()
+        toName(maleIterator.next()),
+        toName(femaleIterator.next())
     ]);
 }
 
 // Если остались девушки, то приглашаем остальных
 while (!femaleIterator.done()) {
-    invitedFriends.push(femaleIterator.next());
+    invitedFriends.push(toName(femaleIterator.next()));
 }
 
 console.info(invitedFriends);
