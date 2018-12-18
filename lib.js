@@ -8,16 +8,7 @@ function isInstanceFilter(filter) {
 }
 
 function sortByName(arrObjects) {
-    return arrObjects.sort(function (a, b) {
-        if (a.name > b.name) {
-            return 1;
-        }
-        if (a.name < b.name) {
-            return -1;
-        }
-
-        return 0;
-    });
+    return arrObjects.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 function levelDetermination(level, friends, invited) {
@@ -43,7 +34,7 @@ function levelDetermination(level, friends, invited) {
     return newLevelFriends;
 }
 
-function definitionInvitedFriends(friends) {
+function definitionInvitedFriends(friends, maxLevel) {
     let levelFriends = friends.filter(friend => friend.best);
     levelFriends.forEach((parent, indexParent) => {
         levelFriends.forEach((element, index) => {
@@ -54,7 +45,7 @@ function definitionInvitedFriends(friends) {
     });
     let level = 1;
     let invited = new Map();
-    while (levelFriends[0]) {
+    while (levelFriends[0] && level <= maxLevel && maxLevel > 0) {
         invited.set(level, sortByName(levelFriends));
         levelFriends = levelDetermination(level, friends, invited);
         level++;
@@ -83,13 +74,13 @@ Iterator.prototype = {
     },
     define(friends, filter, maxLevel) {
         isInstanceFilter(filter);
-        const invited = definitionInvitedFriends(friends);
+        if (maxLevel === undefined) {
+            maxLevel = Infinity;
+        }
+        const invited = definitionInvitedFriends(friends, maxLevel);
         friends = [];
         for (let levelFriends of invited) {
-            if (maxLevel && maxLevel > 0 && levelFriends[0] <= maxLevel ||
-            maxLevel === undefined) {
-                friends = friends.concat(levelFriends[1]);
-            }
+            friends = friends.concat(levelFriends[1]);
         }
         friends = friends.filter(friend => filter.checkFilter(friend));
         this.nextIndex = 0;
