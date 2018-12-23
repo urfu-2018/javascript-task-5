@@ -43,7 +43,7 @@ class Iterator {
         if (this.index < this.layer.length) {
             return false;
         }
-        if (!this.layer.length) {
+        if (!this.queue.length) {
             return true;
         }
         this.queue = this.queue.reduce((acc, friend) => {
@@ -62,8 +62,6 @@ class Iterator {
     }
 
     next() {
-        console.warn(this.used);
-
         return this.done() ? null : this.layer[this.index++];
     }
 }
