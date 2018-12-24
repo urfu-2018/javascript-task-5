@@ -5,23 +5,24 @@
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
+ * @param {int} maxLevel
  */
-function Iterator(friends, filter) {
+function Iterator(friends, filter, maxLevel = Infinity) {
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
-    this.filterFriends = getFriends(friends, filter);
+    this.filteredFriends = getFriends(friends, filter, maxLevel);
     this.pointer = 0;
     this.done = function () {
-        return this.pointer + 1 > this.filterFriends.length;
+        return this.pointer + 1 > this.filteredFriends.length;
     };
     this.next = function () {
-        return this.done() ? null : this.filterFriends[this.pointer++];
+        return this.done() ? null : this.filteredFriends[this.pointer++];
     };
 }
 
 
-function getFriends(friends, filter, maxLevel = Infinity) {
+function getFriends(friends, filter, maxLevel) {
     let filteredFriends = [];
     let level = 0;
     let currentLevelFriends = friends.filter(friend => friend.best).sort(sortByName);
@@ -31,11 +32,11 @@ function getFriends(friends, filter, maxLevel = Infinity) {
         filteredFriends = filteredFriends.concat(currentLevelFriends);
 
         newFilterFriends = currentLevelFriends
-            .map((friend) => friend.friends)
-            .reduce((a, b) => a.concat(b))
+            .reduce(function (prev, curr) {
+                return [...prev, ...curr.friends];
+            }, [])
             .sort()
-            .map((name) => friends.filter(f => f.name === name))
-            .reduce((a, b) => a.concat(b));
+            .map(name => friends.find(f => f.name === name));
 
         currentLevelFriends = getUniqueFriends(newFilterFriends, filteredFriends);
         level++;
@@ -73,9 +74,7 @@ function sortByName(a, b) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, friends, filter);
-    this.filterFriends = getFriends(friends, filter, maxLevel);
-    console.info(this.filterFriends);
+    Iterator.call(this, friends, filter, maxLevel);
 }
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
