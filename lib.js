@@ -1,13 +1,12 @@
 'use strict';
 
 function bestFriends(friends) {
-    return sorts(friends.filter(f => f.best));
+    return sorts(friends.filter(friend => friend.best));
 }
 
-function searchFriends(newFriendsList, cheackList, friends, nowValue) {
+function searchFriends(newFriendsList, checkList, friends, person) {
     for (let element of friends) {
-        let count = nowValue.friends.includes(element.name);
-        if (count && !cheackList.includes(element)) {
+        if (person.friends.includes(element.name) && !checkList.includes(element)) {
             newFriendsList.push(element);
         }
     }
@@ -16,37 +15,35 @@ function searchFriends(newFriendsList, cheackList, friends, nowValue) {
 }
 
 function sorts(friend) {
-    return friend.sort(function (a, b) {
-        return a.name < b.name;
-    });
+    return friend.sort((a, b) => a.name < b.name);
 }
 
-function pushNewElement(filter, nowValue, cheackList, finalFriendsList) {
-    if (filter.filter(nowValue) && !cheackList.includes(nowValue)) {
+function pushNewElement(filter, nowValue, checkList, finalFriendsList) {
+    if (filter.filter(nowValue) && !checkList.includes(nowValue)) {
         finalFriendsList.push(nowValue);
     }
 
     return finalFriendsList;
 }
 
-function sortedListFriends(friends, filter, maxLevel) {
+function sortListOfFriends(friends, filter, maxLevel) {
     let bestFriendsList = bestFriends(friends);
-    let finalFriendsList = [];
-    let cheackList = [];
-    let newFriendsList = [];
-    while (maxLevel !== 0 && bestFriendsList.length && maxLevel > 0) {
+    let result = [];
+    let checkList = [];
+    let currentFriendsList = [];
+    while (bestFriendsList.length && maxLevel > 0) {
         let nowValue = bestFriendsList.pop();
-        finalFriendsList = pushNewElement(filter, nowValue, cheackList, finalFriendsList);
-        cheackList.push(nowValue);
-        newFriendsList = sorts(searchFriends(newFriendsList, cheackList, friends, nowValue));
-        if (bestFriendsList.length === 0) {
+        result = pushNewElement(filter, nowValue, checkList, result);
+        checkList.push(nowValue);
+        currentFriendsList = sorts(searchFriends(currentFriendsList, checkList, friends, nowValue));
+        if (!bestFriendsList.length) {
             maxLevel -= 1;
-            bestFriendsList = newFriendsList;
-            newFriendsList = [];
+            bestFriendsList = currentFriendsList;
+            currentFriendsList = [];
         }
     }
 
-    return finalFriendsList;
+    return result;
 }
 
 /**
@@ -59,7 +56,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError('');
     }
-    this.friends = sortedListFriends(friends, filter, Infinity);
+    this.friends = sortListOfFriends(friends, filter, Infinity);
     this.index = 0;
     this.done = function () {
         return this.index >= this.friends.length;
@@ -80,7 +77,7 @@ function Iterator(friends, filter) {
  */
 function LimitedIterator(friends, filter, maxLevel) {
     Iterator.call(this, friends, filter);
-    this.friends = sortedListFriends(friends, filter, maxLevel);
+    this.friends = sortListOfFriends(friends, filter, maxLevel);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
