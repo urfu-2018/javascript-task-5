@@ -7,7 +7,20 @@
  * @param {Filter} filter
  */
 function Iterator(friends, filter) {
-    console.info(friends, filter);
+    if (filter instanceof Filter) {
+        throw new TypeError('Объект фильтра не является инстансом функции-конструктора Filter');
+    }
+
+    this.guests = [];
+    this.currentGuest = 0;
+}
+
+Iterator.prototype.done = function() {
+    return this.currentGuest === this.guests.length;
+}
+
+Iterator.prototype.next = function() {
+    return this.done() ? null : guests[currentGuest++];
 }
 
 /**
@@ -26,27 +39,31 @@ function LimitedIterator(friends, filter, maxLevel) {
  * Фильтр друзей
  * @constructor
  */
-function Filter() {
-    console.info('Filter');
-}
+function Filter() {}
+
+Filter.prototype.checkFriend = friend => true;
 
 /**
  * Фильтр друзей
  * @extends Filter
  * @constructor
  */
-function MaleFilter() {
-    console.info('MaleFilter');
-}
+function MaleFilter() {}
+
+MaleFilter.prototype = Object.create(Filter.prototype);
+MaleFilter.prototype.constructor = MaleFilter;
+MaleFilter.prototype.checkFriend = friend => friend.gender === 'male';
 
 /**
  * Фильтр друзей-девушек
  * @extends Filter
  * @constructor
  */
-function FemaleFilter() {
-    console.info('FemaleFilter');
-}
+function FemaleFilter() {}
+
+FemaleFilter.prototype = Object.create(Filter.prototype);
+FemaleFilter.prototype.constructor = FemaleFilter;
+FemaleFilter.prototype.checkFriend = friend => friend.gender === 'female';
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
