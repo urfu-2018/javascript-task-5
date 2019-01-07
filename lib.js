@@ -24,6 +24,10 @@ Iterator.prototype.next = function () {
 };
 
 Iterator.prototype.createGuestsList = function (friends, filter, maxLevel = Infinity) {
+    if (maxLevel <= 0) {
+        return [];
+    }
+
     const friendsNameComparator = (a, b) => a.name.localeCompare(b.name);
 
     let currentLevelGuests = friends
