@@ -1,91 +1,76 @@
 'use strict';
 
-function bestFriendSort(x, y) {
-    if (x === y) {
-        return 0;
+function getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames) {
+    let friendsNames = [];
+
+    for (const friendName of invitingFriendsNames) {
+        friendsNames = friendsNames.concat(
+            friendsMap.get(friendName)
+                .friends
+                .filter(f => f !== undefined && !invitedFriends.has(f))
+        );
     }
 
-    return x ? -1 : 1;
+    // console.info(friendsNames);
+
+    return friendsNames.sort((a, b) => a.localeCompare(b));
 }
 
-function getFriends(person, persons) {
-    const friendsNames = new Set(person.friends);
-    let result = [];
+function getGuests(friends, maxLevel) {
+    let level = maxLevel;
+    const friendsMap = new Map();
+    friends.forEach(friend => friendsMap.set(friend.name, friend));
 
-    for (const p of persons) {
-        if (friendsNames.has(p.name)) {
-            result.push(p);
-        }
-    }
+    let invitingFriendsNames = friends
+        .filter(f => f.best)
+        .map(f => f.name)
+        .sort((a, b) => a.localeCompare(b));
 
-    result = result.sort(bestFriendSort);
-
-    return result;
-}
-
-function addFriendsToQueue(person, queue, persons, deepLevel) {
-    if (deepLevel > 0) {
-        for (const friend of getFriends(person, persons)) {
-            queue.push({ deepLevel, 'currentPerson': friend });
-        }
-    }
-}
-
-function* makeIterator(persons, filter, maxLevel) {
+    var guests = [];
     const invitedFriends = new Set();
-    persons = persons.sort((a, b) => a.name.localeCompare(b.name));
-    const queue = persons
-        .filter(p => p.best === true)
-        .map(person => ({ 'deepLevel': maxLevel, 'currentPerson': person }));
 
-    while (queue.length !== 0) {
-        const { deepLevel, currentPerson } = queue.shift();
-
-        if (invitedFriends.has(currentPerson)) {
-            continue;
+    while (level !== 0) {
+        for (const name of invitingFriendsNames) {
+            guests.push(friendsMap.get(name));
+            invitedFriends.add(name);
         }
 
-        invitedFriends.add(currentPerson);
-        if (filter.predicate(currentPerson)) {
-            yield currentPerson;
+        invitingFriendsNames = getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames);
+
+        if (invitingFriendsNames.length === 0) {
+            break;
         }
-        addFriendsToQueue(currentPerson, queue, persons, deepLevel - 1);
+
+        level--;
     }
+
+    return guests;
 }
-
-const iterator = {
-    init(iter) {
-        this.iter = iter;
-        this.nextElement = this.iter.next();
-    },
-
-    next() {
-        const result = this.nextElement.value;
-        this.nextElement = this.iter.next();
-
-        return result;
-    },
-
-    done() {
-        return this.nextElement.done;
-    }
-};
 
 /**
  * Итератор по друзьям
  * @constructor
  * @param {Object[]} friends
  * @param {Filter} filter
+ * @param {Number} maxLevel
  */
-function Iterator(friends, filter) {
+function Iterator(friends, filter, maxLevel = Infinity) {
+    this.guests = getGuests(friends, maxLevel);
+
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
 
-    const iter = Object.create(iterator);
-    iter.init(makeIterator(friends, filter, Number.POSITIVE_INFINITY));
+    this.index = 0;
+    this.guests = this.guests.filter(filter.predicate);
 
-    return iter;
+    this.next = function () {
+        return this.done() ? null : this.guests[this.index++];
+    };
+
+    this.done = function () {
+        return (this.index >= this.guests.length);
+    };
 }
 
 /**
@@ -97,28 +82,18 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError();
-    }
-
-    const iter = Object.create(iterator);
-    iter.init(makeIterator(friends, filter, maxLevel));
-
-    return iter;
+    Iterator.call(this, friends, filter, maxLevel);
 }
+
+LimitedIterator.prototype = Object.create(Iterator.prototype);
 
 /**
  * Фильтр друзей
  * @constructor
  */
 function Filter() {
-    this.gender = undefined;
-    this.predicate = function (record) {
-        return !this.gender || this.gender === record.gender;
-    }.bind(this);
+    this.predicate = () => true;
 }
-
-const filterPrototype = new Filter();
 
 /**
  * Фильтр друзей
@@ -129,7 +104,7 @@ function MaleFilter() {
     this.predicate = friend => friend.gender === 'male';
 }
 
-MaleFilter.prototype = filterPrototype;
+MaleFilter.prototype = Object.create(Filter.prototype);
 
 /**
  * Фильтр друзей-девушек
@@ -140,9 +115,9 @@ function FemaleFilter() {
     this.predicate = friend => friend.gender === 'female';
 }
 
-FemaleFilter.prototype = filterPrototype;
+FemaleFilter.prototype = Object.create(Filter.prototype);
 
-exports.Iterator = Iterator;
+exports.Iterator = LimitedIterator;
 exports.LimitedIterator = LimitedIterator;
 
 exports.Filter = Filter;
