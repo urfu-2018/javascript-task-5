@@ -60,9 +60,7 @@ function Iterator(friends, filter) {
     }
 
     this.friends = friends.filter(filter.predicate);
-
     this.index = 0;
-    this.friends = this.friends.filter(filter.predicate);
 
     this.next = function () {
         return this.done() ? null : this.friends[this.index++];
