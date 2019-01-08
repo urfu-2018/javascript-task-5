@@ -27,7 +27,7 @@ function getGuests(friends, maxLevel) {
         .map(f => f.name)
         .sort((a, b) => a.localeCompare(b));
 
-    var guests = [];
+    const guests = [];
     const invitedFriends = new Set();
 
     while (level !== 0) {
