@@ -42,7 +42,7 @@ function getGuests(friends, maxLevel) {
             break;
         }
 
-        level--;
+        // level--;
     }
 
     return guests;
