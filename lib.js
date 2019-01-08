@@ -11,8 +11,6 @@ function getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames) {
         );
     }
 
-    // console.info(friendsNames);
-
     return friendsNames.sort((a, b) => a.localeCompare(b));
 }
 
@@ -55,11 +53,11 @@ function getGuests(friends, maxLevel) {
  * @param {Number} maxLevel
  */
 function Iterator(friends, filter, maxLevel = Infinity) {
-    this.guests = getGuests(friends, maxLevel);
-
     if (!(filter instanceof Filter)) {
         throw new TypeError();
     }
+
+    this.guests = getGuests(friends, maxLevel);
 
     this.index = 0;
     this.guests = this.guests.filter(filter.predicate);
@@ -69,7 +67,7 @@ function Iterator(friends, filter, maxLevel = Infinity) {
     };
 
     this.done = function () {
-        return (this.index >= this.guests.length);
+        return this.index >= this.guests.length;
     };
 }
 
