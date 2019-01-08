@@ -18,7 +18,7 @@ function getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames) {
 }
 
 function getGuests(friends, maxLevel) {
-    let level = maxLevel;
+    // let level = maxLevel;
     const friendsMap = new Map();
     friends.forEach(friend => friendsMap.set(friend.name, friend));
 
@@ -30,7 +30,7 @@ function getGuests(friends, maxLevel) {
     const guests = [];
     const invitedFriends = new Set();
 
-    while (level !== 0) {
+    for (let i = 0; i < maxLevel; i++) {
         for (const name of invitingFriendsNames) {
             guests.push(friendsMap.get(name));
             invitedFriends.add(name);
@@ -67,7 +67,7 @@ function Iterator(friends, filter) {
     };
 
     this.done = function () {
-        return !(this.index < this.friends.length);
+        return this.index >= this.friends.length;
     };
 }
 
