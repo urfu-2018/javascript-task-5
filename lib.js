@@ -18,7 +18,6 @@ function getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames) {
 }
 
 function getGuests(friends, maxLevel = Infinity) {
-    // let level = maxLevel;
     const friendsMap = new Map();
     friends.forEach(friend => friendsMap.set(friend.name, friend));
 
@@ -41,12 +40,22 @@ function getGuests(friends, maxLevel = Infinity) {
         if (invitingFriendsNames.length === 0) {
             break;
         }
-
-        // level--;
     }
 
     return guests;
 }
+
+Iterator.prototype = {
+    constructor: Iterator,
+
+    next: function () {
+        return this.done() ? null : this.guests[this.index++];
+    },
+
+    done: function () {
+        return this.index >= this.guests.length;
+    }
+};
 
 /**
  * Итератор по друзьям
@@ -59,16 +68,10 @@ function Iterator(friends, filter) {
         throw new TypeError();
     }
 
-    this.friends = friends.filter(filter.predicate);
+    this.guests = getGuests(friends, this.maxLevel)
+        .filter(filter.predicate);
+
     this.index = 0;
-
-    this.next = function () {
-        return this.done() ? null : this.friends[this.index++];
-    };
-
-    this.done = function () {
-        return this.index >= this.friends.length;
-    };
 }
 
 /**
@@ -80,10 +83,12 @@ function Iterator(friends, filter) {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    Iterator.call(this, getGuests(friends, maxLevel), filter);
+    this.maxLevel = maxLevel;
+    Iterator.call(this, friends, filter);
 }
 
 LimitedIterator.prototype = Object.create(Iterator.prototype);
+LimitedIterator.prototype.constructor = LimitedIterator;
 
 /**
  * Фильтр друзей
@@ -115,7 +120,7 @@ function FemaleFilter() {
 
 FemaleFilter.prototype = Object.create(Filter.prototype);
 
-exports.Iterator = LimitedIterator;
+exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
 
 exports.Filter = Filter;
