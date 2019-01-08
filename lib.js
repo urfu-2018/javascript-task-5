@@ -67,7 +67,7 @@ function Iterator(friends, filter) {
     };
 
     this.done = function () {
-        return this.index >= this.friends.length;
+        return !(this.index < this.friends.length);
     };
 }
 
