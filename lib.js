@@ -7,14 +7,14 @@ function getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames) {
         const friends = friendsMap
             .get(friendName)
             .friends
-            .filter(f => f !== undefined && !invitedFriends.has(f));
+            .filter(f => !invitedFriends.has(f));
 
         for (const friend of friends) {
             friendsNames.add(friend);
         }
     }
 
-    return [...friendsNames].sort((a, b) => a.localeCompare(b));
+    return Array.from(friendsNames).sort((a, b) => a.localeCompare(b));
 }
 
 function getGuests(friends, maxLevel) {
