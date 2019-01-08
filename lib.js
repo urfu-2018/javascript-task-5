@@ -17,8 +17,8 @@ function getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames) {
     return Array.from(friendsNames).sort((a, b) => a.localeCompare(b));
 }
 
-function getGuests(friends, maxLevel) {
-    // let level = maxLevel;
+function getGuests(friends, maxLevel = Infinity) {
+    let level = maxLevel;
     const friendsMap = new Map();
     friends.forEach(friend => friendsMap.set(friend.name, friend));
 
@@ -30,7 +30,7 @@ function getGuests(friends, maxLevel) {
     const guests = [];
     const invitedFriends = new Set();
 
-    for (let i = 0; i < maxLevel; i++) {
+    while (level !== 0) {
         for (const name of invitingFriendsNames) {
             guests.push(friendsMap.get(name));
             invitedFriends.add(name);
@@ -42,7 +42,7 @@ function getGuests(friends, maxLevel) {
             break;
         }
 
-        // level--;
+        level--;
     }
 
     return guests;
