@@ -14,7 +14,7 @@ function getFriendsNames(friendsMap, invitedFriends, invitingFriendsNames) {
         }
     }
 
-    return Array.from(friendsNames).sort((a, b) => a.localeCompare(b));
+    return [...friendsNames].sort((a, b) => a.localeCompare(b));
 }
 
 function getGuests(friends, maxLevel) {
